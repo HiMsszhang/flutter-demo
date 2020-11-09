@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'WechatPayModel.g.dart';
+part 'PayModel.g.dart';
 
 @JsonSerializable()
 class WechatPayModel {
@@ -20,4 +20,18 @@ class WechatPayModel {
   Map<String, dynamic> toJson() => _$WechatPayModelToJson(this);
 
   WechatPayModel.empty();
+}
+
+@JsonSerializable()
+class AliPayModel {
+  String sign;
+
+  AliPayModel();
+
+  //反序列化
+  factory AliPayModel.fromJson(Map<String, dynamic> json) => _$AliPayModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$AliPayModelToJson(this);
+
+  AliPayModel.empty();
 }

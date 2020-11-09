@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:molan_edu/utils/net/http.dart';
 import 'result.dart';
 
-import 'package:molan_edu/models/WechatPayModel.dart';
+import 'package:molan_edu/models/PayModel.dart';
 
 /// 课程
 class PayAPI {
@@ -23,7 +23,7 @@ class PayAPI {
         'course_price': coursePrice,
       };
       Response res = await http.post('/paynow', queryParameters: params);
-      var result = WechatPayModel.fromJson(res.data ?? {});
+      var result = paymentMethodId == 1 ? AliPayModel.fromJson(res.data ?? {}) : WechatPayModel.fromJson(res.data ?? {});
       return DataResult(result, true);
     } catch (e) {
       return DataResult(e, false);

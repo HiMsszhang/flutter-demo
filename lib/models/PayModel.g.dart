@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'WechatPayModel.dart';
+part of 'PayModel.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -25,5 +25,14 @@ Map<String, dynamic> _$WechatPayModelToJson(WechatPayModel instance) =>
       'timestamp': instance.timestamp,
       'noncestr': instance.noncestr,
       'package': instance.package,
+      'sign': instance.sign,
+    };
+
+AliPayModel _$AliPayModelFromJson(Map<String, dynamic> json) {
+  return AliPayModel()..sign = json['sign'] as String;
+}
+
+Map<String, dynamic> _$AliPayModelToJson(AliPayModel instance) =>
+    <String, dynamic>{
       'sign': instance.sign,
     };

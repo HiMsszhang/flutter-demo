@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fluwx/fluwx.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/apis/pay.dart';
-import 'package:molan_edu/models/WechatPayModel.dart';
+import 'package:molan_edu/models/PayModel.dart';
+import 'package:fluwx/fluwx.dart';
+import 'package:tobias/tobias.dart' as tobias;
 
 class PopupPay extends StatefulWidget {
   final bool showTags;
@@ -28,6 +29,9 @@ class _PopupPayState extends State<PopupPay> {
   int _radioIndex = 0;
   bool _useMo = false;
 
+  /// 1支付宝 2微信
+  int _paymentMethodId = 1;
+
   _onRadioChanged(int index) {
     _radioIndex = index;
     setState(() {});
@@ -42,26 +46,36 @@ class _PopupPayState extends State<PopupPay> {
     DataResult data = await PayAPI.payNow(
       courseId: 2,
       courseModelId: 1,
-      paymentMethodId: 2,
+      paymentMethodId: _paymentMethodId,
       discountMoMoney: 0,
       coursePrice: 0.01,
     );
-    WechatPayModel res = data.data;
-    payWithWeChat(
-      appId: res.appid,
-      partnerId: res.partnerid,
-      prepayId: res.prepayid,
-      packageValue: res.package,
-      nonceStr: res.noncestr,
-      timeStamp: int.parse(res.timestamp),
-      sign: res.sign,
-    )
-        .then(
-      (value) => print('>>>>>>>>>>>>>>$value'),
-    )
-        .catchError((onError) {
-      print('>>>>>>>>>>>>>>1$onError');
-    });
+    if (_paymentMethodId == 1) {
+      try {
+        AliPayModel res = data.data;
+        print("The pay info is : " + res.sign);
+        var payResult = await tobias.aliPay(res.sign);
+        print("--->$payResult");
+      } catch (e) {
+        print("error--->$e");
+      }
+    } else if (_paymentMethodId == 2) {
+      try {
+        WechatPayModel res = data.data;
+        var payResult = await payWithWeChat(
+          appId: res.appid,
+          partnerId: res.partnerid,
+          prepayId: res.prepayid,
+          packageValue: res.package,
+          nonceStr: res.noncestr,
+          timeStamp: int.parse(res.timestamp),
+          sign: res.sign,
+        );
+        print("--->$payResult");
+      } catch (e) {
+        print("error--->$e");
+      }
+    }
   }
 
   @override

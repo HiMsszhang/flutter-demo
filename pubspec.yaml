@@ -52,6 +52,8 @@ dependencies:
   pull_to_refresh: ^1.6.2 #https://pub.flutter-io.cn/packages/pull_to_refresh
   #支付
   fluwx: ^2.4.0 #https://pub.flutter-io.cn/packages/fluwx
+  tobias: ^1.7.1+1 #https://pub.flutter-io.cn/packages/tobias
+
   fluttertoast: ^7.1.1 # toast提示框
   permission_handler: ^5.0.1+1 # 权限处理
   image_gallery_saver: ^1.6.0
