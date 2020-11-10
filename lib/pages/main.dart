@@ -51,6 +51,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
   PageController _pageController = PageController();
 
   DateTime mLastDateTime;
+  bool hasLogin = false;
 
   @override
   void initState() {
@@ -100,6 +101,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
 
   _load() {
     delayed(() async {
+      await context.read<UserState>().getUser();
       if (widget.page != 0) {
         _jumpToPage(widget.page);
       }
@@ -107,8 +109,10 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
       if (isFirst == null) {
         Navigator.pushNamed(context, '/guide');
       }
-      await context.read<UserState>().getUser();
-      await _imLogin();
+      hasLogin = context.read<UserState>().hasLogin;
+      if (hasLogin) {
+        await _imLogin();
+      }
     });
   }
 
@@ -140,7 +144,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
       UserModel user = context.read<UserState>().userInfo;
       await LocalStorage.setJSON(Config.IM_SIGN, sign);
       await TencentImPlugin.login(
-        identifier: user.id.toString(),
+        userID: user.id.toString() + 'user',
         userSig: sign,
       );
     } catch (e) {

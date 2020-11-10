@@ -7,11 +7,13 @@ class CommonAvatar extends StatefulWidget {
 
   /// 显示性别
   final bool showSex;
+  final String avatar;
 
   CommonAvatar({
     Key key,
     this.size,
     this.showSex = true,
+    this.avatar = '',
   }) : super(key: key);
 
   _CommonAvatarState createState() => _CommonAvatarState();
@@ -27,12 +29,25 @@ class _CommonAvatarState extends State<CommonAvatar> {
         children: [
           ClipOval(
             clipBehavior: Clip.hardEdge,
-            child: Image.asset(
-              "assets/images/placeholder.png",
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-            ),
+            child: widget.avatar.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: widget.avatar,
+                    fit: BoxFit.cover,
+                    width: widget.size ?? 100.w,
+                    height: widget.size ?? 100.w,
+                    placeholder: (context, url) => Image.asset(
+                      "assets/images/placeholder.png",
+                      fit: BoxFit.cover,
+                      width: widget.size ?? 100.w,
+                      height: widget.size ?? 100.w,
+                    ),
+                  )
+                : Image.asset(
+                    "assets/images/placeholder.png",
+                    fit: BoxFit.cover,
+                    width: widget.size ?? 100.w,
+                    height: widget.size ?? 100.w,
+                  ),
           ),
           widget.showSex ? _widgetBoy() : Container(),
         ],

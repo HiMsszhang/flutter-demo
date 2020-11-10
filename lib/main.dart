@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> with HttpErrorListener {
   void initState() {
     super.initState();
     // 初始化IM SDK(每次仅调用一次)
-    TencentImPlugin.init(appid: Config.TENCENT_IM_APPID, logPrintLevel: LogPrintLevel.info);
+    TencentImPlugin.initSDK(appid: Config.TENCENT_IM_APPID, logPrintLevel: LogPrintLevel.info);
     _initFluwx();
   }
 

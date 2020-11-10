@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
+import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 
 class ChatPersonPage extends StatefulWidget {
   const ChatPersonPage({
@@ -16,10 +17,19 @@ class ChatPersonPage extends StatefulWidget {
 }
 
 class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
+  String _message;
   @override
   void initState() {
     super.initState();
   }
+
+  _onInput(String value) {
+    setState(() {
+      _message = value;
+    });
+  }
+
+  _send(String value) {}
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +83,8 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
                           border: OutlineInputBorder(borderSide: BorderSide.none),
                           contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                         ),
+                        onChanged: _onInput,
+                        onSubmitted: _send,
                       ),
                     ),
                   ),

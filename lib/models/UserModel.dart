@@ -26,8 +26,12 @@ class UserModel {
   int age;
 
   /// 学员墨币数量
-  @JsonKey(name: 'mo_money', defaultValue: '')
+  @JsonKey(name: 'mo_money', defaultValue: 0)
   int moMoney;
+
+  /// 星星数量
+  @JsonKey(name: 'stars_num', defaultValue: 0)
+  int starsNum;
 
   /// 学员token
   @JsonKey(defaultValue: '')

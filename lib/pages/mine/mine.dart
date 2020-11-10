@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
+
 import 'package:molan_edu/widgets/common_avatar.dart';
+import 'package:molan_edu/models/UserModel.dart';
+import 'package:molan_edu/providers/user_state.dart';
 
 class MinePage extends StatefulWidget {
   const MinePage({
@@ -27,11 +30,15 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
     {"title": "设置", "name": "setting"},
   ];
 
+  UserModel _user = new UserModel();
+  bool hasLogin = false;
+
   @override
   void initState() {
     super.initState();
+    hasLogin = context.read<UserState>().hasLogin;
     delayed(() {
-      toLoginPopup();
+      if (!hasLogin) toLoginPopup();
     });
   }
 
@@ -65,6 +72,7 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
 
   @override
   Widget build(BuildContext context) {
+    _user = context.watch<UserState>().userInfo;
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
@@ -110,63 +118,64 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
   Widget _widgetHeader() {
     return Container(
       padding: EdgeInsets.fromLTRB(60.w, 34.w, 0, 68.w),
-      child: Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CommonAvatar(),
-              SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          '公爵大人',
-                          style: Styles.normalFont(fontSize: 34.sp, color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(width: 33.w),
-                        Text(
-                          '10岁',
-                          style: Styles.normalFont(fontSize: 30.sp, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.w),
-                    UnconstrainedBox(
-                      child: Container(
-                        height: 42.w,
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(42.w),
-                          color: Color.fromRGBO(255, 255, 255, .21),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image.asset('assets/images/common/icon_star_outline.png', width: 26.w, height: 25.w),
-                            SizedBox(width: 11.w),
-                            Text('88星星', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white, height: 1.2)),
-                          ],
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          NavigatorUtils.pushNamed(context, hasLogin ? '/mine.info.edit' : '/login');
+        },
+        child: Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CommonAvatar(avatar: _user?.avatar ?? ''),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            hasLogin ? _user?.name : '立即登录',
+                            style: Styles.normalFont(fontSize: 34.sp, color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 33.w),
+                          Text(
+                            '${_user?.age ?? 0}岁',
+                            style: Styles.normalFont(fontSize: 30.sp, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.w),
+                      UnconstrainedBox(
+                        child: Container(
+                          height: 42.w,
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(42.w),
+                            color: Color.fromRGBO(255, 255, 255, .21),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.asset('assets/images/common/icon_star_outline.png', width: 26.w, height: 25.w),
+                              SizedBox(width: 11.w),
+                              Text('${_user?.starsNum ?? 0}星星', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white, height: 1.2)),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Positioned(
-            top: -10.w,
-            right: 20.w,
-            child: GestureDetector(
-              onTap: () {
-                NavigatorUtils.pushNamed(context, '/mine.info.edit');
-              },
+              ],
+            ),
+            Positioned(
+              top: -10.w,
+              right: 20.w,
               child: Padding(
                 padding: EdgeInsets.all(10.w),
                 child: ImageIcon(
@@ -176,8 +185,8 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/utils/local_storage.dart';
 
@@ -27,6 +28,11 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
 
   _clear() {
     LocalStorage.clear();
+  }
+
+  _logOut() async {
+    await context.read<UserState>().logOut();
+    NavigatorUtils.pushNamedAndRemoveUntil(context, '/');
   }
 
   @override
@@ -80,6 +86,26 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
               onTap: () {
                 _clear();
               }),
+          _widgetItem(
+              title: '注销账户',
+              icon: 'delete',
+              onTap: () {
+                _clear();
+              }),
+          GestureDetector(
+            onTap: _logOut,
+            child: Container(
+              width: 690.w,
+              height: 90.w,
+              margin: EdgeInsets.symmetric(horizontal: 30.w).copyWith(top: 70.w),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(90.w),
+                color: Theme.of(context).accentColor,
+              ),
+              child: Text('退出登录', style: Styles.normalFont(fontSize: 32.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ),
         ],
       ),
     );
