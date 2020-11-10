@@ -11,6 +11,7 @@ class LoginInput extends StatefulWidget {
   final TextAlign textAlign;
   final Widget leading;
   final Widget action;
+  final TextInputType keyboardType;
   LoginInput({
     Key key,
     this.hintText,
@@ -20,6 +21,7 @@ class LoginInput extends StatefulWidget {
     this.textAlign = TextAlign.left,
     this.leading,
     this.action,
+    this.keyboardType,
   }) : super(key: key);
 
   _LoginInputState createState() => _LoginInputState();
@@ -86,6 +88,7 @@ class _LoginInputState extends State<LoginInput> {
                 widget.onChanged(value);
                 setState(() {});
               },
+              keyboardType: widget.keyboardType,
             ),
           ),
           widget.action ?? Container(),

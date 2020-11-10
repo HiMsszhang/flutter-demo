@@ -8,6 +8,10 @@ import 'package:molan_edu/pages/timetable/timetable.dart';
 import 'package:molan_edu/pages/chat/chat.dart';
 import 'package:molan_edu/pages/mine/mine.dart';
 import 'package:molan_edu/utils/local_storage.dart';
+import 'package:tencent_im_plugin/tencent_im_plugin.dart';
+import 'package:molan_edu/providers/user_state.dart';
+import 'package:molan_edu/apis/user.dart';
+import 'package:molan_edu/models/UserModel.dart';
 
 class TabItem {
   String title;
@@ -103,6 +107,8 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
       if (isFirst == null) {
         Navigator.pushNamed(context, '/guide');
       }
+      await context.read<UserState>().getUser();
+      await _imLogin();
     });
   }
 
@@ -125,6 +131,21 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  _imLogin() async {
+    try {
+      DataResult res = await UserAPI.imSign();
+      String sign = res.data['sign'];
+      UserModel user = context.read<UserState>().userInfo;
+      await LocalStorage.setJSON(Config.IM_SIGN, sign);
+      await TencentImPlugin.login(
+        identifier: user.id.toString(),
+        userSig: sign,
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override

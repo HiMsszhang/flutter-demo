@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/login_input.dart';
+import 'package:molan_edu/apis/user.dart';
+import 'package:molan_edu/apis/common.dart';
+import 'package:molan_edu/models/UserModel.dart';
+import 'package:molan_edu/providers/user_state.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -14,9 +20,73 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> with UtilsMixin {
+  String _mobile = '';
+  String _code = '';
+
+  int _seconds = -1;
+  Timer _timer;
+  String _text = '获取验证码';
+
+  bool _isCountDown = false;
+
+  void _startTimer() {
+    _seconds = 60;
+    _isCountDown = true;
+    _timer = Timer.periodic(Duration(seconds: 1), _update);
+  }
+
+  void _stopTimer() {
+    _isCountDown = false;
+    if (_timer != null) {
+      _timer.cancel();
+    }
+  }
+
+  void _update(Timer timer) {
+    if (_seconds == 0) {
+      _text = '重新获取';
+      _stopTimer();
+    } else {
+      _seconds--;
+      _text = '${_seconds}s';
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _stopTimer();
+  }
+
+  _submit() async {
+    try {
+      DataResult res = await UserAPI.login(mobile: _mobile, code: _code);
+      UserModel user = res.data;
+      await context.read<UserState>().updateUser(user);
+      NavigatorUtils.pushNamedAndRemoveUntil(context, '/');
+    } catch (e) {}
+  }
+
+  _getCode() async {
+    if (_mobile == '') {
+      showToast('请输入手机号');
+      return;
+    }
+    if (!_isCountDown) {
+      try {
+        await CommonAPI.getCode(mobile: _mobile);
+        _startTimer();
+      } catch (e) {}
+    }
+    if (_seconds > 0) return;
   }
 
   @override
@@ -97,16 +167,22 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
                         ),
                         hintText: '请输入手机号码',
                         action: GestureDetector(
-                          onTap: () {},
+                          onTap: _getCode,
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 8.w),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(46.w),
                               border: Border.all(width: 1, color: Color(0xFFFFAA86)),
                             ),
-                            child: Text('获取验证码', style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFFFFAA86), height: 1.2)),
+                            child: Text(_text, style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFFFFAA86), height: 1.2)),
                           ),
                         ),
+                        onChanged: (value) {
+                          setState(() {
+                            _mobile = value;
+                          });
+                        },
+                        keyboardType: TextInputType.phone,
                       ),
                       SizedBox(height: 40.w),
                       LoginInput(
@@ -116,24 +192,33 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
                           child: Image.asset('assets/images/common/icon_password.png', width: 23.w, height: 30.w),
                         ),
                         hintText: '请输入验证码',
+                        onChanged: (value) {
+                          setState(() {
+                            _code = value;
+                          });
+                        },
+                        keyboardType: TextInputType.number,
                       ),
                       SizedBox(height: 80.w),
-                      Container(
-                        width: double.infinity,
-                        height: 94.w,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(94.w),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFFFABA4),
-                              Color(0xFFFFC4A3),
-                            ],
+                      RawMaterialButton(
+                        onPressed: _submit,
+                        child: Container(
+                          width: double.infinity,
+                          height: 94.w,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(94.w),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFFFFABA4),
+                                Color(0xFFFFC4A3),
+                              ],
+                            ),
                           ),
+                          child: Text('登录', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
-                        child: Text('登录', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),

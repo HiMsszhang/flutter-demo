@@ -8,3 +8,4 @@ export 'package:cached_network_image/cached_network_image.dart';
 export 'package:molan_edu/utils/net/http.dart';
 export 'package:molan_edu/apis/result.dart';
 export 'package:molan_edu/config/config.dart';
+export 'package:provider/provider.dart';

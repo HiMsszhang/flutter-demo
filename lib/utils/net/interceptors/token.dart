@@ -12,7 +12,7 @@ class TokenInterceptors extends InterceptorsWrapper {
     var authorizationCode = await getAuthorization();
     _token = authorizationCode;
     print('_token:$_token');
-    options.headers["token"] = '7209006c-bc59-4385-ae48-ae6ae0a213d1';
+    options.headers["token"] = _token;
     return options;
   }
 

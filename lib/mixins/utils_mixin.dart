@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:molan_edu/styles.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -141,5 +142,10 @@ mixin UtilsMixin<T extends StatefulWidget> on State<T> {
         );
       },
     );
+  }
+
+  /// toast
+  void showToast(String msg, {int time}) {
+    Fluttertoast.showToast(msg: msg, timeInSecForIosWeb: time);
   }
 }

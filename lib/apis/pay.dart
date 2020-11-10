@@ -4,9 +4,9 @@ import 'result.dart';
 
 import 'package:molan_edu/models/PayModel.dart';
 
-/// 课程
+/// 支付
 class PayAPI {
-  /// 课程首页列表
+  /// 支付
   static Future<DataResult> payNow({
     int courseId,
     int courseModelId,

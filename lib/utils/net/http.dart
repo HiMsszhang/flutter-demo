@@ -29,7 +29,6 @@ class HttpManager {
       requestBody: true,
       responseBody: true,
     ));
-//    dio.interceptors.add(new LogsInterceptors());
     dio.interceptors.add(new ErrorInterceptors(dio));
     dio.interceptors.add(new ResponseInterceptors(dio)); // 使用默认配置
     // // if(Config.env == Env.DEV){
