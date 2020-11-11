@@ -145,83 +145,107 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
             padding: EdgeInsets.fromLTRB(30.w, 20.w, 30.w, 44.w),
             child: Column(
               children: [
-                Image.asset('assets/images/logo.png', width: 369.w, height: 150.w),
-                SizedBox(height: 118.w),
-                Container(
-                  width: 690.w,
-                  padding: EdgeInsets.symmetric(horizontal: 54.w, vertical: 90.w),
-                  decoration: Styles.normalDecoration.copyWith(
-                    borderRadius: BorderRadius.circular(16.w),
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('欢迎来到墨岚', style: Styles.normalFont(fontSize: 36.sp, color: Color(0xFFFFA680))),
-                      SizedBox(height: 40.w),
-                      LoginInput(
-                        leading: Container(
-                          width: 53.w,
-                          alignment: Alignment.centerRight,
-                          child: Image.asset('assets/images/common/icon_phone.png', width: 23.w, height: 30.w),
-                        ),
-                        hintText: '请输入手机号码',
-                        action: GestureDetector(
-                          onTap: _getCode,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 8.w),
+                SizedBox(height: 200.w),
+                Stack(
+                  overflow: Overflow.visible,
+                  children: [
+                    Container(
+                      width: 690.w,
+                      padding: EdgeInsets.symmetric(horizontal: 54.w, vertical: 90.w),
+                      decoration: Styles.normalDecoration.copyWith(
+                        borderRadius: BorderRadius.circular(16.w),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('登录墨岚', style: Styles.normalFont(fontSize: 36.sp, color: Color(0xFFFFA680))),
+                          SizedBox(height: 40.w),
+                          LoginInput(
+                            leading: Container(
+                              width: 53.w,
+                              alignment: Alignment.centerRight,
+                              child: Image.asset('assets/images/common/icon_phone.png', width: 23.w, height: 30.w),
+                            ),
+                            hintText: '请输入手机号码',
+                            action: GestureDetector(
+                              onTap: _getCode,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 8.w),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(46.w),
+                                  border: Border.all(width: 1, color: Color(0xFFFFAA86)),
+                                ),
+                                child: Text(_text, style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFFFFAA86), height: 1.2)),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                _mobile = value;
+                              });
+                            },
+                            keyboardType: TextInputType.phone,
+                          ),
+                          SizedBox(height: 40.w),
+                          LoginInput(
+                            leading: Container(
+                              width: 53.w,
+                              alignment: Alignment.centerRight,
+                              child: Image.asset('assets/images/common/icon_password.png', width: 23.w, height: 30.w),
+                            ),
+                            hintText: '请输入验证码',
+                            onChanged: (value) {
+                              setState(() {
+                                _code = value;
+                              });
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          SizedBox(height: 80.w),
+                          RawMaterialButton(
+                            onPressed: _submit,
+                            child: Container(
+                              width: double.infinity,
+                              height: 94.w,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(94.w),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0xFFFFABA4),
+                                    Color(0xFFFFC4A3),
+                                  ],
+                                ),
+                              ),
+                              child: Text('注册即登录', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      top: -89.w,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 208.w,
+                            height: 208.w,
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(46.w),
-                              border: Border.all(width: 1, color: Color(0xFFFFAA86)),
+                              borderRadius: BorderRadius.circular(208.w),
+                              color: Theme.of(context).primaryColor,
                             ),
-                            child: Text(_text, style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFFFFAA86), height: 1.2)),
-                          ),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            _mobile = value;
-                          });
-                        },
-                        keyboardType: TextInputType.phone,
+                            child: Image.asset('assets/images/logo.png', width: 120.w, height: 100.w, fit: BoxFit.contain),
+                          )
+                        ],
                       ),
-                      SizedBox(height: 40.w),
-                      LoginInput(
-                        leading: Container(
-                          width: 53.w,
-                          alignment: Alignment.centerRight,
-                          child: Image.asset('assets/images/common/icon_password.png', width: 23.w, height: 30.w),
-                        ),
-                        hintText: '请输入验证码',
-                        onChanged: (value) {
-                          setState(() {
-                            _code = value;
-                          });
-                        },
-                        keyboardType: TextInputType.number,
-                      ),
-                      SizedBox(height: 80.w),
-                      RawMaterialButton(
-                        onPressed: _submit,
-                        child: Container(
-                          width: double.infinity,
-                          height: 94.w,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(94.w),
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0xFFFFABA4),
-                                Color(0xFFFFC4A3),
-                              ],
-                            ),
-                          ),
-                          child: Text('登录', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -72,12 +72,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0, 1],
-              colors: [Color(0xFFFFCAAD), Color(0xFFFFA7A3)],
-            ),
+            color: Theme.of(context).primaryColor,
           ),
           child: AppBar(
             elevation: 0,
@@ -87,7 +82,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
               Container(
                 margin: EdgeInsets.only(right: 49.w),
                 child: Image.asset(
-                  "assets/images/logo.png",
+                  "assets/images/logo_text.png",
                   width: 123.w,
                   height: 47.w,
                   fit: BoxFit.contain,
@@ -100,7 +95,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
                   decoration: Styles.normalDecoration.copyWith(
                     borderRadius: BorderRadius.circular(64.w),
                     border: Border.all(width: 0.5, color: Colors.white),
-                    color: Color(0xFFFFCEB8),
+                    color: Theme.of(context).primaryColor,
                   ),
                   child: Row(
                     children: [
@@ -108,10 +103,10 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
                       Icon(
                         MyIcons.Iconsearch,
                         size: 30.w,
-                        color: Colors.white,
+                        color: Color(0xFFBBBBBB),
                       ),
                       SizedBox(width: 19.w),
-                      Text('搜索课程名称', style: Styles.normalFont(fontSize: 28.sp, color: Colors.white)),
+                      Text('搜索课程名称', style: Styles.normalFont(fontSize: 28.sp, color: Color(0xFFBBBBBB))),
                     ],
                   ),
                 ),
