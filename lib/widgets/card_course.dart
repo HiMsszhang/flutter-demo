@@ -62,7 +62,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
     var item = widget.data;
     return GestureDetector(
       onTap: () {
-        NavigatorUtils.pushNamed(context, '/course.detail');
+        NavigatorUtils.pushNamed(context, '/course.detail', arguments: {'courseId': 1});
       },
       child: UnconstrainedBox(
         child: Stack(
@@ -135,7 +135,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
                             ),
                             InkWell(
                               onTap: () {
-                                courseInfoPopup(context);
+                                courseInfoPopup(context, widget.data);
                               },
                               child: Container(
                                 width: 30.w,

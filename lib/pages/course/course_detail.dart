@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/CourseDetailModel.dart';
+import 'package:molan_edu/apis/course.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:chewie/chewie.dart';
@@ -15,9 +17,10 @@ import 'package:molan_edu/widgets/mini_rating_star.dart';
 class CourseDetailPage extends StatefulWidget {
   /// 是否是拼团
   final bool isGroup;
-
+  final Map arguments;
   const CourseDetailPage({
     Key key,
+    this.arguments,
     this.isGroup = false,
   }) : super(key: key);
 
@@ -31,10 +34,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
   List<String> _tabList = ['课程简介', '课程目录', '课程规划'];
   int _selectedIndex = 0;
 
+  CourseDetailModel _data;
+
   @override
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network('https://www.runoob.com/try/demo_source/movie.mp4');
+
     _chewieController = ChewieController(
       videoPlayerController: _controller,
       aspectRatio: 750 / 500,
@@ -66,67 +72,78 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
     });
   }
 
+  Future _getCourseDetail() async {
+    DataResult result = await CourseAPI.coursedetail(
+      courseId: 1,
+    );
+    _data = result.data;
+    return _data;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: StickyHeaderBuilder(
-                overlapHeaders: true,
-                builder: (context, stuckAmount) {
-                  stuckAmount = stuckAmount.clamp(-1.0, 0.0);
-                  return AppBar(
-                    brightness: Brightness.values[stuckAmount == -1 ? 1 : 0],
-                    backgroundColor: Color.fromRGBO(255, 255, 255, -stuckAmount),
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        size: 33.w,
-                        color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: ImageIcon(
-                          AssetImage('assets/images/course/icon_ear.png'),
-                          size: 40.w,
+      body: FutureBuilder(
+        future: _getCourseDetail(),
+        builder: (context, snapshot) => Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: StickyHeaderBuilder(
+                  overlapHeaders: true,
+                  builder: (context, stuckAmount) {
+                    stuckAmount = stuckAmount.clamp(-1.0, 0.0);
+                    return AppBar(
+                      brightness: Brightness.values[stuckAmount == -1 ? 1 : 0],
+                      backgroundColor: Color.fromRGBO(255, 255, 255, -stuckAmount),
+                      elevation: 0,
+                      leading: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          size: 33.w,
                           color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
-                      IconButton(
-                        icon: ImageIcon(
-                          AssetImage('assets/images/course/icon_favorite.png'),
-                          size: 40.w,
-                          color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
+                      actions: [
+                        IconButton(
+                          icon: ImageIcon(
+                            AssetImage('assets/images/course/icon_ear.png'),
+                            size: 40.w,
+                            color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
+                          ),
+                          onPressed: () {},
                         ),
-                        onPressed: () {},
-                      ),
+                        IconButton(
+                          icon: ImageIcon(
+                            AssetImage('assets/images/course/icon_favorite.png'),
+                            size: 40.w,
+                            color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
+                          ),
+                          onPressed: () {},
+                        ),
+                      ],
+                    );
+                  },
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _widgetVideo(),
+                      _widgetInfo(),
+                      _widgetDetail(),
+                      RateList(),
+                      RecommendList(),
                     ],
-                  );
-                },
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _widgetVideo(),
-                    _widgetInfo(),
-                    _widgetDetail(),
-                    RateList(),
-                    RecommendList(),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-          _widgetBottom(),
-        ],
+            _widgetBottom(),
+          ],
+        ),
       ),
     );
   }
@@ -183,7 +200,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
               ),
               child: Stack(
                 children: [
-                  Image.asset('assets/images/demo.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                  Image.network('${_data?.avatar ?? null}', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -201,7 +218,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
                         ),
                       ),
                       alignment: Alignment.center,
-                      child: Text('30课时', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
+                      child: Text("${_data?.totalHours ?? 0}课时", style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
                     ),
                   ),
                 ],
@@ -216,14 +233,14 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('勤礼碑一系列', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                    Text(_data?.courseTitle ?? '', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
                     SizedBox(width: 14.w),
-                    Text('【楷书.钢笔】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
+                    Text('【${_data?.typefaceTitle ?? ''}.${_data?.courseCateTitle ?? ''}】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 SizedBox(height: 20.w),
                 Text(
-                  '开课时间：周一至周五 11:00-12:00',
+                  '开课时间：${_data?.learningTime ?? ''} 11:00-12:00',
                   style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -233,10 +250,10 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
                   children: [
                     Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     SizedBox(width: 10.w),
-                    MiniRatingStar(rating: 3),
+                    MiniRatingStar(rating: _data?.courseDifficulty?.toDouble()),
                     InkWell(
                       onTap: () {
-                        courseInfoPopup(context);
+                        courseInfoPopup(context, _data);
                       },
                       child: Container(
                         width: 30.w,
@@ -256,7 +273,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
                         borderRadius: BorderRadius.circular(34.w),
                         color: Theme.of(context).accentColor,
                       ),
-                      child: Text('日更3课时', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white, height: 1.2)),
+                      child: Text('日更${_data?.dailyUpdate ?? ''}课时', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white, height: 1.2)),
                     ),
                   ],
                 ),
@@ -265,7 +282,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('讲师：licky老师', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                    Text('讲师：${_data?.teacherName ?? ''}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       children: [
@@ -332,7 +349,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: Image.asset('assets/images/demo.png', fit: BoxFit.cover),
+      child: Image.network('${_data?.courseDesc ?? ''}', fit: BoxFit.cover),
     );
   }
 
@@ -425,7 +442,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: Image.asset('assets/images/demo.png', fit: BoxFit.cover),
+      child: Image.network('${_data?.curriculumPlanning ?? ''}', fit: BoxFit.cover),
     );
   }
 
@@ -463,7 +480,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
                 : Expanded(
                     child: RichText(
                       text: TextSpan(style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold, color: Styles.color999999), children: [
-                        TextSpan(text: '￥999.00', style: Styles.normalFont(color: Styles.colorRed)),
+                        TextSpan(text: '￥${_data?.coursePrice ?? ''}', style: Styles.normalFont(color: Styles.colorRed)),
                         TextSpan(text: '/期'),
                       ]),
                     ),
