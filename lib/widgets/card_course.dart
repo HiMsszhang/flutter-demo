@@ -62,7 +62,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
     var item = widget.data;
     return GestureDetector(
       onTap: () {
-        NavigatorUtils.pushNamed(context, '/course.detail', arguments: {'courseId': 1});
+        NavigatorUtils.pushNamed(context, '/course.detail', arguments: {'courseId': item.id});
       },
       child: UnconstrainedBox(
         child: Stack(

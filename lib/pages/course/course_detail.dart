@@ -17,7 +17,7 @@ import 'package:molan_edu/widgets/mini_rating_star.dart';
 class CourseDetailPage extends StatefulWidget {
   /// 是否是拼团
   final bool isGroup;
-  final Map arguments;
+  final arguments;
   const CourseDetailPage({
     Key key,
     this.arguments,
@@ -33,7 +33,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
   ChewieController _chewieController;
   List<String> _tabList = ['课程简介', '课程目录', '课程规划'];
   int _selectedIndex = 0;
-
   CourseDetailModel _data;
 
   @override
@@ -74,7 +73,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
 
   Future _getCourseDetail() async {
     DataResult result = await CourseAPI.coursedetail(
-      courseId: 1,
+      courseId: 2,
     );
     _data = result.data;
     return _data;
@@ -88,6 +87,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
         future: _getCourseDetail(),
         builder: (context, snapshot) => Column(
           children: [
+            Container(
+              child: Text("1234567"),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: StickyHeaderBuilder(
