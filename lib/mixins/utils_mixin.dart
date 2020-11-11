@@ -81,7 +81,7 @@ mixin UtilsMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// 课程难度弹窗
-  courseInfoPopup(BuildContext context) {
+  courseInfoPopup(BuildContext context, _data) {
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
@@ -102,7 +102,7 @@ mixin UtilsMixin<T extends StatefulWidget> on State<T> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('适合有一定基础想且提高字型的宝宝。', style: Styles.normalFont(fontSize: 26.sp)),
+                Text(_data.courseDifficultyDesc, style: Styles.normalFont(fontSize: 26.sp)),
                 SizedBox(height: 25.w),
                 Text('建议年龄：12岁+', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
               ],

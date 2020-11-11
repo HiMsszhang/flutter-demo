@@ -163,7 +163,7 @@ class InviteWidget extends StatelessWidget {
               width: 405.w,
               height: 65.w,
               decoration: BoxDecoration(
-                color: Color.fromRGBO(234, 166, 133, 1),
+                color: Color(0xFFEAA685),
                 borderRadius: BorderRadius.circular(33.w),
               ),
             ),
