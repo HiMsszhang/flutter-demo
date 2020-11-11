@@ -5,11 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
+import 'package:tencent_im_plugin/entity/message_entity.dart';
+import 'package:tencent_im_plugin/enums/message_elem_type_enum.dart';
+import 'package:tencent_im_plugin/message_node/message_node.dart';
+import 'package:tencent_im_plugin/message_node/text_message_node.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 
 class ChatPersonPage extends StatefulWidget {
+  final String id;
+  final String name;
   const ChatPersonPage({
     Key key,
+    this.id,
+    this.name,
   }) : super(key: key);
 
   @override
@@ -18,9 +26,21 @@ class ChatPersonPage extends StatefulWidget {
 
 class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
   String _message;
+  List<MessageEntity> _list = [];
+  TextEditingController _inputController;
   @override
   void initState() {
     super.initState();
+    _inputController = TextEditingController();
+    delayed(() async {
+      _getData();
+    });
+  }
+
+  _getData() async {
+    _list = await TencentImPlugin.getC2CHistoryMessageList(userID: widget.id, count: 20);
+    print(_list[0].toJson());
+    setState(() {});
   }
 
   _onInput(String value) {
@@ -29,27 +49,51 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
     });
   }
 
-  _send(String value) {}
+  _send() async {
+    await _sendMessage(TextMessageNode(content: _message));
+    _message = '';
+    _inputController.clear();
+    FocusScope.of(context).unfocus();
+    setState(() {});
+  }
+
+  _sendMessage(MessageNode node) async {
+    String msgId = await TencentImPlugin.sendMessage(
+      node: node,
+      receiver: widget.id,
+    );
+
+    _list.insert(
+      0,
+      MessageEntity(
+        msgID: msgId,
+        node: node,
+        elemType: node.nodeType,
+        self: true,
+      ),
+    );
+
+    this.setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithAppbar(
-      title: 'Vicky老师',
+      title: widget.name ?? "",
       backgroundColor: Color(0xFFF1F1F1),
       body: Column(
         children: [
           _widgetFloatInfo(),
           Expanded(
-            child: ListView(
+            child: ListView.builder(
               padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 30.w),
               reverse: true,
               scrollDirection: Axis.vertical,
-              children: [
-                _widgetLeft(),
-                _widgetLeft(type: 2),
-                _widgetRight(),
-                _widgetRight(type: 2),
-              ],
+              itemCount: _list.length,
+              itemBuilder: (context, index) {
+                var item = _list[index];
+                return item.self ? _widgetRight(item) : _widgetLeft(item);
+              },
             ),
           ),
           SafeArea(
@@ -83,14 +127,41 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
                           border: OutlineInputBorder(borderSide: BorderSide.none),
                           contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                         ),
-                        onChanged: _onInput,
-                        onSubmitted: _send,
+                        onChanged: (value) {
+                          _onInput(value);
+                        },
+                        onSubmitted: (value) async {
+                          await _send();
+                        },
+                        controller: _inputController,
+                        textInputAction: TextInputAction.send,
                       ),
                     ),
                   ),
                   Image.asset('assets/images/chat/icon_emoji.png', width: 56.w, height: 56.w),
                   SizedBox(width: 20.w),
-                  Image.asset('assets/images/chat/icon_more.png', width: 56.w, height: 56.w),
+                  _message != ''
+                      ? Container(
+                          height: 56.w,
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.w),
+                            color: Theme.of(context).accentColor,
+                          ),
+                          child: InkWell(
+                            // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            // padding: EdgeInsets.zero,
+                            onTap: () async {
+                              await _send();
+                            },
+                            child: Text(
+                              '发送',
+                              style: Styles.normalFont(color: Colors.white),
+                            ),
+                          ),
+                        )
+                      : Image.asset('assets/images/chat/icon_more.png', width: 56.w, height: 56.w),
                 ],
               ),
             ),
@@ -100,7 +171,20 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
     );
   }
 
-  Widget _widgetLeft({int type = 1}) {
+  _returnMessage(MessageEntity item) {
+    switch (item.elemType) {
+      case MessageElemTypeEnum.Text:
+        return _widgetMessageTalk(item, isMe: item.self);
+        break;
+      case MessageElemTypeEnum.Image:
+        return _widgetMessagePic(item);
+        break;
+      default:
+        return _widgetMessageTalk(item, isMe: item.self);
+    }
+  }
+
+  Widget _widgetLeft(MessageEntity item) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20.w),
       child: Row(
@@ -109,20 +193,20 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
         children: [
           CommonAvatar(size: 72.w),
           SizedBox(width: 20.w),
-          type == 1 ? _widgetMessageTalk() : _widgetMessagePic(),
+          _returnMessage(item),
         ],
       ),
     );
   }
 
-  Widget _widgetRight({int type = 1}) {
+  Widget _widgetRight(MessageEntity item) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          type == 1 ? _widgetMessageTalk(isMe: true) : _widgetMessagePic(),
+          _returnMessage(item),
           SizedBox(width: 20.w),
           CommonAvatar(size: 72.w),
         ],
@@ -130,7 +214,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
     );
   }
 
-  Widget _widgetMessagePic() {
+  Widget _widgetMessagePic(MessageEntity item) {
     return Container(
       width: 250.w,
       height: 307.w,
@@ -147,7 +231,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
     );
   }
 
-  Widget _widgetMessageTalk({bool isMe = false}) {
+  Widget _widgetMessageTalk(MessageEntity item, {bool isMe = false}) {
     return Stack(
       overflow: Overflow.visible,
       clipBehavior: Clip.none,
@@ -184,7 +268,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
                 ),
               ),
         Container(
-          width: 506.w,
+          constraints: BoxConstraints(maxWidth: 506.w),
           padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 26.w),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.w),
@@ -192,7 +276,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
             // color: Color.fromRGBO(0, 0, 0, 0.2),
           ),
           child: Text(
-            '哈哈哈哈哈哈哈哈嗝哈哈哈哈哈哈哈哈嗝哈哈哈哈哈哈哈哈嗝哈哈哈哈哈哈哈哈嗝哈哈哈哈哈哈哈哈嗝',
+            (item.node as TextMessageNode).content,
             style: Styles.normalFont(fontSize: 28.sp, height: 1.5, color: isMe ? Colors.white : Styles.colorText),
             textAlign: isMe ? TextAlign.right : TextAlign.left,
           ),

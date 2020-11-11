@@ -8,6 +8,9 @@ import 'package:molan_edu/pages/timetable/timetable.dart';
 import 'package:molan_edu/pages/chat/chat.dart';
 import 'package:molan_edu/pages/mine/mine.dart';
 import 'package:molan_edu/utils/local_storage.dart';
+import 'package:tencent_im_plugin/entity/user_entity.dart';
+import 'package:tencent_im_plugin/enums/user_allow_type_enum.dart';
+import 'package:tencent_im_plugin/enums/user_gender_enum.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/apis/user.dart';
@@ -52,6 +55,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
 
   DateTime mLastDateTime;
   bool hasLogin = false;
+  UserModel _user;
 
   @override
   void initState() {
@@ -102,6 +106,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
   _load() {
     delayed(() async {
       await context.read<UserState>().getUser();
+      _user = context.read<UserState>().userInfo;
       if (widget.page != 0) {
         _jumpToPage(widget.page);
       }
@@ -141,11 +146,19 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
     try {
       DataResult res = await UserAPI.imSign();
       String sign = res.data['sign'];
-      UserModel user = context.read<UserState>().userInfo;
       await LocalStorage.setJSON(Config.IM_SIGN, sign);
       await TencentImPlugin.login(
-        userID: user.id.toString() + 'user',
+        userID: _user.id.toString() + 'user',
         userSig: sign,
+      );
+      TencentImPlugin.setSelfInfo(
+        info: UserEntity(
+          nickName: _user.name,
+          faceUrl: _user.avatar,
+          allowType: UserAllowTypeEnum.AllowAny,
+          gender: _user.gender == 1 ? UserGenderEnum.Male : UserGenderEnum.Female,
+          // customInfo: {"Id": _user.id.toString()},
+        ),
       );
     } catch (e) {
       print(e);

@@ -23,7 +23,7 @@ class NavigatorUtils {
     return Navigator.pushNamed(context, routeName, arguments: arguments);
   }
 
-  static push(BuildContext context, Widget widget, {bool full = false, int routeType = 1}) {
+  static push(BuildContext context, Widget widget, {bool full = false, int routeType = 2}) {
     FocusScope.of(context).unfocus();
     return Navigator.push(
       context,
