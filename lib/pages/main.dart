@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
@@ -8,6 +10,8 @@ import 'package:molan_edu/pages/timetable/timetable.dart';
 import 'package:molan_edu/pages/chat/chat.dart';
 import 'package:molan_edu/pages/mine/mine.dart';
 import 'package:molan_edu/utils/local_storage.dart';
+import 'package:molan_edu/utils/net/code.dart';
+import 'package:molan_edu/utils/net/event.dart';
 import 'package:tencent_im_plugin/entity/user_entity.dart';
 import 'package:tencent_im_plugin/enums/user_allow_type_enum.dart';
 import 'package:tencent_im_plugin/enums/user_gender_enum.dart';
@@ -47,7 +51,7 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with UtilsMixin {
+class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener {
   int _selectedIndex = 0;
   List<TabItem> _tabItems;
 
@@ -223,5 +227,61 @@ class _MainPageState extends State<MainPage> with UtilsMixin {
         ),
       ),
     );
+  }
+}
+
+mixin HttpErrorListener on State<MainPage> {
+  StreamSubscription stream;
+
+  @override
+  void initState() {
+    super.initState();
+
+    stream = httpEventBus.on<HttpErrorEvent>().listen((event) {
+      errorHandleFunction(event.code, event.message);
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Fluttertoast.cancel();
+    if (stream != null) {
+      stream.cancel();
+      stream = null;
+    }
+  }
+
+  ///网络错误提醒
+  errorHandleFunction(int code, message) {
+    switch (code) {
+      case Code.NETWORK_ERROR:
+        _showToast('网络异常');
+        break;
+      case 2:
+        _showToast('登录过期，请重新登录！');
+        NavigatorUtils.pushNamed(context, '/login');
+        break;
+      case 403:
+        _showToast('403权限错误');
+        break;
+      case 404:
+        _showToast('404错误');
+        break;
+      case 422:
+        _showToast('请求实体异常');
+        break;
+      case Code.NETWORK_TIMEOUT:
+        //超时
+        _showToast('请求超时');
+        break;
+      default:
+        _showToast(message ?? 'error');
+        break;
+    }
+  }
+
+  void _showToast(String msg) {
+    Fluttertoast.showToast(msg: msg);
   }
 }

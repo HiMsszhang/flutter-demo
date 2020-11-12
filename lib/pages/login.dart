@@ -58,6 +58,9 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await context.read<UserState>().logOut();
+    });
   }
 
   @override
@@ -71,6 +74,7 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
       DataResult res = await UserAPI.login(mobile: _mobile, code: _code);
       UserModel user = res.data;
       await context.read<UserState>().updateUser(user);
+      showToast('登录成功!');
       NavigatorUtils.pushNamedAndRemoveUntil(context, '/');
     } catch (e) {}
   }

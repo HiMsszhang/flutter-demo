@@ -8,10 +8,7 @@ import 'package:molan_edu/widgets/common_search.dart';
 import 'package:molan_edu/widgets/chat_list_item.dart';
 import 'package:tencent_im_plugin/entity/conversation_entity.dart';
 import 'package:tencent_im_plugin/entity/conversation_result_entity.dart';
-import 'package:tencent_im_plugin/entity/friend_add_application_entity.dart';
-import 'package:tencent_im_plugin/entity/friend_operation_result_entity.dart';
-import 'package:tencent_im_plugin/entity/user_entity.dart';
-import 'package:tencent_im_plugin/enums/friend_type_enum.dart';
+import 'package:tencent_im_plugin/enums/tencent_im_listener_type_enum.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 
 class ChatPage extends StatefulWidget {
@@ -29,10 +26,34 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin {
   @override
   void initState() {
     super.initState();
+    TencentImPlugin.addListener(_imListener);
     delayed(() async {
       await _getFriendsList();
-      print(_list.toString());
+      print(_list[0].showName);
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    TencentImPlugin.removeListener(_imListener);
+  }
+
+  /// IM监听器
+  _imListener(type, params) async {
+    print(type);
+    if (type == TencentImListenerTypeEnum.ConversationChanged) {
+      List<ConversationEntity> change = params;
+      for (var i = 0; i < _list.length; i++) {
+        var item = _list[i];
+        for (var changeItem in change) {
+          if (item.conversationID == changeItem.conversationID) {
+            _list[i] = changeItem;
+          }
+        }
+      }
+      setState(() {});
+    }
   }
 
   _toDetail() {
@@ -47,13 +68,6 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin {
     ConversationResultEntity res = await TencentImPlugin.getConversationList(nextSeq: _nextSeq);
     _list = res.conversationList;
     setState(() {});
-  }
-
-  _showAdd() {
-    showDialog(
-      context: context,
-      builder: (context) => AddIMUser(),
-    );
   }
 
   @override
@@ -88,10 +102,6 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin {
         ],
       ),
       backgroundColor: Theme.of(context).primaryColor,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: _showAdd,
-      ),
       body: ListView.separated(
         itemCount: _list.length,
         separatorBuilder: (context, index) => Container(
@@ -106,47 +116,6 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin {
             _toPerson(_list[index]);
           },
         ),
-      ),
-    );
-  }
-}
-
-class AddIMUser extends StatefulWidget {
-  const AddIMUser({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  _AddIMUserState createState() => _AddIMUserState();
-}
-
-class _AddIMUserState extends State<AddIMUser> {
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: TextField(
-        decoration: InputDecoration(hintText: '输入要加好友的id'),
-        onSubmitted: (value) async {
-          try {
-            List<UserEntity> res = await TencentImPlugin.getUsersInfo(userIDList: [value]);
-            print(res[0].toJson());
-            FriendOperationResultEntity result = await TencentImPlugin.addFriend(
-              info: FriendAddApplicationEntity(
-                userID: value,
-                friendRemark: '',
-                addWording: '',
-                addSource: '',
-                addType: FriendTypeEnum.Both,
-              ),
-            );
-            print(result.resultCode);
-          } catch (e) {
-            print('err');
-            print(e);
-          } finally {
-            print('ff');
-          }
-        },
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 import 'package:tencent_im_plugin/entity/message_entity.dart';
 import 'package:tencent_im_plugin/enums/message_elem_type_enum.dart';
+import 'package:tencent_im_plugin/enums/tencent_im_listener_type_enum.dart';
 import 'package:tencent_im_plugin/message_node/message_node.dart';
 import 'package:tencent_im_plugin/message_node/text_message_node.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
@@ -25,16 +26,49 @@ class ChatPersonPage extends StatefulWidget {
 }
 
 class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
-  String _message;
+  String _message = '';
+
+  /// 消息列表
   List<MessageEntity> _list = [];
   TextEditingController _inputController;
+
   @override
   void initState() {
     super.initState();
     _inputController = TextEditingController();
+    TencentImPlugin.addListener(_imListener);
     delayed(() async {
       _getData();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    TencentImPlugin.removeListener(_imListener);
+    String text = _inputController.text.trim();
+    TencentImPlugin.setConversationDraft(conversationID: widget.id, draftText: text.trim() != '' ? text : null);
+  }
+
+  /// IM监听器
+  _imListener(type, params) {
+    if (type == TencentImListenerTypeEnum.NewMessage) {
+      setState(() {
+        _list.insert(0, params);
+      });
+    }
+
+    if (type == TencentImListenerTypeEnum.MessageSendSucc) {
+      print("===================");
+      print("消息发送成功");
+      print("===================");
+    }
+
+    if (type == TencentImListenerTypeEnum.MessageSendFail) {
+      print("===================");
+      print("消息发送失败");
+      print("===================");
+    }
   }
 
   _getData() async {

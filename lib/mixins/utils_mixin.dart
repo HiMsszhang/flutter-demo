@@ -85,27 +85,36 @@ mixin UtilsMixin<T extends StatefulWidget> on State<T> {
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
-      builder: (context) => Column(
+      builder: (context) => Stack(
         children: [
-          Container(
-            width: 549.w,
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 50.w).copyWith(bottom: 107.w),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50.w),
-              color: Theme.of(context).primaryColor,
-              image: DecorationImage(
-                image: AssetImage('assets/images/common/pic_learn.png'),
-                alignment: Alignment(0.8, 0.8),
-                scale: 1.8,
+          GestureDetector(
+            onTap: () {
+              NavigatorUtils.pop(context);
+            },
+            child: Container(width: double.infinity, height: double.infinity, color: Colors.transparent),
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              width: 549.w,
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 50.w).copyWith(bottom: 107.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50.w),
+                color: Theme.of(context).primaryColor,
+                image: DecorationImage(
+                  image: AssetImage('assets/images/common/pic_learn.png'),
+                  alignment: Alignment(0.8, 0.8),
+                  scale: 1.8,
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(_data.courseDifficultyDesc, style: Styles.normalFont(fontSize: 26.sp)),
-                SizedBox(height: 25.w),
-                Text('建议年龄：12岁+', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
-              ],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(_data.courseDifficultyDesc, style: Styles.normalFont(fontSize: 26.sp)),
+                  SizedBox(height: 25.w),
+                  Text('建议年龄：12岁+', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                ],
+              ),
             ),
           ),
         ],

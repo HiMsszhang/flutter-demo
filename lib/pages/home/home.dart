@@ -75,9 +75,8 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
             color: Theme.of(context).primaryColor,
           ),
           child: AppBar(
-            elevation: 0,
             brightness: Brightness.dark,
-            backgroundColor: Colors.transparent,
+            backgroundColor: Theme.of(context).primaryColor,
             actions: [
               Container(
                 margin: EdgeInsets.only(right: 49.w),

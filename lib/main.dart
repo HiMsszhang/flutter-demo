@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +14,6 @@ import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'package:tencent_im_plugin/enums/log_print_level.dart';
 import 'package:molan_edu/config/config.dart';
 import 'package:fluwx/fluwx.dart';
-import 'package:molan_edu/utils/net/code.dart';
-import 'package:molan_edu/utils/net/event.dart';
-import 'package:molan_edu/utils/navigator.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(
@@ -57,7 +51,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with HttpErrorListener {
+class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
@@ -113,61 +107,5 @@ class _MyAppState extends State<MyApp> with HttpErrorListener {
       },
       home: MainPage(),
     );
-  }
-}
-
-mixin HttpErrorListener on State<MyApp> {
-  StreamSubscription stream;
-
-  @override
-  void initState() {
-    super.initState();
-
-    stream = httpEventBus.on<HttpErrorEvent>().listen((event) {
-      errorHandleFunction(event.code, event.message);
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    Fluttertoast.cancel();
-    if (stream != null) {
-      stream.cancel();
-      stream = null;
-    }
-  }
-
-  ///网络错误提醒
-  errorHandleFunction(int code, message) {
-    switch (code) {
-      case Code.NETWORK_ERROR:
-        _showToast('网络异常');
-        break;
-      case 401:
-        _showToast('登录过期，请重新登录！');
-        NavigatorUtils.pushNamed(context, '/login');
-        break;
-      case 403:
-        _showToast('403权限错误');
-        break;
-      case 404:
-        _showToast('404错误');
-        break;
-      case 422:
-        _showToast('请求实体异常');
-        break;
-      case Code.NETWORK_TIMEOUT:
-        //超时
-        _showToast('请求超时');
-        break;
-      default:
-        _showToast(message ?? 'error');
-        break;
-    }
-  }
-
-  void _showToast(String msg) {
-    Fluttertoast.showToast(msg: msg);
   }
 }

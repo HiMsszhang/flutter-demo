@@ -21,7 +21,7 @@ class ResponseInterceptors extends InterceptorsWrapper {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         if (data.code != 1) {
           print(data.toJson());
-          Code.errorHandleFunction(400, data.msg);
+          Code.errorHandleFunction(data.code, data.msg);
           return _dio.reject(data.toJson());
         }
         return _dio.resolve(data.data);
