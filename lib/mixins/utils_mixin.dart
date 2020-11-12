@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:molan_edu/models/AdModel.dart';
+import 'package:molan_edu/pages/course/course_detail.dart';
 import 'package:molan_edu/styles.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -156,5 +158,19 @@ mixin UtilsMixin<T extends StatefulWidget> on State<T> {
   /// toast
   void showToast(String msg, {int time}) {
     Fluttertoast.showToast(msg: msg, timeInSecForIosWeb: time);
+  }
+
+  /// 广告点击事件
+  adTapAction(AdModel item) {
+    switch (item.advertCateId) {
+      case 1:
+        NavigatorUtils.pushNamed(context, '/webview', arguments: {'url': item.url});
+        break;
+      case 2:
+        NavigatorUtils.push(context, CourseDetailPage(courseId: item.url));
+        break;
+      default:
+        NavigatorUtils.pushNamed(context, '/webview', arguments: {'url': item.url});
+    }
   }
 }

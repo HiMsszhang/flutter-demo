@@ -59,6 +59,8 @@ dependencies:
   image_gallery_saver: ^1.6.0
   path_provider: ^1.6.24 # 获取文件路径
 
+  webview_flutter: ^1.0.7 #https://pub.flutter-io.cn/packages/webview_flutter
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

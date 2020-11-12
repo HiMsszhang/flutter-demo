@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/common.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 
@@ -7,6 +8,11 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:molan_edu/widgets/card_experience.dart';
 import 'package:molan_edu/widgets/card_new_course.dart';
 import 'package:molan_edu/widgets/my_pagination.dart';
+import 'package:molan_edu/apis/group.dart';
+import 'package:molan_edu/apis/course.dart';
+import 'package:molan_edu/models/CourseModel.dart';
+import 'package:molan_edu/models/GroupModel.dart';
+import 'package:molan_edu/models/AdModel.dart';
 
 class NavItem {
   String title;
@@ -40,10 +46,16 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
     {'title': '师资承诺', 'icon': 'teacher', 'info': '墨岚教育讲师团队拥有丰富的书法教学经验经过严格筛选 保证每位讲师的授课质量'},
     {'title': '安全承诺', 'icon': 'safe', 'info': '拥有银行资金储备保障的在线教育平台保障用户课时费安全'},
   ];
+  List<ExperienceModel> _experienceList = [];
+  List<CourseModel> _newCourseList = [];
 
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _getExperienceList();
+      await _getNewCourseList();
+    });
     setState(() {});
   }
 
@@ -62,6 +74,23 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
         NavigatorUtils.pushNamed(context, '/invite');
         break;
     }
+  }
+
+  Future<List<AdModel>> _getAdList() async {
+    DataResult res = await CommonAPI.adList(advertCateId: 1);
+    return res.data;
+  }
+
+  _getExperienceList() async {
+    DataResult res = await GroupAPI.getExperienceList(page: 1, listRow: 4);
+    _experienceList = res.data.data;
+    setState(() {});
+  }
+
+  _getNewCourseList() async {
+    DataResult res = await CourseAPI.newCourseList(page: 1, listRow: 4);
+    _newCourseList = res.data;
+    setState(() {});
   }
 
   @override
@@ -202,21 +231,43 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
     return Container(
       width: 750.w,
       height: 440.w,
-      child: Swiper(
-        itemBuilder: (BuildContext context, int index) {
-          return Image.asset(
-            'assets/images/demo.png',
-            fit: BoxFit.cover,
-          );
+      child: FutureBuilder(
+        future: _getAdList(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            List<AdModel> list = snapshot.data;
+            return Swiper(
+              itemBuilder: (BuildContext context, int index) {
+                var item = list[index];
+                return GestureDetector(
+                  onTap: () {
+                    adTapAction(item);
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: item.image,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Image.asset(
+                      "assets/images/placeholder.png",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              },
+              itemCount: list.length ?? 0,
+              pagination: new SwiperCustomPagination(
+                builder: (context, config) => MyPagination(
+                  length: list.length ?? 0,
+                  config: config,
+                  alignment: Alignment(0, 0.76),
+                ),
+              ),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
         },
-        itemCount: 3,
-        pagination: new SwiperCustomPagination(
-          builder: (context, config) => MyPagination(
-            length: 3,
-            config: config,
-            alignment: Alignment(0, 0.76),
-          ),
-        ),
       ),
     );
   }
@@ -342,12 +393,13 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
               physics: BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 15.w),
-              itemCount: 3,
+              itemCount: _experienceList?.length ?? 0,
               itemBuilder: (context, index) => Container(
                 padding: EdgeInsets.only(left: 15.w, right: 15.w),
                 child: CardExperience(
                   width: 513.w,
                   height: 308.w,
+                  data: _experienceList[index],
                 ),
               ),
             ),
@@ -367,12 +419,13 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
           physics: BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.w),
-          itemCount: 3,
+          itemCount: _newCourseList.length ?? 0,
           itemBuilder: (context, index) => Container(
             padding: EdgeInsets.only(left: 15.w, right: 15.w),
             child: CardNewCourse(
               width: 590.w,
               height: 339.w,
+              data: _newCourseList[index],
             ),
           ),
         ),

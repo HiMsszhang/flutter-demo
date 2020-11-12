@@ -25,6 +25,7 @@ import 'package:molan_edu/pages/login.dart';
 import 'package:molan_edu/pages/mine/setting.dart';
 import 'package:molan_edu/pages/main.dart';
 import 'package:molan_edu/pages/guide.dart';
+import 'package:molan_edu/pages/other/webview.dart';
 
 class MyRoutes {
   static routes(String name, Map arguments) {
@@ -82,6 +83,8 @@ class MyRoutes {
       '/setting': (context) => SettingPage(),
       //引导页
       '/guide': (context) => GuidePage(),
+      //webview
+      '/webview': (context) => WebviewPage(url: arguments['url']),
     };
     return route[name];
   }

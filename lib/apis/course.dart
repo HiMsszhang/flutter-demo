@@ -33,4 +33,23 @@ class CourseAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 最新课程列表
+  static Future<DataResult> newCourseList({int page, int listRow}) async {
+    try {
+      var params = {
+        'page': page,
+        'list_row': listRow,
+      };
+      Response res = await http.post('/newcourselist', queryParameters: params);
+      List<CourseModel> result = [];
+      for (var item in res.data) {
+        item = CourseModel.fromJson(item ?? {});
+        result.add(item);
+      }
+      return DataResult(result, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

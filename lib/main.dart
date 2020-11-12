@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     // 初始化IM SDK(每次仅调用一次)
-    TencentImPlugin.initSDK(appid: Config.TENCENT_IM_APPID, logPrintLevel: LogPrintLevel.debug);
+    TencentImPlugin.initSDK(appid: Config.TENCENT_IM_APPID, logPrintLevel: LogPrintLevel.error);
     _initFluwx();
   }
 
