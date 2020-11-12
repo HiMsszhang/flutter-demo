@@ -17,10 +17,10 @@ import 'package:molan_edu/widgets/mini_rating_star.dart';
 class CourseDetailPage extends StatefulWidget {
   /// 是否是拼团
   final bool isGroup;
-  final arguments;
+  final courseId;
   const CourseDetailPage({
     Key key,
-    this.arguments,
+    this.courseId,
     this.isGroup = false,
   }) : super(key: key);
 
@@ -34,11 +34,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
   List<String> _tabList = ['课程简介', '课程目录', '课程规划'];
   int _selectedIndex = 0;
   CourseDetailModel _data;
+  String _controllerUrl;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network('https://www.runoob.com/try/demo_source/movie.mp4');
+    _controller = VideoPlayerController.network('http://test-molan-1256995646.cos.ap-guangzhou.myqcloud.com/3ff8055c0e9c6474d4d83cef054820b6.mp4');
 
     _chewieController = ChewieController(
       videoPlayerController: _controller,
@@ -73,9 +74,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
 
   Future _getCourseDetail() async {
     DataResult result = await CourseAPI.coursedetail(
-      courseId: 2,
+      courseId: widget.courseId,
     );
     _data = result.data;
+
+    _controllerUrl = _data.currentHours['url'];
+
     return _data;
   }
 
@@ -87,9 +91,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
         future: _getCourseDetail(),
         builder: (context, snapshot) => Column(
           children: [
-            Container(
-              child: Text("1234567"),
-            ),
             Expanded(
               child: SingleChildScrollView(
                 child: StickyHeaderBuilder(
@@ -252,7 +253,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
                   children: [
                     Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     SizedBox(width: 10.w),
-                    MiniRatingStar(rating: _data?.courseDifficulty?.toDouble()),
+                    MiniRatingStar(rating: _data?.courseDifficulty?.toDouble() ?? 0),
                     InkWell(
                       onTap: () {
                         courseInfoPopup(context, _data);

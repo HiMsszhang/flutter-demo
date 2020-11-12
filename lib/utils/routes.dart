@@ -34,7 +34,7 @@ class MyRoutes {
       // 课程搜索
       '/course.search': (context) => CourseSearchPage(),
       // 课程详情
-      '/course.detail': (context, {arguments}) => CourseDetailPage(arguments: arguments),
+      '/course.detail': (context) => CourseDetailPage(),
       // 课程学员评价
       '/course.rate': (context) => CourseRatePage(),
       // 拼团广场
