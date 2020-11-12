@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/pages/course/course_detail.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/mini_rating_star.dart';
@@ -62,7 +63,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
     var item = widget.data;
     return GestureDetector(
       onTap: () {
-        NavigatorUtils.pushNamed(context, '/course.detail', arguments: {'courseId': item.id});
+        NavigatorUtils.push(context, CourseDetailPage(courseId: item.id));
       },
       child: UnconstrainedBox(
         child: Stack(
