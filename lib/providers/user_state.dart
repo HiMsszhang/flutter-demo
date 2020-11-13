@@ -18,7 +18,7 @@ class UserState with ChangeNotifier, DiagnosticableTreeMixin {
     _user = user;
     _hasLogin = true;
     LocalStorage.setJSON(Config.S_USERINFO, user);
-    LocalStorage.setJSON(Config.S_TOKEN, user.token);
+    if (user.token != null && user.token != '') LocalStorage.setJSON(Config.S_TOKEN, user.token);
     notifyListeners();
   }
 

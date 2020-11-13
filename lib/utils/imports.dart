@@ -10,3 +10,4 @@ export 'package:molan_edu/apis/result.dart';
 export 'package:molan_edu/config/config.dart';
 export 'package:provider/provider.dart';
 export 'package:fluttertoast/fluttertoast.dart';
+export 'package:flutter_easyloading/flutter_easyloading.dart';

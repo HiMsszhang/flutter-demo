@@ -8,6 +8,9 @@ class MyIcons {
   
   MyIcons._();
   
+  static const IconData Iconmale = IconData(0xe7a0, fontFamily: _family); 
+  static const IconData Iconfemale = IconData(0xe7a1, fontFamily: _family); 
+  static const IconData IconkaiguanguanCopy = IconData(0xe600, fontFamily: _family); 
   static const IconData Iconstar = IconData(0xe60e, fontFamily: _family); 
   static const IconData Iconxiaolian = IconData(0xe745, fontFamily: _family); 
   static const IconData Iconyaoqing = IconData(0xe621, fontFamily: _family); 

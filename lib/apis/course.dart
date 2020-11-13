@@ -35,13 +35,9 @@ class CourseAPI {
   }
 
   /// 最新课程列表
-  static Future<DataResult> newCourseList({int page, int listRow}) async {
+  static Future<DataResult> newCourseList() async {
     try {
-      var params = {
-        'page': page,
-        'list_row': listRow,
-      };
-      Response res = await http.post('/newcourselist', queryParameters: params);
+      Response res = await http.post('/newcourselist');
       List<CourseModel> result = [];
       for (var item in res.data) {
         item = CourseModel.fromJson(item ?? {});

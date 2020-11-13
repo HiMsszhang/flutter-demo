@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
   }
 
   _getNewCourseList() async {
-    DataResult res = await CourseAPI.newCourseList(page: 1, listRow: 4);
+    DataResult res = await CourseAPI.newCourseList();
     _newCourseList = res.data;
     setState(() {});
   }
@@ -166,7 +166,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
             _widgetKnow(),
             _widgetTitle(title: S.current.experienceCourse, color: Color(0xFFFFE6B0), showMore: true),
             _widgetExperience(),
-            _widgetTitle(title: S.current.homeNewCourse, color: Color(0xFFCBB0FF), showMore: true),
+            _widgetTitle(title: S.current.homeNewCourse, color: Color(0xFFCBB0FF), showMore: false),
             _widgetNewCourse(),
             _widgetTitle(title: S.current.wePromise, color: Color(0xFFFFA336)),
             _widgetPromise(),
@@ -253,18 +253,19 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
                   ),
                 );
               },
-              itemCount: list.length ?? 0,
+              itemCount: list?.length ?? 0,
               pagination: new SwiperCustomPagination(
                 builder: (context, config) => MyPagination(
-                  length: list.length ?? 0,
+                  length: list?.length ?? 0,
                   config: config,
                   alignment: Alignment(0, 0.76),
                 ),
               ),
             );
           } else {
-            return Center(
-              child: CircularProgressIndicator(),
+            return Image.asset(
+              "assets/images/placeholder.png",
+              fit: BoxFit.cover,
             );
           }
         },
@@ -419,7 +420,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
           physics: BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.w),
-          itemCount: _newCourseList.length ?? 0,
+          itemCount: _newCourseList?.length ?? 0,
           itemBuilder: (context, index) => Container(
             padding: EdgeInsets.only(left: 15.w, right: 15.w),
             child: CardNewCourse(

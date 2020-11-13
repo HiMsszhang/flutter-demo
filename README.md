@@ -27,3 +27,6 @@ samples, guidance on mobile development, and a full API reference.
 
 持续生成
 >flutter packages pub run build_runner watch
+
+## IconFont图标更新
+>flutter packages pub run iconfont -c http://at.alicdn.com/t/font_2147735_1hqi4q1wl43.css -d my_icons
