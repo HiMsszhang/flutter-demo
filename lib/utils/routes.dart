@@ -26,6 +26,7 @@ import 'package:molan_edu/pages/mine/setting.dart';
 import 'package:molan_edu/pages/main.dart';
 import 'package:molan_edu/pages/guide.dart';
 import 'package:molan_edu/pages/other/webview.dart';
+import 'package:molan_edu/pages/home/course_experience.dart';
 
 class MyRoutes {
   static routes(String name, Map arguments) {
@@ -85,6 +86,8 @@ class MyRoutes {
       '/guide': (context) => GuidePage(),
       //webview
       '/webview': (context) => WebviewPage(url: arguments['url']),
+      //体验课列表
+      '/course.experience': (context) => CourseExperiencePage(),
     };
     return route[name];
   }

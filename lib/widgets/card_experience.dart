@@ -30,7 +30,7 @@ class _CardExperienceState extends State<CardExperience> {
             Container(
               width: widget.width ?? double.infinity,
               height: widget.height ?? double.infinity,
-              padding: EdgeInsets.fromLTRB(26.w, 78.w, 180.w, 0),
+              padding: EdgeInsets.fromLTRB(26.w, 78.w, 180.w, 20.w),
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/images/home/bg_card.png'),
@@ -68,10 +68,17 @@ class _CardExperienceState extends State<CardExperience> {
                     ),
                   ),
                   SizedBox(height: 33.w),
-                  Text(
-                    '${widget.data.learnNum ?? 0}人学习',
-                    style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999),
-                  )
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${widget.data.learnNum ?? 0}人学习',
+                          style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -95,9 +102,10 @@ class _CardExperienceState extends State<CardExperience> {
               right: 26.w,
               child: Image.asset(
                 'assets/images/home/pic_learning_girl.png',
-                width: 234.w,
-                height: 235.w,
+                width: widget.width,
+                height: widget.height - 80.w,
                 fit: BoxFit.contain,
+                alignment: Alignment.bottomRight,
               ),
             ),
           ],

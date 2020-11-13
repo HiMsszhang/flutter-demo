@@ -15,8 +15,8 @@ ExperienceModel _$ExperienceModelFromJson(Map<String, dynamic> json) {
     ..courseCateTitle = json['course_cate_title'] as String ?? ''
     ..teacherName = json['teacher_name'] as String ?? ''
     ..avatar = json['avatar'] as String ?? ''
-    ..typefaceTitle = json['typeface_title\t'] as String ?? ''
-    ..learnNum = json['learn_num\t'] as num ?? 0
+    ..typefaceTitle = json['typeface_title'] as String ?? ''
+    ..learnNum = json['learn_num'] as num ?? 0
     ..duration = json['duration'] as num ?? 0;
 }
 
@@ -29,8 +29,8 @@ Map<String, dynamic> _$ExperienceModelToJson(ExperienceModel instance) =>
       'course_cate_title': instance.courseCateTitle,
       'teacher_name': instance.teacherName,
       'avatar': instance.avatar,
-      'typeface_title\t': instance.typefaceTitle,
-      'learn_num\t': instance.learnNum,
+      'typeface_title': instance.typefaceTitle,
+      'learn_num': instance.learnNum,
       'duration': instance.duration,
     };
 

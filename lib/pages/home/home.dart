@@ -164,7 +164,14 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
               ],
             ),
             _widgetKnow(),
-            _widgetTitle(title: S.current.experienceCourse, color: Color(0xFFFFE6B0), showMore: true),
+            _widgetTitle(
+              title: S.current.experienceCourse,
+              color: Color(0xFFFFE6B0),
+              showMore: true,
+              onTap: () {
+                NavigatorUtils.pushNamed(context, '/course.experience');
+              },
+            ),
             _widgetExperience(),
             _widgetTitle(title: S.current.homeNewCourse, color: Color(0xFFCBB0FF), showMore: false),
             _widgetNewCourse(),
@@ -176,7 +183,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
     );
   }
 
-  Widget _widgetTitle({String title, Color color, bool showMore = false}) {
+  Widget _widgetTitle({String title, Color color, bool showMore = false, VoidCallback onTap}) {
     return Stack(
       children: [
         Positioned(
@@ -205,19 +212,23 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
               ),
               Offstage(
                 offstage: !showMore,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      S.current.seeMore,
-                      style: Styles.normalFont(fontSize: 26.sp, color: Styles.color999999),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28.w,
-                      color: Styles.color999999,
-                    ),
-                  ],
+                child: GestureDetector(
+                  onTap: onTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        S.current.seeMore,
+                        style: Styles.normalFont(fontSize: 26.sp, color: Styles.color999999),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 28.w,
+                        color: Styles.color999999,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

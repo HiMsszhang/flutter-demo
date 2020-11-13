@@ -32,11 +32,11 @@ class ExperienceModel {
   String avatar;
 
   /// 字体标题
-  @JsonKey(name: 'typeface_title	', defaultValue: '')
+  @JsonKey(name: 'typeface_title', defaultValue: '')
   String typefaceTitle;
 
   /// 学习人数
-  @JsonKey(name: 'learn_num	', defaultValue: 0)
+  @JsonKey(name: 'learn_num', defaultValue: 0)
   num learnNum;
 
   /// 总时长
