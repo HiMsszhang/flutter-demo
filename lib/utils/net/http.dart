@@ -32,17 +32,17 @@ class HttpManager {
     ));
     dio.interceptors.add(new ErrorInterceptors(dio));
     dio.interceptors.add(new ResponseInterceptors(dio)); // 使用默认配置
-    if (Config.env == Env.DEV) {
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-        // config the http client
-        client.findProxy = (uri) {
-          //proxy all request to localhost:8888
-          return "PROXY 192.168.124.11:8888";
-        };
-        // you can also create a HttpClient to dio
-        // return HttpClient();
-      };
-    }
+    // if (Config.env == Env.DEV) {
+    //   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+    //     // config the http client
+    //     client.findProxy = (uri) {
+    //       //proxy all request to localhost:8888
+    //       return "PROXY 192.168.124.11:8888";
+    //     };
+    //     // you can also create a HttpClient to dio
+    //     // return HttpClient();
+    //   };
+    // }
   }
 
   ///清除授权
