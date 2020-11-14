@@ -95,6 +95,25 @@ class CourseModelListResp {
 
 //课程详情
 @JsonSerializable()
+class CourseCatModel {
+  /// 课程分类编号
+  int id;
+
+  /// 课程分类标题
+  @JsonKey(name: 'course_cate_title', defaultValue: '')
+  String courseCateTitle;
+
+  CourseCatModel();
+
+  //反序列化
+  factory CourseCatModel.fromJson(Map<String, dynamic> json) => _$CourseCatModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$CourseCatModelToJson(this);
+
+  CourseCatModel.empty();
+}
+
+@JsonSerializable()
 class CourseDetailModel {
   //课程分类编号
   @JsonKey(name: "course_cate_id", defaultValue: 0)

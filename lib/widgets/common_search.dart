@@ -13,6 +13,8 @@ class CommonSearch extends StatefulWidget {
   final Widget action;
   final bool readOnly;
   final VoidCallback onTap;
+  final String inputText;
+  final VoidCallback onClear;
   CommonSearch({
     Key key,
     this.hintText,
@@ -24,15 +26,17 @@ class CommonSearch extends StatefulWidget {
     this.action,
     this.readOnly = false,
     this.onTap,
+    this.inputText = '',
+    this.onClear,
   }) : super(key: key);
 
   _CommonSearchState createState() => _CommonSearchState();
 }
 
 class _CommonSearchState extends State<CommonSearch> {
-  String _inputText = "";
   @override
   Widget build(BuildContext context) {
+    String _inputText = widget.inputText;
     TextEditingController _controller = new TextEditingController.fromValue(
       TextEditingValue(
         text: _inputText,
@@ -76,7 +80,8 @@ class _CommonSearchState extends State<CommonSearch> {
                         child: GestureDetector(
                           onTap: () {
                             _inputText = '';
-                            widget.onChanged(_inputText);
+                            setState(() {});
+                            widget.onClear();
                           },
                           child: Container(
                             width: 36.w,
@@ -99,6 +104,7 @@ class _CommonSearchState extends State<CommonSearch> {
                 widget.onChanged(value);
                 setState(() {});
               },
+              textInputAction: TextInputAction.search,
             ),
           ),
           widget.action ?? Container(),

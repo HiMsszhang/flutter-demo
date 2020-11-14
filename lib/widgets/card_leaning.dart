@@ -3,10 +3,13 @@ import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 
 import 'package:molan_edu/widgets/mini_rating_star.dart';
+import 'package:molan_edu/models/TimeTableModel.dart';
 
 class CardLeaning extends StatefulWidget {
+  final TimeTableModel data;
   CardLeaning({
     Key key,
+    this.data,
   }) : super(key: key);
 
   _CardLeaningState createState() => _CardLeaningState();
@@ -15,6 +18,7 @@ class CardLeaning extends StatefulWidget {
 class _CardLeaningState extends State<CardLeaning> {
   @override
   Widget build(BuildContext context) {
+    var data = widget.data;
     return Container(
       width: 690.w,
       margin: EdgeInsets.only(bottom: 20.w),
@@ -34,17 +38,17 @@ class _CardLeaningState extends State<CardLeaning> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('勤礼碑一系列', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
+                Text(data?.courseTitle ?? '', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
                 SizedBox(width: 10.w),
-                Text('【楷书.钢笔】', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                Text('【${data?.typefaceTitle}.${data?.courseCateTitle}】', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                 SizedBox(width: 10.w),
-                Image.asset('assets/images/timetable/tag_vip.png', width: 67.8.w, height: 25.w),
+                data?.courseModelId == 2 ? Image.asset('assets/images/timetable/tag_vip.png', width: 67.8.w, height: 25.w) : Container(),
               ],
             ),
             SizedBox(height: 23.w),
             Row(
               children: [
-                Text('开课时间：每周一至周日', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                Text('开课时间：${data?.learningTime}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                 Container(
                   margin: EdgeInsets.only(left: 16.w),
                   decoration: BoxDecoration(
@@ -53,7 +57,7 @@ class _CardLeaningState extends State<CardLeaning> {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.w),
                   child: Text(
-                    '日更3课时',
+                    '日更${data?.dailyUpdate}课时',
                     style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666),
                   ),
                 ),
@@ -64,10 +68,10 @@ class _CardLeaningState extends State<CardLeaning> {
               children: [
                 Text('课程难度', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999)),
                 SizedBox(width: 10.w),
-                MiniRatingStar(rating: 3),
+                MiniRatingStar(rating: data.courseDifficulty.toDouble() ?? 0),
                 Expanded(
                   child: Text(
-                    '已学1节 剩余19节',
+                    '已学${data?.learnedNum}节 剩余${data?.surplusNum}节',
                     style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999),
                     textAlign: TextAlign.right,
                   ),
@@ -77,10 +81,14 @@ class _CardLeaningState extends State<CardLeaning> {
             SizedBox(height: 20.w),
             Row(
               children: [
-                CommonAvatar(size: 50.w),
+                CommonAvatar(
+                  size: 50.w,
+                  avatar: data?.avatar ?? '',
+                  showSex: false,
+                ),
                 SizedBox(width: 20.w),
                 Expanded(
-                  child: Text('张杰老师', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                  child: Text('${data?.teacherName}老师', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                 ),
                 Container(
                   width: 162.w,
