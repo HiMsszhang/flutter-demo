@@ -14,6 +14,7 @@ import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'package:tencent_im_plugin/enums/log_print_level.dart';
 import 'package:molan_edu/config/config.dart';
 import 'package:fluwx/fluwx.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 void main() {
   runApp(
@@ -56,7 +57,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     // 初始化IM SDK(每次仅调用一次)
-    TencentImPlugin.initSDK(appid: Config.TENCENT_IM_APPID, logPrintLevel: LogPrintLevel.debug);
+    TencentImPlugin.initSDK(appid: Config.TENCENT_IM_APPID, logPrintLevel: LogPrintLevel.error);
     _initFluwx();
   }
 
@@ -76,7 +77,7 @@ class _MyAppState extends State<MyApp> {
         ScreenUtil.init(context, designSize: Size(750, 1334), allowFontScaling: false);
         return ScrollConfiguration(
           behavior: ScrollBehaviorModified(),
-          child: child,
+          child: FlutterEasyLoading(child: child),
         );
       },
       localizationsDelegates: [

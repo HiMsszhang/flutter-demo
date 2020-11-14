@@ -33,6 +33,7 @@ class CourseAPI {
     }
   }
 
+<<<<<<< HEAD
   //课程目录列表
   static Future<DataResult> coursecataloguelist({int courseId, int page, int listRow}) async {
     try {
@@ -58,6 +59,17 @@ class CourseAPI {
       };
       Response res = await http.post('/courserecommendlist', queryParameters: params);
       var result = CourseRecommendModle.fromJson(res.data ?? []);
+=======
+  /// 最新课程列表
+  static Future<DataResult> newCourseList() async {
+    try {
+      Response res = await http.post('/newcourselist');
+      List<CourseModel> result = [];
+      for (var item in res.data) {
+        item = CourseModel.fromJson(item ?? {});
+        result.add(item);
+      }
+>>>>>>> 188876be9c72bf8c8e6e211caa97d1e1f152f519
       return DataResult(result, true);
     } catch (e) {
       return DataResult(e, false);

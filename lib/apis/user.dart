@@ -34,4 +34,20 @@ class UserAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 修改信息
+  static Future<DataResult> editUserInfo({String name, String avatar, int gender, int age}) async {
+    var params = {
+      'name': name,
+      'avatar': avatar,
+      'gender': gender,
+      'age': age,
+    };
+    try {
+      Response res = await http.post('/profile', queryParameters: params);
+      return DataResult(UserModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

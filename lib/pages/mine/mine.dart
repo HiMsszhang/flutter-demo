@@ -43,6 +43,10 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
   }
 
   _onNavItemTapped(item) {
+    if (!hasLogin) {
+      toLoginPopup();
+      return;
+    }
     switch (item['name']) {
       case "course":
         NavigatorUtils.pushNamed(context, '/mine.course');
@@ -57,6 +61,10 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
   }
 
   _onListItemTapped(item) {
+    if (!hasLogin) {
+      toLoginPopup();
+      return;
+    }
     switch (item['name']) {
       case "headmaster":
         NavigatorUtils.pushNamed(context, '/mine.headmaster');
@@ -121,14 +129,14 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          NavigatorUtils.pushNamed(context, hasLogin ? '/mine.info.edit' : '/login');
+          hasLogin ? NavigatorUtils.pushNamed(context, '/mine.info.edit') : toLoginPopup();
         },
         child: Stack(
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CommonAvatar(avatar: _user?.avatar ?? ''),
+                CommonAvatar(avatar: _user?.avatar ?? '', sex: _user.gender),
                 SizedBox(width: 14.w),
                 Expanded(
                   child: Column(

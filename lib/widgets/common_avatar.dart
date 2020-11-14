@@ -9,11 +9,15 @@ class CommonAvatar extends StatefulWidget {
   final bool showSex;
   final String avatar;
 
+  /// 性别男1女2
+  final int sex;
+
   CommonAvatar({
     Key key,
     this.size,
     this.showSex = true,
     this.avatar = '',
+    this.sex = 1,
   }) : super(key: key);
 
   _CommonAvatarState createState() => _CommonAvatarState();
@@ -49,13 +53,13 @@ class _CommonAvatarState extends State<CommonAvatar> {
                     height: widget.size ?? 100.w,
                   ),
           ),
-          widget.showSex ? _widgetBoy() : Container(),
+          widget.showSex ? _widgetSex() : Container(),
         ],
       ),
     );
   }
 
-  Widget _widgetBoy() {
+  Widget _widgetSex() {
     return Positioned(
       top: 0,
       right: 0,
@@ -65,9 +69,13 @@ class _CommonAvatarState extends State<CommonAvatar> {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.w),
-            color: Color(0xFF90D2F8),
+            color: widget.sex == 1 ? Color(0xFF90D2F8) : Color(0xFFF8BE90),
           ),
-          child: Image.asset('assets/images/common/sex_male.png', width: 17.w, height: 17.w)),
+          child: Icon(
+            widget.sex == 1 ? MyIcons.Iconmale : MyIcons.Iconfemale,
+            size: 14.w,
+            color: Colors.white,
+          )),
     );
   }
 }
