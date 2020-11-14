@@ -1,9 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:molan_edu/utils/net/http.dart';
 import 'result.dart';
-
 import 'package:molan_edu/models/CourseModel.dart';
-import 'package:molan_edu/models/CourseDetailModel.dart';
 import 'package:molan_edu/models/CourseFilterModel.dart';
 
 /// 课程
@@ -57,6 +55,7 @@ class CourseAPI {
     }
   }
 
+  //课程详情
   static Future<DataResult> coursedetail({int courseId}) async {
     try {
       var params = {
@@ -64,6 +63,41 @@ class CourseAPI {
       };
       Response res = await http.post('/coursedetail', queryParameters: params);
       var result = CourseDetailModel.fromJson(res.data ?? {});
+      return DataResult(result, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  //课程目录列表
+  static Future<DataResult> coursecataloguelist({int courseId, int page, int listRow}) async {
+    try {
+      var params = {
+        'course_id': courseId,
+        'page': page,
+        'list_row': listRow,
+      };
+      Response res = await http.post('/coursecataloguelist', queryParameters: params);
+      var result = CourseCataloguelistModleListResp.fromJson(res.data ?? {});
+      return DataResult(result, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  //课程相关推荐
+  static Future<DataResult> courserecommendlist({int courseCateId, int typefaceId}) async {
+    try {
+      Map<String, int> params = {
+        'course_cate_id': courseCateId,
+        'typeface_id': typefaceId,
+      };
+      Response res = await http.post('/courserecommendlist', queryParameters: params);
+      List<CourseRecommendModle> result = [];
+      for (var item in res.data) {
+        item = CourseRecommendModle.fromJson(res.data ?? {});
+        result.add(item);
+      }
       return DataResult(result, true);
     } catch (e) {
       return DataResult(e, false);
