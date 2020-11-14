@@ -154,18 +154,18 @@ Map<String, dynamic> _$CourseCataloguelistModleListRespToJson(
 CourseRecommendModle _$CourseRecommendModleFromJson(Map<String, dynamic> json) {
   return CourseRecommendModle()
     ..id = json['id'] as int
-    ..courseTitle = json['course_title'] as String
-    ..totalHours = json['total_hours'] as int
-    ..courseIntroduct = json['course_introduct'] as String
-    ..courseDifficulty = json['course_difficulty'] as int
-    ..courseDifficultyDesc = json['course_difficulty_desc'] as String
-    ..coursePrice = json['course_price'] as String
-    ..courseCateTitle = json['course_cate_title'] as String
-    ..teacherName = json['teacher_name'] as String
-    ..avatar = json['avatar'] as String
-    ..evaluate = json['evaluate'] as String
-    ..typefaceTitle = json['typeface_title'] as String
-    ..learnNum = json['learn_num'] as int;
+    ..courseTitle = json['course_title'] as String ?? ''
+    ..totalHours = json['total_hours'] as int ?? 0
+    ..courseIntroduct = json['course_introduct'] as String ?? ''
+    ..courseDifficulty = json['course_difficulty'] as int ?? 0
+    ..courseDifficultyDesc = json['course_difficulty_desc'] as String ?? ''
+    ..coursePrice = json['course_price'] as String ?? ''
+    ..courseCateTitle = json['course_cate_title'] as String ?? ''
+    ..teacherName = json['teacher_name'] as String ?? ''
+    ..avatar = json['avatar'] as String ?? ''
+    ..evaluate = json['evaluate'] as String ?? ''
+    ..typefaceTitle = json['typeface_title'] as String ?? ''
+    ..learnNum = json['learn_num'] as int ?? 0;
 }
 
 Map<String, dynamic> _$CourseRecommendModleToJson(

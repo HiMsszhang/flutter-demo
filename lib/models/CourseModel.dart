@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'CourseModel.g.dart';
 
+//课程
 @JsonSerializable()
 class CourseModel {
   /// 课程编号
@@ -92,6 +93,7 @@ class CourseModelListResp {
   CourseModelListResp.empty();
 }
 
+//课程详情
 @JsonSerializable()
 class CourseDetailModel {
   //课程分类编号
@@ -166,6 +168,7 @@ class CourseDetailModel {
   // CourseDetailModel.empty();
 }
 
+//课程目录
 @JsonSerializable()
 class CourseCataloguelistModle {
   //课程目录编号
@@ -212,50 +215,52 @@ class CourseCataloguelistModleListResp {
   Map<String, dynamic> toJson() => _$CourseCataloguelistModleListRespToJson(this);
 }
 
+//课程相关推荐
 @JsonSerializable()
 class CourseRecommendModle {
-  @JsonKey(name: 'id')
   int id;
 
-  @JsonKey(name: 'course_title')
+  @JsonKey(name: 'course_title', defaultValue: '')
   String courseTitle;
 
-  @JsonKey(name: 'total_hours')
+  @JsonKey(name: 'total_hours', defaultValue: 0)
   int totalHours;
 
-  @JsonKey(name: 'course_introduct')
+  @JsonKey(name: 'course_introduct', defaultValue: '')
   String courseIntroduct;
 
-  @JsonKey(name: 'course_difficulty')
+  @JsonKey(name: 'course_difficulty', defaultValue: 0)
   int courseDifficulty;
 
-  @JsonKey(name: 'course_difficulty_desc')
+  @JsonKey(name: 'course_difficulty_desc', defaultValue: '')
   String courseDifficultyDesc;
 
-  @JsonKey(name: 'course_price')
+  @JsonKey(name: 'course_price', defaultValue: '')
   String coursePrice;
 
-  @JsonKey(name: 'course_cate_title')
+  @JsonKey(name: 'course_cate_title', defaultValue: '')
   String courseCateTitle;
 
-  @JsonKey(name: 'teacher_name')
+  @JsonKey(name: 'teacher_name', defaultValue: '')
   String teacherName;
 
-  @JsonKey(name: 'avatar')
+  @JsonKey(defaultValue: '')
   String avatar;
 
-  @JsonKey(name: 'evaluate')
+  @JsonKey(defaultValue: '')
   String evaluate;
 
-  @JsonKey(name: 'typeface_title')
+  @JsonKey(name: 'typeface_title', defaultValue: '')
   String typefaceTitle;
 
-  @JsonKey(name: 'learn_num')
+  @JsonKey(name: 'learn_num', defaultValue: 0)
   int learnNum;
 
   CourseRecommendModle();
 
-  factory CourseRecommendModle.fromJson(Map<String, dynamic> srcJson) => _$CourseRecommendModleFromJson(srcJson);
-
+  //反序列化
+  factory CourseRecommendModle.fromJson(Map<String, dynamic> json) => _$CourseRecommendModleFromJson(json);
+//序列化
   Map<String, dynamic> toJson() => _$CourseRecommendModleToJson(this);
+  CourseRecommendModle.enty();
 }

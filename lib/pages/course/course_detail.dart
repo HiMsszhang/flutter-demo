@@ -72,7 +72,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     DataResult result = await CourseAPI.coursedetail(
       courseId: widget.courseId,
     );
-    _data = result.data;
+    return _data = result.data;
   }
 
   String _formatTime(int timeNum) {
@@ -162,7 +162,15 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                     _widgetInfo(),
                     _widgetDetail(),
                     RateList(),
-                    RecommendList(),
+                    FutureBuilder(
+                      future: _getCourseDetail(),
+                      builder: (BuildContext context, snapshot) {
+                        return RecommendList(
+                          typefaceId: _data.typefaceId,
+                          courseCateId: _data.courseIateId,
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

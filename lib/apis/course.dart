@@ -59,7 +59,7 @@ class CourseAPI {
       Response res = await http.post('/courserecommendlist', queryParameters: params);
       List<CourseRecommendModle> result = [];
       for (var item in res.data) {
-        item = CourseRecommendModle.fromJson(res.data ?? {});
+        item = CourseRecommendModle.fromJson(item ?? {});
         result.add(item);
       }
       return DataResult(result, true);
