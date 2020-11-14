@@ -163,7 +163,7 @@ class _RecommendListState extends State<RecommendList> {
           );
         } else {
           return Container(
-            child: Text('去你妈的'),
+            child: Text('测试'),
           );
         }
       },

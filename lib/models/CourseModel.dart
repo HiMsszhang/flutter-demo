@@ -213,29 +213,7 @@ class CourseCataloguelistModleListResp {
 }
 
 @JsonSerializable()
-class CourseRecommendModle extends Object {
-  @JsonKey(name: 'code')
-  int code;
-
-  @JsonKey(name: 'msg')
-  String msg;
-
-  @JsonKey(name: 'data')
-  List<CourseRecommendModleData> data;
-
-  CourseRecommendModle(
-    this.code,
-    this.msg,
-    this.data,
-  );
-
-  factory CourseRecommendModle.fromJson(Map<String, dynamic> srcJson) => _$CourseRecommendModleFromJson(srcJson);
-
-  Map<String, dynamic> toJson() => _$CourseRecommendModleToJson(this);
-}
-
-@JsonSerializable()
-class CourseRecommendModleData extends Object {
+class CourseRecommendModle {
   @JsonKey(name: 'id')
   int id;
 
@@ -275,23 +253,9 @@ class CourseRecommendModleData extends Object {
   @JsonKey(name: 'learn_num')
   int learnNum;
 
-  CourseRecommendModleData(
-    this.id,
-    this.courseTitle,
-    this.totalHours,
-    this.courseIntroduct,
-    this.courseDifficulty,
-    this.courseDifficultyDesc,
-    this.coursePrice,
-    this.courseCateTitle,
-    this.teacherName,
-    this.avatar,
-    this.evaluate,
-    this.typefaceTitle,
-    this.learnNum,
-  );
+  CourseRecommendModle();
 
-  factory CourseRecommendModleData.fromJson(Map<String, dynamic> srcJson) => _$CourseRecommendModleDataFromJson(srcJson);
+  factory CourseRecommendModle.fromJson(Map<String, dynamic> srcJson) => _$CourseRecommendModleFromJson(srcJson);
 
-  Map<String, dynamic> toJson() => _$CourseRecommendModleDataToJson(this);
+  Map<String, dynamic> toJson() => _$CourseRecommendModleToJson(this);
 }

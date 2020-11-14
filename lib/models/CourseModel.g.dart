@@ -152,46 +152,24 @@ Map<String, dynamic> _$CourseCataloguelistModleListRespToJson(
     };
 
 CourseRecommendModle _$CourseRecommendModleFromJson(Map<String, dynamic> json) {
-  return CourseRecommendModle(
-    json['code'] as int,
-    json['msg'] as String,
-    (json['data'] as List)
-        ?.map((e) => e == null
-            ? null
-            : CourseRecommendModleData.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-  );
+  return CourseRecommendModle()
+    ..id = json['id'] as int
+    ..courseTitle = json['course_title'] as String
+    ..totalHours = json['total_hours'] as int
+    ..courseIntroduct = json['course_introduct'] as String
+    ..courseDifficulty = json['course_difficulty'] as int
+    ..courseDifficultyDesc = json['course_difficulty_desc'] as String
+    ..coursePrice = json['course_price'] as String
+    ..courseCateTitle = json['course_cate_title'] as String
+    ..teacherName = json['teacher_name'] as String
+    ..avatar = json['avatar'] as String
+    ..evaluate = json['evaluate'] as String
+    ..typefaceTitle = json['typeface_title'] as String
+    ..learnNum = json['learn_num'] as int;
 }
 
 Map<String, dynamic> _$CourseRecommendModleToJson(
         CourseRecommendModle instance) =>
-    <String, dynamic>{
-      'code': instance.code,
-      'msg': instance.msg,
-      'data': instance.data,
-    };
-
-CourseRecommendModleData _$CourseRecommendModleDataFromJson(
-    Map<String, dynamic> json) {
-  return CourseRecommendModleData(
-    json['id'] as int,
-    json['course_title'] as String,
-    json['total_hours'] as int,
-    json['course_introduct'] as String,
-    json['course_difficulty'] as int,
-    json['course_difficulty_desc'] as String,
-    json['course_price'] as String,
-    json['course_cate_title'] as String,
-    json['teacher_name'] as String,
-    json['avatar'] as String,
-    json['evaluate'] as String,
-    json['typeface_title'] as String,
-    json['learn_num'] as int,
-  );
-}
-
-Map<String, dynamic> _$CourseRecommendModleDataToJson(
-        CourseRecommendModleData instance) =>
     <String, dynamic>{
       'id': instance.id,
       'course_title': instance.courseTitle,
