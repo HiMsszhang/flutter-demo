@@ -79,7 +79,7 @@ class _CardMineCourseState extends State<CardMineCourse> {
             ),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 21.w),
+              padding: EdgeInsets.symmetric(vertical: 15.w),
               margin: EdgeInsets.symmetric(horizontal: 30.w),
               decoration: BoxDecoration(
                 border: Border(top: BorderSide(width: 0.5, color: Color(0xFFF5F5F5))),
@@ -126,7 +126,7 @@ class _CardMineCourseState extends State<CardMineCourse> {
                       ),
                     ],
                   ),
-                  Text('已支付\n￥999.00', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorRed, fontWeight: FontWeight.bold), textAlign: TextAlign.right),
+                  Text('已支付\n￥999.00', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorRed, fontWeight: FontWeight.bold, height: 1.5), textAlign: TextAlign.right),
                 ],
               ),
             ),

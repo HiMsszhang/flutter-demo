@@ -65,3 +65,15 @@ Map<String, dynamic> _$CourseModelListRespToJson(
       'last_page': instance.lastPage,
       'data': instance.data,
     };
+
+CourseCatModel _$CourseCatModelFromJson(Map<String, dynamic> json) {
+  return CourseCatModel()
+    ..id = json['id'] as int
+    ..courseCateTitle = json['course_cate_title'] as String ?? '';
+}
+
+Map<String, dynamic> _$CourseCatModelToJson(CourseCatModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'course_cate_title': instance.courseCateTitle,
+    };

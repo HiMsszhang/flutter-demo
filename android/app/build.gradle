@@ -37,6 +37,8 @@ android {
 
     lintOptions {
         disable 'InvalidPackage'
+		// fluwx问题暂时解决
+		checkReleaseBuilds false
     }
 
     defaultConfig {
