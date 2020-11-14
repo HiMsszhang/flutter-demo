@@ -24,7 +24,8 @@ CourseModel _$CourseModelFromJson(Map<String, dynamic> json) {
     ..learnNum = json['learn_num'] as num ?? 0;
 }
 
-Map<String, dynamic> _$CourseModelToJson(CourseModel instance) => <String, dynamic>{
+Map<String, dynamic> _$CourseModelToJson(CourseModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'course_title': instance.courseTitle,
       'total_hours': instance.totalHours,
@@ -47,10 +48,17 @@ CourseModelListResp _$CourseModelListRespFromJson(Map<String, dynamic> json) {
     ..perPage = json['per_page'] as int ?? 0
     ..currentPage = json['current_page'] as int ?? 0
     ..lastPage = json['last_page'] as int ?? 0
-    ..data = (json['data'] as List)?.map((e) => e == null ? null : CourseModel.fromJson(e as Map<String, dynamic>))?.toList() ?? [];
+    ..data = (json['data'] as List)
+            ?.map((e) => e == null
+                ? null
+                : CourseModel.fromJson(e as Map<String, dynamic>))
+            ?.toList() ??
+        [];
 }
 
-Map<String, dynamic> _$CourseModelListRespToJson(CourseModelListResp instance) => <String, dynamic>{
+Map<String, dynamic> _$CourseModelListRespToJson(
+        CourseModelListResp instance) =>
+    <String, dynamic>{
       'total': instance.total,
       'per_page': instance.perPage,
       'current_page': instance.currentPage,
@@ -64,7 +72,8 @@ CourseCatModel _$CourseCatModelFromJson(Map<String, dynamic> json) {
     ..courseCateTitle = json['course_cate_title'] as String ?? '';
 }
 
-Map<String, dynamic> _$CourseCatModelToJson(CourseCatModel instance) => <String, dynamic>{
+Map<String, dynamic> _$CourseCatModelToJson(CourseCatModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'course_cate_title': instance.courseCateTitle,
     };
@@ -89,7 +98,8 @@ CourseDetailModel _$CourseDetailModelFromJson(Map<String, dynamic> json) {
     ..currentHours = json['current_hours'] as Map<String, dynamic> ?? {};
 }
 
-Map<String, dynamic> _$CourseDetailModelToJson(CourseDetailModel instance) => <String, dynamic>{
+Map<String, dynamic> _$CourseDetailModelToJson(CourseDetailModel instance) =>
+    <String, dynamic>{
       'course_cate_id': instance.courseIateId,
       'course_title': instance.courseTitle,
       'typeface_id': instance.typefaceId,
@@ -108,7 +118,8 @@ Map<String, dynamic> _$CourseDetailModelToJson(CourseDetailModel instance) => <S
       'current_hours': instance.currentHours,
     };
 
-CourseCataloguelistModle _$CourseCataloguelistModleFromJson(Map<String, dynamic> json) {
+CourseCataloguelistModle _$CourseCataloguelistModleFromJson(
+    Map<String, dynamic> json) {
   return CourseCataloguelistModle()
     ..id = json['id'] as int
     ..courseCatalogueTitle = json['course_catalogue_title'] as String ?? ''
@@ -117,7 +128,9 @@ CourseCataloguelistModle _$CourseCataloguelistModleFromJson(Map<String, dynamic>
     ..duration = json['duration'] as num ?? '';
 }
 
-Map<String, dynamic> _$CourseCataloguelistModleToJson(CourseCataloguelistModle instance) => <String, dynamic>{
+Map<String, dynamic> _$CourseCataloguelistModleToJson(
+        CourseCataloguelistModle instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'course_catalogue_title': instance.courseCatalogueTitle,
       'course_arrangement': instance.courseArrangement,
@@ -125,16 +138,24 @@ Map<String, dynamic> _$CourseCataloguelistModleToJson(CourseCataloguelistModle i
       'duration': instance.duration,
     };
 
-CourseCataloguelistModleListResp _$CourseCataloguelistModleListRespFromJson(Map<String, dynamic> json) {
+CourseCataloguelistModleListResp _$CourseCataloguelistModleListRespFromJson(
+    Map<String, dynamic> json) {
   return CourseCataloguelistModleListResp()
     ..total = json['total'] as int ?? 0
     ..perPage = json['per_page'] as int ?? 0
     ..currentPage = json['current_page'] as int ?? 0
     ..lastPage = json['last_page'] as int ?? 0
-    ..data = (json['data'] as List)?.map((e) => e == null ? null : CourseCataloguelistModle.fromJson(e as Map<String, dynamic>))?.toList() ?? [];
+    ..data = (json['data'] as List)
+            ?.map((e) => e == null
+                ? null
+                : CourseCataloguelistModle.fromJson(e as Map<String, dynamic>))
+            ?.toList() ??
+        [];
 }
 
-Map<String, dynamic> _$CourseCataloguelistModleListRespToJson(CourseCataloguelistModleListResp instance) => <String, dynamic>{
+Map<String, dynamic> _$CourseCataloguelistModleListRespToJson(
+        CourseCataloguelistModleListResp instance) =>
+    <String, dynamic>{
       'total': instance.total,
       'per_page': instance.perPage,
       'current_page': instance.currentPage,
@@ -159,7 +180,9 @@ CourseRecommendModle _$CourseRecommendModleFromJson(Map<String, dynamic> json) {
     ..learnNum = json['learn_num'] as int;
 }
 
-Map<String, dynamic> _$CourseRecommendModleToJson(CourseRecommendModle instance) => <String, dynamic>{
+Map<String, dynamic> _$CourseRecommendModleToJson(
+        CourseRecommendModle instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'course_title': instance.courseTitle,
       'total_hours': instance.totalHours,
