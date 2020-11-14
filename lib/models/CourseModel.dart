@@ -213,42 +213,85 @@ class CourseCataloguelistModleListResp {
 }
 
 @JsonSerializable()
-class CourseRecommendModle {
-  int id;
-  @JsonKey(name: 'course_title', defaultValue: '')
-  String courseTitle;
-  @JsonKey(name: 'total_hours', defaultValue: 0)
-  num totalHours;
-  @JsonKey(name: 'course_introduct', defaultValue: '')
-  String courseIntroduct;
-  @JsonKey(name: 'course_difficulty', defaultValue: 0)
-  num courseDifficulty;
-  @JsonKey(name: 'course_price', defaultValue: '')
-  String coursePrice;
-  @JsonKey(name: 'course_cate_title', defaultValue: '')
-  String courseCateTitle;
-  @JsonKey(name: 'teacher_name', defaultValue: '')
-  String teacherName;
-  @JsonKey(defaultValue: '')
-  String avatar;
-  @JsonKey(name: 'typeface_title', defaultValue: '')
-  String typefaceTitle;
-  // @JsonKey(name: 'sign_up', defaultValue: 0)
-  // num signUp;
-  CourseRecommendModle();
+class CourseRecommendModle extends Object {
+  @JsonKey(name: 'code')
+  int code;
 
-  factory CourseRecommendModle.fromJson(Map<String, dynamic> json) => _$CourseRecommendModleFromJson(json);
+  @JsonKey(name: 'msg')
+  String msg;
+
+  @JsonKey(name: 'data')
+  List<CourseRecommendModleData> data;
+
+  CourseRecommendModle(
+    this.code,
+    this.msg,
+    this.data,
+  );
+
+  factory CourseRecommendModle.fromJson(Map<String, dynamic> srcJson) => _$CourseRecommendModleFromJson(srcJson);
 
   Map<String, dynamic> toJson() => _$CourseRecommendModleToJson(this);
 }
 
 @JsonSerializable()
-class CourseRecommendModleList {
-  @JsonKey(defaultValue: [])
-  List<CourseRecommendModle> data;
-  CourseRecommendModleList();
+class CourseRecommendModleData extends Object {
+  @JsonKey(name: 'id')
+  int id;
 
-  factory CourseRecommendModleList.fromJson(Map<String, dynamic> json) => _$CourseRecommendModleListFromJson(json);
+  @JsonKey(name: 'course_title')
+  String courseTitle;
 
-  Map<String, dynamic> toJson() => _$CourseRecommendModleListToJson(this);
+  @JsonKey(name: 'total_hours')
+  int totalHours;
+
+  @JsonKey(name: 'course_introduct')
+  String courseIntroduct;
+
+  @JsonKey(name: 'course_difficulty')
+  int courseDifficulty;
+
+  @JsonKey(name: 'course_difficulty_desc')
+  String courseDifficultyDesc;
+
+  @JsonKey(name: 'course_price')
+  String coursePrice;
+
+  @JsonKey(name: 'course_cate_title')
+  String courseCateTitle;
+
+  @JsonKey(name: 'teacher_name')
+  String teacherName;
+
+  @JsonKey(name: 'avatar')
+  String avatar;
+
+  @JsonKey(name: 'evaluate')
+  String evaluate;
+
+  @JsonKey(name: 'typeface_title')
+  String typefaceTitle;
+
+  @JsonKey(name: 'learn_num')
+  int learnNum;
+
+  CourseRecommendModleData(
+    this.id,
+    this.courseTitle,
+    this.totalHours,
+    this.courseIntroduct,
+    this.courseDifficulty,
+    this.courseDifficultyDesc,
+    this.coursePrice,
+    this.courseCateTitle,
+    this.teacherName,
+    this.avatar,
+    this.evaluate,
+    this.typefaceTitle,
+    this.learnNum,
+  );
+
+  factory CourseRecommendModleData.fromJson(Map<String, dynamic> srcJson) => _$CourseRecommendModleDataFromJson(srcJson);
+
+  Map<String, dynamic> toJson() => _$CourseRecommendModleDataToJson(this);
 }

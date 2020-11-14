@@ -52,12 +52,12 @@ class CourseAPI {
   //课程相关推荐
   static Future<DataResult> courserecommendlist({int courseCateId, int typefaceId}) async {
     try {
-      var params = {
+      Map<String, int> params = {
         'course_cate_id': courseCateId,
         'typeface_id': typefaceId,
       };
       Response res = await http.post('/courserecommendlist', queryParameters: params);
-      var result = CourseRecommendModleList.fromJson(res.data ?? {});
+      var result = CourseRecommendModle.fromJson(res.data ?? []);
       return DataResult(result, true);
     } catch (e) {
       return DataResult(e, false);

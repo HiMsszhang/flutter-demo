@@ -14,14 +14,14 @@ class RecommendList extends StatefulWidget {
 }
 
 class _RecommendListState extends State<RecommendList> {
-  CourseRecommendModleList _courseRecommendData;
+  CourseRecommendModle _data;
 
   Future _getCourseRecommendList() async {
     DataResult result = await CourseAPI.courserecommendlist(
       courseCateId: 1,
       typefaceId: 1,
     );
-    _courseRecommendData = result.data[0];
+    _data = result.data;
   }
 
   @override
@@ -57,7 +57,7 @@ class _RecommendListState extends State<RecommendList> {
       future: _getCourseRecommendList(),
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          var item = _courseRecommendData;
+          // var item = _data.data[index];
           return Container(
             margin: EdgeInsets.only(top: 14.w),
             clipBehavior: Clip.hardEdge,
@@ -91,7 +91,7 @@ class _RecommendListState extends State<RecommendList> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text('${item.data}', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                                  Text('{}', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
                                   Text('【楷书.钢笔】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
                                 ],
                               ),
@@ -162,7 +162,9 @@ class _RecommendListState extends State<RecommendList> {
             ),
           );
         } else {
-          return Container();
+          return Container(
+            child: Text('去你妈的'),
+          );
         }
       },
     );

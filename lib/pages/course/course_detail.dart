@@ -41,9 +41,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   @override
   void initState() {
     super.initState();
-
+    _controller = VideoPlayerController.network(_vedioUrl);
     _chewieController = ChewieController(
-      videoPlayerController: VideoPlayerController.network(_vedioUrl),
+      videoPlayerController: _controller,
       aspectRatio: 750 / 500,
       autoPlay: true,
       looping: true,

@@ -152,47 +152,58 @@ Map<String, dynamic> _$CourseCataloguelistModleListRespToJson(
     };
 
 CourseRecommendModle _$CourseRecommendModleFromJson(Map<String, dynamic> json) {
-  return CourseRecommendModle()
-    ..id = json['id'] as int
-    ..courseTitle = json['course_title'] as String ?? ''
-    ..totalHours = json['total_hours'] as num ?? 0
-    ..courseIntroduct = json['course_introduct'] as String ?? ''
-    ..courseDifficulty = json['course_difficulty'] as num ?? 0
-    ..coursePrice = json['course_price'] as String ?? ''
-    ..courseCateTitle = json['course_cate_title'] as String ?? ''
-    ..teacherName = json['teacher_name'] as String ?? ''
-    ..avatar = json['avatar'] as String ?? ''
-    ..typefaceTitle = json['typeface_title'] as String ?? '';
+  return CourseRecommendModle(
+    json['code'] as int,
+    json['msg'] as String,
+    (json['data'] as List)
+        ?.map((e) => e == null
+            ? null
+            : CourseRecommendModleData.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
 }
 
 Map<String, dynamic> _$CourseRecommendModleToJson(
         CourseRecommendModle instance) =>
+    <String, dynamic>{
+      'code': instance.code,
+      'msg': instance.msg,
+      'data': instance.data,
+    };
+
+CourseRecommendModleData _$CourseRecommendModleDataFromJson(
+    Map<String, dynamic> json) {
+  return CourseRecommendModleData(
+    json['id'] as int,
+    json['course_title'] as String,
+    json['total_hours'] as int,
+    json['course_introduct'] as String,
+    json['course_difficulty'] as int,
+    json['course_difficulty_desc'] as String,
+    json['course_price'] as String,
+    json['course_cate_title'] as String,
+    json['teacher_name'] as String,
+    json['avatar'] as String,
+    json['evaluate'] as String,
+    json['typeface_title'] as String,
+    json['learn_num'] as int,
+  );
+}
+
+Map<String, dynamic> _$CourseRecommendModleDataToJson(
+        CourseRecommendModleData instance) =>
     <String, dynamic>{
       'id': instance.id,
       'course_title': instance.courseTitle,
       'total_hours': instance.totalHours,
       'course_introduct': instance.courseIntroduct,
       'course_difficulty': instance.courseDifficulty,
+      'course_difficulty_desc': instance.courseDifficultyDesc,
       'course_price': instance.coursePrice,
       'course_cate_title': instance.courseCateTitle,
       'teacher_name': instance.teacherName,
       'avatar': instance.avatar,
+      'evaluate': instance.evaluate,
       'typeface_title': instance.typefaceTitle,
-    };
-
-CourseRecommendModleList _$CourseRecommendModleListFromJson(
-    Map<String, dynamic> json) {
-  return CourseRecommendModleList()
-    ..data = (json['data'] as List)
-            ?.map((e) => e == null
-                ? null
-                : CourseRecommendModle.fromJson(e as Map<String, dynamic>))
-            ?.toList() ??
-        [];
-}
-
-Map<String, dynamic> _$CourseRecommendModleListToJson(
-        CourseRecommendModleList instance) =>
-    <String, dynamic>{
-      'data': instance.data,
+      'learn_num': instance.learnNum,
     };
