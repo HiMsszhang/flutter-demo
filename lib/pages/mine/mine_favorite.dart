@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/mine.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/CourseCollectionModel.dart';
+import 'package:molan_edu/models/teacherCollectionModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/card_mine_course.dart';
@@ -24,12 +27,39 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
   int _selectedIndex = 0;
   PageController _pageController;
   bool _showSearch = false;
-
+  CourseCollectionModel _courseData;
+  TeacherCollectionModel _teacherDate;
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+    // delayed(() async {
+    //   // await _load();
+    // });
   }
+
+  Future _getCourseCollectionList() async {
+    DataResult result = await MineApi.courseCollectionlist(
+      page: 1,
+      listRow: 10,
+    );
+    _courseData = result.data;
+    return _courseData.data;
+  }
+
+  Future _getTeacherCollectionList() async {
+    DataResult result = await MineApi.teacherCollectionList(
+      page: 1,
+      listRow: 10,
+    );
+    _teacherDate = result.data;
+    return _teacherDate.data;
+  }
+
+  // _load() async {
+  //   await _getCourseCollectionList();
+  //   setState(() {});
+  // }
 
   @override
   void dispose() {
@@ -103,17 +133,34 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
         controller: _pageController,
         onPageChanged: _onPageChanged,
         children: [
-          ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-            itemCount: 10,
-            itemBuilder: (context, index) => CardMineCourse(
-              showTags: true,
-            ),
+          FutureBuilder(
+            future: _getCourseCollectionList(),
+            builder: (context, snapshot) {
+              return ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                itemCount: _courseData.data.length,
+                itemBuilder: (context, index) => CardMineCourse(
+                  showTags: true,
+                  data: _courseData.data,
+                  index: index,
+                ),
+              );
+            },
           ),
-          ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-            itemCount: 10,
-            itemBuilder: (context, index) => CardMineTeacher(),
+          FutureBuilder(
+            future: _getTeacherCollectionList(),
+            builder: (context, snapshot) {
+              var item = _teacherDate.data;
+              return ListView.builder(
+                  padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                  itemCount: item.length,
+                  itemBuilder: (context, index) {
+                    return CardMineTeacher(
+                      data: item,
+                      index: index,
+                    );
+                  });
+            },
           ),
         ],
       ),

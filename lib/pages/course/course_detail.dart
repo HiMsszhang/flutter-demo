@@ -36,7 +36,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   int _selectedIndex = 0;
   CourseDetailModel _data;
   CourseCataloguelistModleListResp _courseCatalogueData;
-  String _vedioUrl = 'http:\/\/test-molan-1256995646.cos.ap-guangzhou.myqcloud.com\/3ff8055c0e9c6474d4d83cef054820b6.mp4';
+  String _vedioUrl;
   int _currentIndex = 0;
   @override
   void initState() {
@@ -49,6 +49,14 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
       looping: true,
       customControls: CustomControls(),
     );
+    delayed(() async {
+      await _load();
+    });
+  }
+
+  _load() async {
+    await _getCourseDetail();
+    setState(() {});
   }
 
   @override
@@ -72,7 +80,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     DataResult result = await CourseAPI.coursedetail(
       courseId: widget.courseId,
     );
-    return _data = result.data;
+    _data = result.data;
+    _vedioUrl = _data.currentHours['uel'];
+    return _data;
   }
 
   String _formatTime(int timeNum) {
@@ -100,14 +110,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
 
     _streamController.sink.add(_selectedIndex);
   }
-
-  // _onCourseTap(int index) {
-  //   Future.delayed(Duration(milliseconds: 8000)).then((e) {
-  //     setState(() {
-  //       _currentIndex = index;
-  //     });
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -479,9 +481,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         padding: EdgeInsets.fromLTRB(25.w, 16.w, 63.w, 16.w),
                         onPressed: () {
-                          _currentIndex = index;
-                          _vedioUrl = item[index].url;
-                          _streamController.sink.add(_currentIndex);
+                          // _currentIndex = index;
+                          // _vedioUrl = item[index].url;
+                          // _streamController.sink.add(_currentIndex);
                         },
                         child: Row(
                           children: [

@@ -4,9 +4,13 @@ import 'package:molan_edu/widgets/common_avatar.dart';
 
 class CardMineTeacher extends StatefulWidget {
   final bool showTags;
+  final data;
+  final index;
   CardMineTeacher({
     Key key,
     this.showTags = false,
+    this.data,
+    this.index,
   }) : super(key: key);
 
   _CardMineTeacherState createState() => _CardMineTeacherState();
@@ -15,6 +19,7 @@ class CardMineTeacher extends StatefulWidget {
 class _CardMineTeacherState extends State<CardMineTeacher> {
   @override
   Widget build(BuildContext context) {
+    var item = widget.data[widget.index];
     return Container(
       width: 690.w,
       margin: EdgeInsets.only(bottom: 20.w),
@@ -35,16 +40,18 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
                   child: Row(
                     children: [
                       CommonAvatar(
+                        showSex: false,
                         size: 90.w,
+                        avatar: item.avatar,
                       ),
                       SizedBox(width: 22.w),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('licky老师', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
+                            Text(item.teacherName, style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
                             SizedBox(height: 18.w),
-                            Text('学生喜爱度99.5%', style: Styles.specialFont(fontSize: 26.sp, color: Theme.of(context).accentColor)),
+                            Text('学生喜爱度${item.likeability}%', style: Styles.specialFont(fontSize: 26.sp, color: Theme.of(context).accentColor)),
                           ],
                         ),
                       ),
@@ -69,7 +76,7 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
             SizedBox(height: 36.w),
             Container(
               height: 80.w,
-              child: Text('北京大学，硕士，三年教龄，风趣幽默，有责任心，让课程变的生动。', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666, height: 1.38)),
+              child: Text(item.introduce, style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666, height: 1.38)),
             ),
             widget.showTags
                 ? Container(
