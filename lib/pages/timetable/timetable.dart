@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:molan_edu/apis/timeTable.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/card_leaning.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:molan_edu/models/TimeTableModel.dart';
+import 'package:molan_edu/providers/user_state.dart';
+import 'package:molan_edu/apis/timeTable.dart';
 
 class TimetablePage extends StatefulWidget {
+  final jumpToPage;
   const TimetablePage({
     Key key,
+    this.jumpToPage,
   }) : super(key: key);
 
   @override
@@ -18,10 +21,11 @@ class TimetablePage extends StatefulWidget {
 
 class _TimetablePageState extends State<TimetablePage> with UtilsMixin {
   TimeTableListResp _data;
-  List<TimeTableModel> _dataList = [];
-  RefreshController _listController = RefreshController(initialRefresh: false);
+  List<TimeTableModel> _dataList = new List<TimeTableModel>.empty();
+  RefreshController _listController = RefreshController(initialRefresh: true);
   int _page = 1;
   int _listRow = 10;
+  bool hasLogin = false;
 
   @override
   void initState() {
@@ -32,7 +36,8 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin {
   }
 
   _load() async {
-    _listController.requestRefresh();
+    hasLogin = context.read<UserState>().hasLogin;
+    if (hasLogin) _listController.requestRefresh();
     setState(() {});
   }
 
@@ -96,26 +101,74 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin {
                 ),
               ),
               Expanded(
-                child: SmartRefresher(
-                  enablePullDown: true,
-                  enablePullUp: true,
-                  onRefresh: _onRefresh,
-                  onLoading: _onLoading,
-                  controller: _listController,
-                  header: myCustomHeader(),
-                  footer: myCustomFooter(),
-                  child: ListView(
-                    children: [
-                      ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                        itemCount: _dataList.length,
-                        itemBuilder: (context, index) => CardLeaning(data: _dataList[index]),
+                child: !hasLogin && _data?.total != null
+                    ? Container(
+                        child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
+                          children: [
+                            TextSpan(text: '暂无课程表\n请'),
+                            WidgetSpan(
+                              child: GestureDetector(
+                                onTap: () {
+                                  NavigatorUtils.pushNamed(context, '/login');
+                                },
+                                child: Text(
+                                  '登录',
+                                  style: Styles.normalFont(fontSize: 30.sp, color: Theme.of(context).accentColor, decoration: TextDecoration.underline),
+                                ),
+                              ),
+                            ),
+                            TextSpan(text: '后查看'),
+                          ],
+                        ),
+                      ))
+                    : SmartRefresher(
+                        enablePullDown: true,
+                        enablePullUp: true,
+                        onRefresh: _onRefresh,
+                        onLoading: _onLoading,
+                        controller: _listController,
+                        header: myCustomHeader(),
+                        footer: myCustomFooter(),
+                        child: ListView(
+                          children: [
+                            _data?.total == 0
+                                ? Container(
+                                    alignment: Alignment.center,
+                                    child: RichText(
+                                      textAlign: TextAlign.center,
+                                      text: TextSpan(
+                                        style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
+                                        children: [
+                                          TextSpan(text: '暂无课程表\n先去课程广场'),
+                                          WidgetSpan(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                widget.jumpToPage(1);
+                                              },
+                                              child: Text(
+                                                '看看吧',
+                                                style: Styles.normalFont(fontSize: 30.sp, color: Theme.of(context).accentColor, decoration: TextDecoration.underline),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                            ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                              itemCount: _dataList.length,
+                              itemBuilder: (context, index) => CardLeaning(data: _dataList[index]),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),

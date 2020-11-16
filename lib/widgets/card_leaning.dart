@@ -4,6 +4,7 @@ import 'package:molan_edu/widgets/common_avatar.dart';
 
 import 'package:molan_edu/widgets/mini_rating_star.dart';
 import 'package:molan_edu/models/TimeTableModel.dart';
+import 'package:molan_edu/pages/timetable/timetable_list.dart';
 
 class CardLeaning extends StatefulWidget {
   final TimeTableModel data;
@@ -16,6 +17,23 @@ class CardLeaning extends StatefulWidget {
 }
 
 class _CardLeaningState extends State<CardLeaning> {
+  _studyStatus() {
+    switch (widget.data.studyStatus) {
+      case 1:
+        return '未开始';
+        break;
+      case 2:
+        return '继续学习';
+        break;
+      case 3:
+        return '已结课';
+        break;
+      default:
+        return '继续学习';
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var data = widget.data;
@@ -30,7 +48,7 @@ class _CardLeaningState extends State<CardLeaning> {
         padding: EdgeInsets.all(30.w),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         onPressed: () {
-          NavigatorUtils.pushNamed(context, '/timetable.list');
+          NavigatorUtils.push(context, TimetableListPage(id: data.courseId, title: data.courseTitle, courseModelId: data.courseModelId));
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +120,7 @@ class _CardLeaningState extends State<CardLeaning> {
                     constraints: BoxConstraints(minHeight: 162.w, minWidth: 48.w),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     onPressed: () {},
-                    child: Text('继续学习', style: Styles.normalFont(fontSize: 28.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(_studyStatus(), style: Styles.normalFont(fontSize: 28.sp, color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],

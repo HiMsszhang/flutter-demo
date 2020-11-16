@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:molan_edu/utils/imports.dart';
 
+import 'package:molan_edu/models/TimeTableModel.dart';
+import 'package:molan_edu/pages/timetable/timetable_detail.dart';
+
 class CardTimetable extends StatefulWidget {
-  final bool isLock;
-  final VoidCallback onTap;
+  final TimeTableMenuModel data;
+  //课程学习模式 1--普通 2--VIP
+  final int courseModelId;
 
   CardTimetable({
     Key key,
-    this.isLock = true,
-    this.onTap,
+    this.data,
+    this.courseModelId,
   }) : super(key: key);
 
   _CardTimetableState createState() => _CardTimetableState();
@@ -17,6 +21,7 @@ class CardTimetable extends StatefulWidget {
 class _CardTimetableState extends State<CardTimetable> {
   @override
   Widget build(BuildContext context) {
+    var data = widget.data;
     return Container(
       width: 690.w,
       margin: EdgeInsets.only(bottom: 20.w),
@@ -29,7 +34,8 @@ class _CardTimetableState extends State<CardTimetable> {
         padding: EdgeInsets.all(30.w),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         onPressed: () {
-          widget.onTap();
+          if (data.isLock == 2) return;
+          NavigatorUtils.push(context, TimetableDetailPage(id: data.id, title: data.courseCatalogueTitle));
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,16 +44,15 @@ class _CardTimetableState extends State<CardTimetable> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('第一节', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
+                  Text(data.courseArrangement ?? '', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
                   SizedBox(height: 21.w),
                   Row(
                     children: [
-                      Text('勤礼碑一系列', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
-                      Text('【楷书.钢笔】', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                      Text(data.courseCatalogueTitle ?? '', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(height: 54.w),
-                  widget.isLock ? _widgetLock() : _widgetLearn(),
+                  data.isLock == 2 ? _widgetLock() : _widgetLearn(),
                 ],
               ),
             ),
@@ -60,15 +65,24 @@ class _CardTimetableState extends State<CardTimetable> {
               ),
               child: Stack(
                 children: [
-                  Image.asset('assets/images/demo.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
+                  CachedNetworkImage(
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                    imageUrl: data.image ?? '',
+                    placeholder: (context, url) => Image.asset('assets/images/demo.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
+                  ),
                   Align(
                     alignment: Alignment.topCenter,
-                    child: Container(
-                      width: 180.w,
-                      height: 35.w,
-                      alignment: Alignment.center,
-                      color: Theme.of(context).accentColor,
-                      child: Text('上次学到', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white)),
+                    child: Offstage(
+                      offstage: data.lastLearningStatus == 2,
+                      child: Container(
+                        width: 180.w,
+                        height: 35.w,
+                        alignment: Alignment.center,
+                        color: Theme.of(context).accentColor,
+                        child: Text('上次学到', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white)),
+                      ),
                     ),
                   ),
                 ],
@@ -84,13 +98,13 @@ class _CardTimetableState extends State<CardTimetable> {
     return Row(
       children: [
         ...List.generate(
-          3,
+          widget.courseModelId == 1 ? 2 : 3,
           (index) => Container(
             margin: EdgeInsets.only(right: 30.w),
             child: ImageIcon(
               AssetImage('assets/images/timetable/icon_learn.png'),
               size: 41.w,
-              color: Color(0xFFD7D7D7),
+              color: widget.data.completionStatus > index ? Theme.of(context).accentColor : Color(0xFFD7D7D7),
             ),
           ),
         ),
@@ -105,7 +119,7 @@ class _CardTimetableState extends State<CardTimetable> {
           height: 40.w,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(40.w),
-            color: Color(0xFFD7D7D7),
+            color: widget.data.completionStatus == 3 ? Theme.of(context).accentColor : Color(0xFFD7D7D7),
           ),
           child: Icon(
             Icons.check,
@@ -127,7 +141,7 @@ class _CardTimetableState extends State<CardTimetable> {
           height: 41.w,
         ),
         SizedBox(width: 18.w),
-        Text('12-03  开始学习哦', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+        Text('${widget.data.openingTime}  开始学习哦', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
       ],
     );
   }

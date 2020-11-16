@@ -127,32 +127,33 @@ mixin UtilsMixin<T extends StatefulWidget> on State<T> {
   /// 列表加载头部
   Widget myCustomHeader() {
     return WaterDropHeader(
-      complete: Text("加载完成"),
+      waterDropColor: Theme.of(context).accentColor,
     );
   }
 
   /// 列表加载底部
   Widget myCustomFooter() {
-    return CustomFooter(
-      builder: (BuildContext context, LoadStatus mode) {
-        Widget body;
-        if (mode == LoadStatus.idle) {
-          body = Text("上拉加载");
-        } else if (mode == LoadStatus.loading) {
-          body = CupertinoActivityIndicator();
-        } else if (mode == LoadStatus.failed) {
-          body = Text("加载失败！点击重试！");
-        } else if (mode == LoadStatus.canLoading) {
-          body = Text("松手,加载更多!");
-        } else {
-          body = Text("没有更多数据了!");
-        }
-        return Container(
-          height: 55.0,
-          child: Center(child: body),
-        );
-      },
-    );
+    return ClassicFooter();
+    // CustomFooter(
+    //   builder: (BuildContext context, LoadStatus mode) {
+    //     Widget body;
+    //     if (mode == LoadStatus.idle) {
+    //       body = Text("上拉加载");
+    //     } else if (mode == LoadStatus.loading) {
+    //       body = CupertinoActivityIndicator();
+    //     } else if (mode == LoadStatus.failed) {
+    //       body = Text("加载失败！点击重试！");
+    //     } else if (mode == LoadStatus.canLoading) {
+    //       body = Text("松手,加载更多!");
+    //     } else {
+    //       body = Text("没有更多数据了!");
+    //     }
+    //     return Container(
+    //       height: 55.0,
+    //       child: Center(child: body),
+    //     );
+    //   },
+    // );
   }
 
   /// toast

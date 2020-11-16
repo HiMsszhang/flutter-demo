@@ -10,6 +10,7 @@ import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/generated/l10n.dart';
 import 'package:molan_edu/styles.dart';
 import 'package:molan_edu/utils/routes.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'package:tencent_im_plugin/enums/log_print_level.dart';
 import 'package:molan_edu/config/config.dart';
@@ -85,6 +86,8 @@ class _MyAppState extends State<MyApp> {
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        //下拉刷新国际化
+        RefreshLocalizations.delegate,
       ],
       supportedLocales: S.delegate.supportedLocales,
       title: "墨岚教育",

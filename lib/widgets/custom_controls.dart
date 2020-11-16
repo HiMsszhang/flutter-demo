@@ -12,7 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class CustomControls extends StatefulWidget {
-  const CustomControls({Key key}) : super(key: key);
+  final String title;
+  const CustomControls({
+    Key key,
+    this.title = '',
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -65,6 +69,8 @@ class _CustomControlsState extends State<CustomControls> {
           absorbing: _hideStuff,
           child: Column(
             children: <Widget>[
+              // 在全屏时才显示
+              chewieController.isFullScreen ? _buildHeader(context, widget.title) : new Container(),
               _latestValue != null && !_latestValue.isPlaying && _latestValue.duration == null || _latestValue.isBuffering
                   ? const Expanded(
                       child: const Center(
@@ -384,6 +390,46 @@ class _CustomControlsState extends State<CustomControls> {
             _startHideTimer();
           },
           colors: chewieController.materialProgressColors ?? ChewieProgressColors(playedColor: Colors.white, handleColor: Theme.of(context).accentColor, bufferedColor: Colors.grey, backgroundColor: Theme.of(context).disabledColor),
+        ),
+      ),
+    );
+  }
+
+  AnimatedOpacity _buildHeader(BuildContext context, String title) {
+    return new AnimatedOpacity(
+      opacity: _hideStuff ? 0.0 : 1.0,
+      duration: new Duration(milliseconds: 300),
+      child: new Container(
+        height: barHeight,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [
+              Color.fromRGBO(1, 1, 1, 0),
+              Color.fromRGBO(1, 1, 1, 0.5),
+            ],
+          ),
+        ),
+        child: new Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            new IconButton(
+              onPressed: _onExpandCollapse,
+              color: _themeColor,
+              icon: new Icon(Icons.chevron_left),
+            ),
+            Expanded(
+              child: new Text(
+                '$title',
+                style: new TextStyle(
+                  color: _themeColor,
+                  fontSize: 18.0,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ),
     );

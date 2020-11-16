@@ -85,7 +85,9 @@ class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener 
         S.current.timetable,
         image: 'assets/images/tab/tab_timetable.png',
         selectedImage: 'assets/images/tab/tab_timetable_selected.png',
-        tabView: TimetablePage(),
+        tabView: TimetablePage(
+          jumpToPage: (index) => _jumpToPage(index),
+        ),
         isMain: true,
         index: 2,
       ),
@@ -259,7 +261,7 @@ mixin HttpErrorListener on State<MainPage> {
         _showToast('网络异常');
         break;
       case 2:
-        _showToast('登录过期，请重新登录！');
+        _showToast('未登录或登录过期，请重新登录！');
         NavigatorUtils.pushNamed(context, '/login');
         break;
       case 403:

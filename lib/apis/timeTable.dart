@@ -21,4 +21,38 @@ class TimeTableAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 课程表目录列表
+  static Future<DataResult> menuList({
+    int page,
+    int listRow,
+    int courseId,
+  }) async {
+    try {
+      var params = {
+        'page': page,
+        'list_row': listRow,
+        'course_id': courseId,
+      };
+      Response res = await http.post('/courseordercataloguelist', queryParameters: params);
+      return DataResult(TimeTableMenuListResp.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  /// 课程表目录详情
+  static Future<DataResult> menuDetail({
+    int courseCatalogueId,
+  }) async {
+    try {
+      var params = {
+        'course_catalogue_id': courseCatalogueId,
+      };
+      Response res = await http.post('/coursecataloguedetail', queryParameters: params);
+      return DataResult(TimeTableMenuDetailModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

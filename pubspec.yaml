@@ -34,8 +34,8 @@ dependencies:
   flutter_swiper: ^1.1.6 #https://pub.flutter-io.cn/packages/flutter_swiper
   iconfont: ^0.7.3 #https://pub.dev/packages/iconfont
   cached_network_image: ^2.2.0 #https://pub.flutter-io.cn/packages/cached_network_image
-  video_player: '>=0.7.0 <0.11.0' #https://pub.flutter-io.cn/packages/video_player
-  chewie: ^0.9.10 #https://pub.flutter-io.cn/packages/chewie
+  video_player: ^1.0.0 #https://pub.flutter-io.cn/packages/video_player
+  chewie: ^0.12.0 #https://pub.flutter-io.cn/packages/chewie
   sticky_headers: ^0.1.8+1 #https://pub.flutter-io.cn/packages/sticky_headers
   material_segmented_control: ^2.1.0 #https://pub.flutter-io.cn/packages/material_segmented_control
   fl_chart: ^0.12.0 #https://pub.flutter-io.cn/packages/fl_chart
