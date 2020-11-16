@@ -1,22 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/pages/course/course_detail.dart';
 import 'package:molan_edu/utils/imports.dart';
-
 import 'package:molan_edu/widgets/common_avatar.dart';
 import 'package:molan_edu/widgets/mini_rating_star.dart';
 
 class CardMineCourse extends StatefulWidget {
   final bool showTags;
+  final data;
+  final index;
   CardMineCourse({
     Key key,
     this.showTags = false,
+    this.data,
+    this.index,
   }) : super(key: key);
 
   _CardMineCourseState createState() => _CardMineCourseState();
 }
 
-class _CardMineCourseState extends State<CardMineCourse> {
+class _CardMineCourseState extends State<CardMineCourse> with UtilsMixin {
+  @override
+  void initState() {
+    super.initState();
+    delayed(() async {
+      await _load();
+    });
+  }
+
+  _load() async {
+    await widget.data;
+  }
+
   @override
   Widget build(BuildContext context) {
+    var item = widget.data[widget.index];
     return Container(
       margin: EdgeInsets.only(bottom: 20.w),
       clipBehavior: Clip.hardEdge,
@@ -24,7 +42,12 @@ class _CardMineCourseState extends State<CardMineCourse> {
         borderRadius: BorderRadius.circular(16.w),
       ),
       child: RawMaterialButton(
-        onPressed: () {},
+        onPressed: () {
+          NavigatorUtils.push(
+            context,
+            CourseDetailPage(courseId: item.course.id),
+          );
+        },
         child: Column(
           children: [
             Container(
@@ -39,17 +62,17 @@ class _CardMineCourseState extends State<CardMineCourse> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('勤礼碑一系列', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
-                            Text('【楷书.钢笔】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Theme.of(context).accentColor)),
+                            Text(item.course.courseTitle, style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                            Text('【${item.course.typefaceTitle}.钢笔】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Theme.of(context).accentColor)),
                           ],
                         ),
                       ),
-                      Text('20课', style: Styles.normalFont(fontSize: 26.sp)),
+                      Text('${item.course.totalHours}课时', style: Styles.normalFont(fontSize: 26.sp)),
                       SizedBox(width: 30.w),
                     ],
                   ),
                   SizedBox(height: 17.w),
-                  Text('学习时间：周一至周五 11:00-12:00', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666), overflow: TextOverflow.ellipsis),
+                  Text('学习时间：${item.course.learningTime}', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666), overflow: TextOverflow.ellipsis),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -59,7 +82,7 @@ class _CardMineCourseState extends State<CardMineCourse> {
                         children: [
                           Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                           SizedBox(width: 10.w),
-                          MiniRatingStar(rating: 3),
+                          MiniRatingStar(rating: item.course.courseDifficulty.toDouble()),
                         ],
                       ),
                       Container(
@@ -70,7 +93,7 @@ class _CardMineCourseState extends State<CardMineCourse> {
                           borderRadius: BorderRadius.horizontal(left: Radius.circular(56.w)),
                           color: Theme.of(context).accentColor,
                         ),
-                        child: Text('学习中', style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
+                        child: Text(item.isBuy == 1 ? '学习中' : '未购买', style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
                       ),
                     ],
                   ),
@@ -96,27 +119,27 @@ class _CardMineCourseState extends State<CardMineCourse> {
                           CommonAvatar(
                             size: 40.w,
                             showSex: false,
+                            avatar: item.teacher.avatar,
                           ),
                           SizedBox(width: 15.w),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Vicky老师', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                              Text(item.teacher.teacherName, style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                               widget.showTags
                                   ? Row(
                                       children: [
-                                        ...List.generate(
-                                          2,
-                                          (index) => Container(
+                                        ...List.generate(item.teacher.teacherLabel.length, (index) {
+                                          return Container(
                                             padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 4.w),
                                             margin: EdgeInsets.only(right: 20.w, top: 4.w),
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.circular(36.w),
                                               color: Color(0xFFEEEEEE),
                                             ),
-                                            child: Text('3年教龄', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999, height: 1.2)),
-                                          ),
-                                        ),
+                                            child: Text(item.teacher.teacherLabel[index], style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999, height: 1.2)),
+                                          );
+                                        }),
                                       ],
                                     )
                                   : Container(),
@@ -126,7 +149,7 @@ class _CardMineCourseState extends State<CardMineCourse> {
                       ),
                     ],
                   ),
-                  Text('已支付\n￥999.00', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorRed, fontWeight: FontWeight.bold, height: 1.5), textAlign: TextAlign.right),
+                  Text('${item.isBuy == 1 ? '已支付' : '课程价格'}\n¥${item.course.coursePrice}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorRed, fontWeight: FontWeight.bold, height: 1.5), textAlign: TextAlign.right),
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:molan_edu/apis/course.dart';
 import 'package:molan_edu/models/CourseModel.dart';
+import 'package:molan_edu/pages/course/course_detail.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/mini_rating_star.dart';
@@ -76,7 +77,9 @@ class _RecommendListState extends State<RecommendList> {
         borderRadius: BorderRadius.circular(16.w),
       ),
       child: RawMaterialButton(
-        onPressed: () {},
+        onPressed: () {
+          NavigatorUtils.push(context, CourseDetailPage(courseId: item.id));
+        },
         child: Column(
           children: [
             Container(
