@@ -20,7 +20,10 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> with UtilsMixin {
+class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAliveClientMixin<ChatPage> {
+  @override
+  bool get wantKeepAlive => true;
+
   List<ConversationEntity> _list = [];
   int _nextSeq = 0;
   @override
@@ -72,6 +75,7 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

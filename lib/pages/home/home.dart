@@ -33,7 +33,10 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with UtilsMixin {
+class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAliveClientMixin<HomePage> {
+  @override
+  bool get wantKeepAlive => true;
+
   List<NavItem> _navList = [
     NavItem(title: S.current.homeNavWriting, image: 'writing'),
     NavItem(title: S.current.homeNavCourse, image: 'course'),
@@ -95,6 +98,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: PreferredSize(
@@ -481,7 +485,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin {
             width: 690.w,
             height: 76.w,
             margin: EdgeInsets.only(top: 26.w),
-            color: Color(0xFFFFC2A3),
+            color: Theme.of(context).buttonColor,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

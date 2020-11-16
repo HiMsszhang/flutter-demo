@@ -73,7 +73,7 @@ class _CommonSearchState extends State<CommonSearch> {
                 border: OutlineInputBorder(borderSide: BorderSide.none),
                 hintText: widget.hintText ?? S.current.inputPlaceholder,
                 hintStyle: Styles.normalFont(color: Theme.of(context).disabledColor, fontSize: 28.sp),
-                contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 16.w),
                 suffixIcon: _inputText != ''
                     ? Padding(
                         padding: EdgeInsets.only(right: 40.w),

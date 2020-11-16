@@ -19,10 +19,13 @@ class TimetablePage extends StatefulWidget {
   _TimetablePageState createState() => _TimetablePageState();
 }
 
-class _TimetablePageState extends State<TimetablePage> with UtilsMixin {
+class _TimetablePageState extends State<TimetablePage> with UtilsMixin, AutomaticKeepAliveClientMixin<TimetablePage> {
+  @override
+  bool get wantKeepAlive => true;
+
   TimeTableListResp _data;
   List<TimeTableModel> _dataList = new List<TimeTableModel>.empty();
-  RefreshController _listController = RefreshController(initialRefresh: true);
+  RefreshController _listController = RefreshController(initialRefresh: false);
   int _page = 1;
   int _listRow = 10;
   bool hasLogin = false;
@@ -70,6 +73,7 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
@@ -104,26 +108,27 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin {
                 child: !hasLogin && _data?.total != null
                     ? Container(
                         child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
-                          children: [
-                            TextSpan(text: '暂无课程表\n请'),
-                            WidgetSpan(
-                              child: GestureDetector(
-                                onTap: () {
-                                  NavigatorUtils.pushNamed(context, '/login');
-                                },
-                                child: Text(
-                                  '登录',
-                                  style: Styles.normalFont(fontSize: 30.sp, color: Theme.of(context).accentColor, decoration: TextDecoration.underline),
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
+                            children: [
+                              TextSpan(text: '暂无课程表\n请'),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    NavigatorUtils.pushNamed(context, '/login');
+                                  },
+                                  child: Text(
+                                    '登录',
+                                    style: Styles.normalFont(fontSize: 30.sp, color: Theme.of(context).accentColor, decoration: TextDecoration.underline),
+                                  ),
                                 ),
                               ),
-                            ),
-                            TextSpan(text: '后查看'),
-                          ],
+                              TextSpan(text: '后查看'),
+                            ],
+                          ),
                         ),
-                      ))
+                      )
                     : SmartRefresher(
                         enablePullDown: true,
                         enablePullUp: true,

@@ -104,7 +104,7 @@ class _CardNewCourseState extends State<CardNewCourse> {
                     height: 48.w,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(48.w),
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).buttonColor,
                     ),
                     alignment: Alignment.center,
                     child: Text(

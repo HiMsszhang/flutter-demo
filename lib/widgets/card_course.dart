@@ -91,8 +91,8 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           children: [
-                            Text(item?.courseTitle ?? '', style: Styles.normalFont(fontSize: 32.sp, color: Colors.white)),
-                            Text('【${item?.typefaceTitle}.${item?.courseCateTitle}】', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
+                            Text(item?.courseTitle ?? '', style: Styles.normalFont(fontSize: 32.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text('【${item?.typefaceTitle}.${item?.courseCateTitle}】', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white, fontWeight: FontWeight.bold)),
                           ],
                         ),
                         SizedBox(height: 20.w),
@@ -100,7 +100,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
                           width: 345.w,
                           child: RichText(
                             text: TextSpan(
-                              style: Styles.normalFont(fontSize: 24.sp, color: Colors.white, height: 1.4),
+                              style: Styles.normalFont(fontSize: 24.sp, color: Colors.white, height: 1.4, fontWeight: FontWeight.bold),
                               children: [
                                 TextSpan(text: '开课时间：${item?.learningTime}'),
                                 WidgetSpan(
@@ -160,9 +160,9 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text('￥${item?.coursePrice}', style: Styles.normalFont(fontSize: 30.sp, color: _cardTheme()['priceColor'], fontWeight: FontWeight.bold)),
+                                Text('￥${item?.coursePrice}', style: Styles.normalFont(fontSize: 32.sp, color: _cardTheme()['priceColor'], fontWeight: FontWeight.bold)),
                                 SizedBox(width: 15.w),
-                                Text('(${item?.totalHours}课时)', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white)),
+                                Text('(${item?.totalHours}课时)', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white, height: 1.2)),
                               ],
                             ),
                           ),

@@ -46,7 +46,10 @@ class CoursePage extends StatefulWidget {
   _CoursePageState createState() => _CoursePageState();
 }
 
-class _CoursePageState extends State<CoursePage> with UtilsMixin {
+class _CoursePageState extends State<CoursePage> with UtilsMixin, AutomaticKeepAliveClientMixin<CoursePage> {
+  @override
+  bool get wantKeepAlive => true;
+
   List<CourseCatModel> _tabList = [];
   int _selectedIndex = 0;
   CourseModelListResp _data;
@@ -142,6 +145,7 @@ class _CoursePageState extends State<CoursePage> with UtilsMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -416,7 +420,7 @@ class _FilterOverlayState extends State<FilterOverlay> with UtilsMixin {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item['title'], style: Styles.specialFont(fontSize: 32.sp)),
+                Text(item['title'], style: Styles.specialFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
                 SizedBox(height: 26.w),
                 Wrap(
                   spacing: 20.w,

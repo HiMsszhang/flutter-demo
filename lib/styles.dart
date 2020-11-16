@@ -13,6 +13,7 @@ abstract class Styles {
   static const colorRed = Color(0xFFFF0000);
   static const colorBlue = Color(0xFF7CC3FF);
   static const colorNoData = Color(0xFFFFC9A7);
+  static const colorBtn = Color(0xFFFFA06B);
 
   /// 一般字体
   static normalFont({
@@ -37,13 +38,15 @@ abstract class Styles {
     Color color,
     FontWeight fontWeight,
     double height,
+    TextDecoration decoration,
   }) {
     return TextStyle(
-      fontFamily: 'HappyFont',
+      // fontFamily: 'HappyFont',
       fontSize: fontSize,
       color: color,
       fontWeight: fontWeight,
-      height: height ?? 1,
+      height: height ?? 1.1,
+      decoration: decoration,
     );
   }
 

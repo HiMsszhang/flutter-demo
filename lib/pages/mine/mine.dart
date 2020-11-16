@@ -15,7 +15,10 @@ class MinePage extends StatefulWidget {
   _MinePageState createState() => _MinePageState();
 }
 
-class _MinePageState extends State<MinePage> with UtilsMixin {
+class _MinePageState extends State<MinePage> with UtilsMixin, AutomaticKeepAliveClientMixin<MinePage> {
+  @override
+  bool get wantKeepAlive => true;
+
   List<Map> _mineList = [
     {"title": "我的课程", "subtitle": "已购买的课程", "name": "course"},
     {"title": "我的收藏", "subtitle": "收藏老师/课程", "name": "favorite"},
@@ -80,6 +83,7 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     _user = context.watch<UserState>().userInfo;
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
@@ -125,7 +129,7 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
 
   Widget _widgetHeader() {
     return Container(
-      padding: EdgeInsets.fromLTRB(60.w, 34.w, 0, 68.w),
+      padding: EdgeInsets.fromLTRB(30.w, 34.w, 0, 68.w),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
@@ -273,7 +277,7 @@ class _MinePageState extends State<MinePage> with UtilsMixin {
                       Image.asset('assets/images/mine/icon_${item['name']}.png', width: 46.w, height: 46.w, fit: BoxFit.contain),
                       SizedBox(width: 20.w),
                       Expanded(
-                        child: Text(item['title'], style: Styles.normalFont(fontSize: 26.sp, color: Styles.colorText)),
+                        child: Text(item['title'], style: Styles.normalFont(fontSize: 28.sp, color: Styles.colorText)),
                       ),
                       Icon(Icons.arrow_forward_ios, size: 30.w, color: Styles.color999999),
                     ],

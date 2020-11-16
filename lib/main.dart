@@ -97,6 +97,7 @@ class _MyAppState extends State<MyApp> {
         accentColor: Styles.colorTheme,
         primarySwatch: Colors.lime,
         disabledColor: Styles.colorInfo,
+        buttonColor: Styles.colorBtn,
       ),
       onGenerateRoute: (settings) {
         print(settings.name);

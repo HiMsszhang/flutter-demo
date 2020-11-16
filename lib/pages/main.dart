@@ -55,7 +55,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener 
   int _selectedIndex = 0;
   List<TabItem> _tabItems;
 
-  PageController _pageController = PageController();
+  PageController _pageController = PageController(keepPage: true);
 
   DateTime mLastDateTime;
   bool hasLogin = false;
