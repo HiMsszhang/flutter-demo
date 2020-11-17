@@ -149,7 +149,7 @@ class _CoursePageState extends State<CoursePage> with UtilsMixin, AutomaticKeepA
     return Scaffold(
       appBar: AppBar(
         actions: [
-          Expanded(
+          Expanded(ç
             child: _widgetTabbar(),
           ),
           UnconstrainedBox(
