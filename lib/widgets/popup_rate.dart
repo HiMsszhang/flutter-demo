@@ -1,36 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/timeTable.dart';
+import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/TimeTableModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/custom_rating_bar.dart';
 
 class PopupRate extends StatefulWidget {
+  final TimeTableMenuDetailModel data;
+  final VoidCallback onBack;
   PopupRate({
     Key key,
+    this.data,
+    this.onBack,
   }) : super(key: key);
 
   _PopupRateState createState() => _PopupRateState();
 }
 
-class _PopupRateState extends State<PopupRate> {
+class _PopupRateState extends State<PopupRate> with UtilsMixin {
   List<Map> labelList = [
-    {'title': '老师的仪容仪表'},
-    {'title': '老师的专业素养'},
-    {'title': '课程编排的节奏'},
-    {'title': '总体'},
+    {'title': '老师的仪容仪表', 'rate': 5},
+    {'title': '老师的专业素养', 'rate': 5},
+    {'title': '课程编排的节奏', 'rate': 5},
+    {'title': '总体', 'rate': 5},
   ];
+  List<TeacherRateModel> _tagList = [];
+  String _content;
 
   /// 评价选项
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    delayed(() async {
+      await _getList();
+    });
+  }
+
+  _getList() async {
+    DataResult result = await TimeTableAPI.teacherRateTags();
+    _tagList = result.data;
+    setState(() {});
+  }
 
   _onOptionsTap(int index) {
     _selectedIndex = index;
     setState(() {});
   }
 
+  _submit() async {
+    var data = widget.data;
+    DataResult result = await TimeTableAPI.rateTeacher(
+      teacherId: data.teacherId,
+      courseId: data.courseId,
+      courseCatalogueId: data.id,
+      teacherAppearance: labelList[0]['rate'],
+      teacherLiteracy: labelList[1]['rate'],
+      curriculumArrangement: labelList[2]['rate'],
+      comprehensive: labelList[3]['rate'],
+      teacherLabelId: _tagList[_selectedIndex].id,
+      content: _content,
+    );
+    if (result.result) {
+      showToast('评价成功');
+      widget.onBack();
+      NavigatorUtils.pop(context);
+    }
+  }
+
+  _returnWord(int rate) {
+    switch (rate) {
+      case 1:
+        return '不满意!';
+        break;
+      case 2:
+        return '有待提高!';
+        break;
+      case 3:
+        return '一般!';
+        break;
+      case 4:
+        return '很赞!';
+        break;
+      case 5:
+        return '超棒!';
+        break;
+      default:
+        return '';
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(bottom: 50.w + MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(bottom: 50.w),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.w)),
         color: Theme.of(context).primaryColor,
@@ -69,7 +135,12 @@ class _PopupRateState extends State<PopupRate> {
             var item = labelList[index];
             return _widgetRating(
               title: item['title'],
-              onRating: (value, i) {},
+              index: index,
+              onRating: (value, i) {
+                setState(() {
+                  labelList[index]['rate'] = value.toInt();
+                });
+              },
             );
           }),
           _widgetOptions(),
@@ -102,29 +173,40 @@ class _PopupRateState extends State<PopupRate> {
               maxLines: 5,
               style: Styles.normalFont(fontSize: 26.sp),
               decoration: InputDecoration(
-                hintText: '请输入你想说的话',
+                hintText: '请输入你想说的话(非必填)',
                 border: OutlineInputBorder(borderSide: BorderSide.none),
                 contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
               ),
+              onChanged: (value) {
+                setState(() {
+                  _content = value;
+                });
+              },
             ),
           ),
           SizedBox(height: 40.w),
-          Container(
-            width: 690.w,
-            height: 90.w,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(90.w),
-              color: Theme.of(context).accentColor,
+          GestureDetector(
+            onTap: _submit,
+            child: Container(
+              width: 690.w,
+              height: 90.w,
+              alignment: Alignment.center,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(90.w),
+                color: Theme.of(context).buttonColor,
+              ),
+              child: Text('提 交', style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, fontWeight: FontWeight.bold)),
             ),
-            child: Text('提 交', style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, fontWeight: FontWeight.bold)),
           ),
+          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
         ],
       ),
     );
   }
 
-  Widget _widgetRating({Function(double, ValueNotifier<bool>) onRating, String title = ''}) {
+  Widget _widgetRating({Function(double, ValueNotifier<bool>) onRating, String title = '', int index}) {
+    var rate = labelList[index]['rate'];
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 16.w),
       child: Row(
@@ -138,6 +220,8 @@ class _PopupRateState extends State<PopupRate> {
             icon: Image.asset('assets/images/common/icon_star_border.png', width: 30.w, height: 30.w),
             size: 30.w,
             spacing: 7.w,
+            allowHalfRating: false,
+            rating: rate.toDouble(),
             color: Theme.of(context).accentColor,
             onRatingCallback: (value, i) {
               onRating(value, i);
@@ -145,7 +229,7 @@ class _PopupRateState extends State<PopupRate> {
           ),
           SizedBox(width: 20.w),
           Expanded(
-            child: Text('超棒！', style: Styles.normalFont(fontSize: 28.sp, color: Styles.color666666)),
+            child: Text('${_returnWord(rate)}', style: Styles.normalFont(fontSize: 28.sp, color: Styles.color666666)),
           ),
         ],
       ),
@@ -166,7 +250,7 @@ class _PopupRateState extends State<PopupRate> {
         spacing: 13.w,
         runSpacing: 20.w,
         children: List.generate(
-          8,
+          _tagList.length ?? 0,
           (index) => InkWell(
             onTap: () {
               _onOptionsTap(index);
@@ -180,7 +264,7 @@ class _PopupRateState extends State<PopupRate> {
                 color: _selectedIndex == index ? Theme.of(context).accentColor : Color(0xFFF5F5F5),
               ),
               child: Text(
-                '生动有趣',
+                _tagList[index].labelTitle ?? '',
                 style: Styles.normalFont(fontSize: 26.sp, color: _selectedIndex == index ? Colors.white : Styles.color999999),
               ),
             ),

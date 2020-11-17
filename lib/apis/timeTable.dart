@@ -72,4 +72,50 @@ class TimeTableAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 老师评价标签
+  static Future<DataResult> teacherRateTags() async {
+    try {
+      Response res = await http.post('/teacherlabellist');
+      List<TeacherRateModel> result = [];
+      for (var item in res.data) {
+        item = TeacherRateModel.fromJson(item ?? {});
+        result.add(item);
+      }
+      return DataResult(result, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  /// 评价老师
+  static Future<DataResult> rateTeacher({
+    int teacherId,
+    int courseId,
+    int courseCatalogueId,
+    int teacherAppearance,
+    int teacherLiteracy,
+    int curriculumArrangement,
+    int comprehensive,
+    int teacherLabelId,
+    String content,
+  }) async {
+    try {
+      Map<String, dynamic> params = {
+        'teacher_id': teacherId,
+        'course_id': courseId,
+        'course_catalogue_id': courseCatalogueId,
+        'teacher_appearance': teacherAppearance,
+        'teacher_literacy': teacherLiteracy,
+        'curriculum_arrangement': curriculumArrangement,
+        'teacher_label_id': teacherLabelId,
+        'comprehensive': comprehensive,
+      };
+      if (content != null) params['content'] = content;
+      Response res = await http.post('/courseevaluate', queryParameters: params);
+      return DataResult(res.data, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

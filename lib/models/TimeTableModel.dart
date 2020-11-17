@@ -188,6 +188,10 @@ class TimeTableMenuDetailModel {
   @JsonKey(name: 'teacher_id', defaultValue: 0)
   num teacherId;
 
+  /// 老师名称
+  @JsonKey(name: 'teacher_name', defaultValue: '')
+  String teacherName;
+
   /// 完成状态
   @JsonKey(name: 'completion_status', defaultValue: 0)
   num completionStatus;
@@ -204,4 +208,25 @@ class TimeTableMenuDetailModel {
   Map<String, dynamic> toJson() => _$TimeTableMenuDetailModelToJson(this);
 
   TimeTableMenuDetailModel.empty();
+}
+
+///老师评价标签
+@JsonSerializable()
+class TeacherRateModel {
+  /// 老师评价标签编号
+  @JsonKey(defaultValue: 0)
+  num id;
+
+  /// 老师评价标签标题
+  @JsonKey(name: 'label_title', defaultValue: '')
+  String labelTitle;
+
+  TeacherRateModel();
+
+  //反序列化
+  factory TeacherRateModel.fromJson(Map<String, dynamic> json) => _$TeacherRateModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$TeacherRateModelToJson(this);
+
+  TeacherRateModel.empty();
 }

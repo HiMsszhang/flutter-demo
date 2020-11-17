@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:molan_edu/apis/timeTable.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
-import 'package:molan_edu/models/TimeTableModel.dart';
-import 'package:molan_edu/pages/other/fullscreen_video.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/popup_rate.dart';
+import 'package:molan_edu/models/TimeTableModel.dart';
+import 'package:molan_edu/pages/chat/chat_person.dart';
+import 'package:molan_edu/pages/other/fullscreen_video.dart';
+import 'package:molan_edu/apis/timeTable.dart';
 
 class TimetableDetailPage extends StatefulWidget {
   final int id;
@@ -64,6 +65,10 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
         },
       ),
     );
+  }
+
+  _toPerson() {
+    NavigatorUtils.push(context, ChatPersonPage(id: '${_data.teacherId}teacher', name: _data.teacherName));
   }
 
   @override
@@ -187,23 +192,25 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
                 _widgetProgress(
                   title: '视频学习',
                   image: 'assets/images/timetable/bg_learn_video.png',
-                  done: data.completionStatus == 1,
+                  done: data.completionStatus >= 1,
                   onTap: () {
                     if (data.completionStatus == 0) _toVideo(data);
                   },
                 ),
-                _widgetProgress(
-                  title: '提交作业',
-                  image: 'assets/images/timetable/bg_learn_homework.png',
-                  done: data.completionStatus == 2,
-                  onTap: () {
-                    if (data.completionStatus == 1) _popupRate(context);
-                  },
-                ),
+                data.courseModelId == 2
+                    ? _widgetProgress(
+                        title: '提交作业',
+                        image: 'assets/images/timetable/bg_learn_homework.png',
+                        done: data.completionStatus >= 2,
+                        onTap: () {
+                          if (data.completionStatus == 1) _toPerson();
+                        },
+                      )
+                    : Container(),
                 _widgetProgress(
                   title: '评价本课',
                   image: 'assets/images/timetable/bg_learn_rate.png',
-                  done: data.completionStatus == 3,
+                  done: data.completionStatus >= 3,
                   last: true,
                   onTap: () {
                     if (data.courseModelId == 1) {
@@ -310,7 +317,14 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
       backgroundColor: Colors.transparent,
       context: context,
       builder: (context) {
-        return PopupRate();
+        return PopupRate(
+          data: _data,
+          onBack: () {
+            setState(() {
+              future = _getDetail();
+            });
+          },
+        );
       },
     );
   }
