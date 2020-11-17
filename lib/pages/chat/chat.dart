@@ -32,7 +32,6 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
     TencentImPlugin.addListener(_imListener);
     delayed(() async {
       await _getFriendsList();
-      print(_list[0].showName);
     });
   }
 

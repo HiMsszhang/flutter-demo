@@ -10,10 +10,12 @@ import 'package:video_player/video_player.dart';
 class FullscreenVideoPage extends StatefulWidget {
   final String url;
   final String title;
+  final VoidCallback onFinished;
   const FullscreenVideoPage({
     Key key,
     this.url,
     this.title = '',
+    this.onFinished,
   }) : super(key: key);
 
   @override
@@ -26,10 +28,11 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
 
   @override
   void initState() {
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.landscapeLeft,
-    //   DeviceOrientation.landscapeRight,
-    // ]);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
     _controller = VideoPlayerController.network(widget.url);
     if (_controller.value.hasError) {
       print(_controller.value.errorDescription);
@@ -40,11 +43,16 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
       looping: false,
       autoInitialize: true,
       aspectRatio: 16 / 9,
-      fullScreenByDefault: true,
-      allowFullScreen: true,
+      allowFullScreen: false,
       allowedScreenSleep: false,
       deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-      customControls: CustomControls(title: widget.title),
+      customControls: CustomControls(
+        title: widget.title,
+        showTopBar: true,
+        onBack: () async {
+          await _back();
+        },
+      ),
       errorBuilder: (context, errorMessage) {
         return Center(
           child: Text(
@@ -54,47 +62,49 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
         );
       },
     );
-    _chewieController.addListener(_videoListener);
-    _chewieController.enterFullScreen();
+    _controller.addListener(_videoListener);
     super.initState();
   }
 
   @override
-  void deactivate() {
-    // delayed(() async {
-    //   await SystemChrome.setPreferredOrientations([
-    //     DeviceOrientation.portraitUp,
-    //   ]);
-    // });
-    // _chewieController.dispose();
-    // _chewieController.removeListener(_videoListener);
-    // _controller.dispose();
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
-    // delayed(() async {
-    //   await SystemChrome.setPreferredOrientations([
-    //     DeviceOrientation.portraitUp,
-    //   ]);
-    // });
+    _chewieController.videoPlayerController.value;
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     _chewieController.dispose();
-    _chewieController.removeListener(_videoListener);
+    _controller.removeListener(_videoListener);
     _controller.dispose();
     super.dispose();
   }
 
-  _videoListener() {
-    if (!_chewieController.isFullScreen) {
-      _chewieController.removeListener(_videoListener);
-      _chewieController.dispose();
-      Navigator.pop(context);
+  _videoListener() async {
+    var value = _controller.value.position.inSeconds;
+    var duration = _controller.value.duration.inSeconds;
+    if (value >= duration) {
+      if (widget.onFinished != null) widget.onFinished();
+      await _back();
     }
+  }
+
+  _back() async {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    NavigatorUtils.pop(context);
+  }
+
+  Future<bool> _onPop() async {
+    await _back();
+    return new Future.value(false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Chewie(controller: _chewieController);
+    return WillPopScope(
+      onWillPop: _onPop,
+      child: Chewie(controller: _chewieController),
+    );
   }
 }

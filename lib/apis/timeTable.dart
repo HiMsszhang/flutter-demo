@@ -55,4 +55,21 @@ class TimeTableAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 视频学习完毕
+  static Future<DataResult> videoDone({
+    int courseId,
+    int courseCatalogueId,
+  }) async {
+    try {
+      var params = {
+        'course_id': courseId,
+        'course_catalogue_id': courseCatalogueId,
+      };
+      Response res = await http.post('/videofinished', queryParameters: params);
+      return DataResult(res, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

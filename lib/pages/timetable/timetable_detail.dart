@@ -21,20 +21,49 @@ class TimetableDetailPage extends StatefulWidget {
 }
 
 class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMixin {
+  Future future;
+  TimeTableMenuDetailModel _data;
+
   @override
   void initState() {
     super.initState();
+    future = _getDetail();
   }
 
   Future<TimeTableMenuDetailModel> _getDetail() async {
     DataResult result = await TimeTableAPI.menuDetail(
       courseCatalogueId: widget.id,
     );
+    setState(() {
+      _data = result.data;
+    });
     return result.data;
   }
 
+  _onVideoFinished() async {
+    DataResult res = await TimeTableAPI.videoDone(
+      courseCatalogueId: widget.id,
+      courseId: _data.courseId,
+    );
+    if (res.result) {
+      showToast('视频学习完成');
+      setState(() {
+        future = _getDetail();
+      });
+    }
+  }
+
   _toVideo(TimeTableMenuDetailModel data) {
-    NavigatorUtils.push(context, FullscreenVideoPage(url: data.url, title: data.courseCatalogueTitle));
+    NavigatorUtils.push(
+      context,
+      FullscreenVideoPage(
+        url: data.url,
+        title: data.courseCatalogueTitle,
+        onFinished: () {
+          _onVideoFinished();
+        },
+      ),
+    );
   }
 
   @override
@@ -43,7 +72,7 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
       title: widget.title,
       backgroundColor: Theme.of(context).primaryColor,
       body: FutureBuilder(
-        future: _getDetail(),
+        future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             TimeTableMenuDetailModel data = snapshot.data;
@@ -167,6 +196,9 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
                   title: '提交作业',
                   image: 'assets/images/timetable/bg_learn_homework.png',
                   done: data.completionStatus == 2,
+                  onTap: () {
+                    if (data.completionStatus == 1) _popupRate(context);
+                  },
                 ),
                 _widgetProgress(
                   title: '评价本课',
@@ -174,7 +206,11 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
                   done: data.completionStatus == 3,
                   last: true,
                   onTap: () {
-                    _popupRate(context);
+                    if (data.courseModelId == 1) {
+                      if (data.completionStatus == 1) _popupRate(context);
+                    } else if (data.courseModelId == 2) {
+                      if (data.completionStatus == 2) _popupRate(context);
+                    }
                   },
                 ),
               ],
