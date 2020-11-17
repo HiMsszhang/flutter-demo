@@ -13,6 +13,7 @@ import 'package:molan_edu/apis/course.dart';
 import 'package:molan_edu/models/CourseModel.dart';
 import 'package:molan_edu/models/GroupModel.dart';
 import 'package:molan_edu/models/AdModel.dart';
+import 'package:molan_edu/providers/user_state.dart';
 
 class NavItem {
   String title;
@@ -51,11 +52,13 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
   ];
   List<ExperienceModel> _experienceList = [];
   List<CourseModel> _newCourseList = [];
+  bool hasLogin = false;
 
   @override
   void initState() {
     super.initState();
     delayed(() async {
+      hasLogin = context.read<UserState>().hasLogin;
       await _getExperienceList();
       await _getNewCourseList();
     });
@@ -74,7 +77,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
         NavigatorUtils.pushNamed(context, '/group');
         break;
       case 3:
-        NavigatorUtils.pushNamed(context, '/invite');
+        NavigatorUtils.pushNamed(context, hasLogin ? '/invite' : '/login');
         break;
     }
   }
@@ -121,25 +124,30 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
                 ),
               ),
               UnconstrainedBox(
-                child: Container(
-                  width: 522.w,
-                  height: 64.w,
-                  decoration: Styles.normalDecoration.copyWith(
-                    borderRadius: BorderRadius.circular(64.w),
-                    border: Border.all(width: 0.5, color: Colors.white),
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(width: 19.w),
-                      Icon(
-                        MyIcons.Iconsearch,
-                        size: 30.w,
-                        color: Color(0xFFBBBBBB),
-                      ),
-                      SizedBox(width: 19.w),
-                      Text('搜索课程名称', style: Styles.normalFont(fontSize: 28.sp, color: Color(0xFFBBBBBB))),
-                    ],
+                child: GestureDetector(
+                  onTap: () {
+                    NavigatorUtils.pushNamed(context, '/course.search');
+                  },
+                  child: Container(
+                    width: 522.w,
+                    height: 64.w,
+                    decoration: Styles.normalDecoration.copyWith(
+                      borderRadius: BorderRadius.circular(64.w),
+                      border: Border.all(width: 0.5, color: Colors.white),
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(width: 19.w),
+                        Icon(
+                          MyIcons.Iconsearch,
+                          size: 30.w,
+                          color: Color(0xFFBBBBBB),
+                        ),
+                        SizedBox(width: 19.w),
+                        Text('搜索课程名称', style: Styles.normalFont(fontSize: 28.sp, color: Color(0xFFBBBBBB))),
+                      ],
+                    ),
                   ),
                 ),
               ),

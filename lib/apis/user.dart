@@ -16,8 +16,8 @@ class UserAPI {
       var params = {
         'mobile': mobile,
         'code': code,
-        'invite_code': inviteCode,
       };
+      if (inviteCode != null) params['invite_code'] = inviteCode;
       Response res = await http.post('/registerorlogin', queryParameters: params);
       return DataResult(UserModel.fromJson(res.data ?? {}), true);
     } catch (e) {

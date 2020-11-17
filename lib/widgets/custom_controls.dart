@@ -13,9 +13,13 @@ import 'package:video_player/video_player.dart';
 
 class CustomControls extends StatefulWidget {
   final String title;
+  final VoidCallback onBack;
+  final bool showTopBar;
   const CustomControls({
     Key key,
     this.title = '',
+    this.onBack,
+    this.showTopBar = false,
   }) : super(key: key);
 
   @override
@@ -70,7 +74,7 @@ class _CustomControlsState extends State<CustomControls> {
           child: Column(
             children: <Widget>[
               // 在全屏时才显示
-              chewieController.isFullScreen ? _buildHeader(context, widget.title) : new Container(),
+              chewieController.isFullScreen || widget.showTopBar ? _buildHeader(context, widget.title) : new Container(),
               _latestValue != null && !_latestValue.isPlaying && _latestValue.duration == null || _latestValue.isBuffering
                   ? const Expanded(
                       child: const Center(
@@ -415,7 +419,9 @@ class _CustomControlsState extends State<CustomControls> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new IconButton(
-              onPressed: _onExpandCollapse,
+              onPressed: () {
+                widget.onBack();
+              },
               color: _themeColor,
               icon: new Icon(Icons.chevron_left),
             ),

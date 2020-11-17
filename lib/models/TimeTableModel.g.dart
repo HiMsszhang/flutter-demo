@@ -122,6 +122,7 @@ TimeTableMenuDetailModel _$TimeTableMenuDetailModelFromJson(
     ..courseArrangement = json['course_arrangement'] as String ?? ''
     ..url = json['url'] as String ?? ''
     ..teacherId = json['teacher_id'] as num ?? 0
+    ..teacherName = json['teacher_name'] as String ?? ''
     ..completionStatus = json['completion_status'] as num ?? 0
     ..courseModelId = json['course_model_id'] as num ?? 0;
 }
@@ -136,6 +137,19 @@ Map<String, dynamic> _$TimeTableMenuDetailModelToJson(
       'course_arrangement': instance.courseArrangement,
       'url': instance.url,
       'teacher_id': instance.teacherId,
+      'teacher_name': instance.teacherName,
       'completion_status': instance.completionStatus,
       'course_model_id': instance.courseModelId,
+    };
+
+TeacherRateModel _$TeacherRateModelFromJson(Map<String, dynamic> json) {
+  return TeacherRateModel()
+    ..id = json['id'] as num ?? 0
+    ..labelTitle = json['label_title'] as String ?? '';
+}
+
+Map<String, dynamic> _$TeacherRateModelToJson(TeacherRateModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label_title': instance.labelTitle,
     };

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:molan_edu/apis/timeTable.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
-import 'package:molan_edu/models/TimeTableModel.dart';
-import 'package:molan_edu/pages/other/fullscreen_video.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/popup_rate.dart';
+import 'package:molan_edu/models/TimeTableModel.dart';
+import 'package:molan_edu/pages/chat/chat_person.dart';
+import 'package:molan_edu/pages/other/fullscreen_video.dart';
+import 'package:molan_edu/apis/timeTable.dart';
 
 class TimetableDetailPage extends StatefulWidget {
   final int id;
@@ -21,20 +22,53 @@ class TimetableDetailPage extends StatefulWidget {
 }
 
 class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMixin {
+  Future future;
+  TimeTableMenuDetailModel _data;
+
   @override
   void initState() {
     super.initState();
+    future = _getDetail();
   }
 
   Future<TimeTableMenuDetailModel> _getDetail() async {
     DataResult result = await TimeTableAPI.menuDetail(
       courseCatalogueId: widget.id,
     );
+    setState(() {
+      _data = result.data;
+    });
     return result.data;
   }
 
+  _onVideoFinished() async {
+    DataResult res = await TimeTableAPI.videoDone(
+      courseCatalogueId: widget.id,
+      courseId: _data.courseId,
+    );
+    if (res.result) {
+      showToast('视频学习完成');
+      setState(() {
+        future = _getDetail();
+      });
+    }
+  }
+
   _toVideo(TimeTableMenuDetailModel data) {
-    NavigatorUtils.push(context, FullscreenVideoPage(url: data.url, title: data.courseCatalogueTitle));
+    NavigatorUtils.push(
+      context,
+      FullscreenVideoPage(
+        url: data.url,
+        title: data.courseCatalogueTitle,
+        onFinished: () {
+          _onVideoFinished();
+        },
+      ),
+    );
+  }
+
+  _toPerson() {
+    NavigatorUtils.push(context, ChatPersonPage(id: '${_data.teacherId}teacher', name: _data.teacherName));
   }
 
   @override
@@ -43,7 +77,7 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
       title: widget.title,
       backgroundColor: Theme.of(context).primaryColor,
       body: FutureBuilder(
-        future: _getDetail(),
+        future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             TimeTableMenuDetailModel data = snapshot.data;
@@ -158,23 +192,32 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
                 _widgetProgress(
                   title: '视频学习',
                   image: 'assets/images/timetable/bg_learn_video.png',
-                  done: data.completionStatus == 1,
+                  done: data.completionStatus >= 1,
                   onTap: () {
                     if (data.completionStatus == 0) _toVideo(data);
                   },
                 ),
-                _widgetProgress(
-                  title: '提交作业',
-                  image: 'assets/images/timetable/bg_learn_homework.png',
-                  done: data.completionStatus == 2,
-                ),
+                data.courseModelId == 2
+                    ? _widgetProgress(
+                        title: '提交作业',
+                        image: 'assets/images/timetable/bg_learn_homework.png',
+                        done: data.completionStatus >= 2,
+                        onTap: () {
+                          if (data.completionStatus == 1) _toPerson();
+                        },
+                      )
+                    : Container(),
                 _widgetProgress(
                   title: '评价本课',
                   image: 'assets/images/timetable/bg_learn_rate.png',
-                  done: data.completionStatus == 3,
+                  done: data.completionStatus >= 3,
                   last: true,
                   onTap: () {
-                    _popupRate(context);
+                    if (data.courseModelId == 1) {
+                      if (data.completionStatus == 1) _popupRate(context);
+                    } else if (data.courseModelId == 2) {
+                      if (data.completionStatus == 2) _popupRate(context);
+                    }
                   },
                 ),
               ],
@@ -274,7 +317,14 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
       backgroundColor: Colors.transparent,
       context: context,
       builder: (context) {
-        return PopupRate();
+        return PopupRate(
+          data: _data,
+          onBack: () {
+            setState(() {
+              future = _getDetail();
+            });
+          },
+        );
       },
     );
   }

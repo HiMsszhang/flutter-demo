@@ -87,4 +87,9 @@ class NavigatorUtils {
       (Route route) => false,
     );
   }
+
+  static popUntil(BuildContext context, String routeName) {
+    FocusScope.of(context).unfocus();
+    return Navigator.popUntil(context, ModalRoute.withName(routeName));
+  }
 }
