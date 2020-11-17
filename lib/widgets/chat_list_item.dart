@@ -106,7 +106,7 @@ class _ChatListItemState extends State<ChatListItem> with UtilsMixin {
                     ],
                   ),
                   SizedBox(height: 16.w),
-                  Text('[行书]勤礼碑一系列', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999)),
+                  // Text('[行书]勤礼碑一系列', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999)),
                   Padding(
                     padding: EdgeInsets.only(top: 24.w),
                     child: Text('${_showCount()}${_showText()}', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),

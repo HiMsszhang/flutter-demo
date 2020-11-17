@@ -225,7 +225,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          CommonAvatar(size: 72.w),
+          CommonAvatar(size: 72.w, showSex: false, avatar: item.faceUrl),
           SizedBox(width: 20.w),
           _returnMessage(item),
         ],
@@ -242,7 +242,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
         children: [
           _returnMessage(item),
           SizedBox(width: 20.w),
-          CommonAvatar(size: 72.w),
+          CommonAvatar(size: 72.w, showSex: false, avatar: item.faceUrl),
         ],
       ),
     );

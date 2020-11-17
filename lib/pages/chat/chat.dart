@@ -6,10 +6,12 @@ import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/common_search.dart';
 import 'package:molan_edu/widgets/chat_list_item.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_im_plugin/entity/conversation_entity.dart';
 import 'package:tencent_im_plugin/entity/conversation_result_entity.dart';
 import 'package:tencent_im_plugin/enums/tencent_im_listener_type_enum.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
+import 'package:molan_edu/providers/user_state.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({
@@ -26,12 +28,16 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
 
   List<ConversationEntity> _list = [];
   int _nextSeq = 0;
+  bool hasLogin = false;
+  RefreshController _listController = RefreshController(initialRefresh: false);
+
   @override
   void initState() {
     super.initState();
     TencentImPlugin.addListener(_imListener);
     delayed(() async {
-      await _getFriendsList();
+      hasLogin = context.read<UserState>().hasLogin;
+      if (hasLogin) _listController.requestRefresh();
     });
   }
 
@@ -39,6 +45,18 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
   void dispose() {
     super.dispose();
     TencentImPlugin.removeListener(_imListener);
+  }
+
+  void _onRefresh() async {
+    _list = await _getList();
+    setState(() {});
+    _listController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    _list.addAll(await _getList());
+    _listController.loadComplete();
+    if (mounted) setState(() {});
   }
 
   /// IM监听器
@@ -66,10 +84,11 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
     NavigatorUtils.push(context, ChatPersonPage(id: item.userID, name: item.showName));
   }
 
-  _getFriendsList() async {
+  Future<List<ConversationEntity>> _getList() async {
     ConversationResultEntity res = await TencentImPlugin.getConversationList(nextSeq: _nextSeq);
-    _list = res.conversationList;
+    _nextSeq = res.nextSeq;
     setState(() {});
+    return res.conversationList;
   }
 
   @override
@@ -105,19 +124,34 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
         ],
       ),
       backgroundColor: Theme.of(context).primaryColor,
-      body: ListView.separated(
-        itemCount: _list.length,
-        separatorBuilder: (context, index) => Container(
-          width: 690.w,
-          height: 0.5,
-          color: Color(0xFFE6E6E6),
-          margin: EdgeInsets.symmetric(horizontal: 30.w),
-        ),
-        itemBuilder: (context, index) => ChatListItem(
-          data: _list[index],
-          onTap: () {
-            _toPerson(_list[index]);
-          },
+      body: SmartRefresher(
+        enablePullDown: true,
+        enablePullUp: true,
+        onRefresh: _onRefresh,
+        onLoading: _onLoading,
+        controller: _listController,
+        header: myCustomHeader(),
+        footer: myCustomFooter(),
+        child: ListView(
+          children: [
+            ListView.separated(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: _list.length,
+              separatorBuilder: (context, index) => Container(
+                width: 690.w,
+                height: 0.5,
+                color: Color(0xFFE6E6E6),
+                margin: EdgeInsets.symmetric(horizontal: 30.w),
+              ),
+              itemBuilder: (context, index) => ChatListItem(
+                data: _list[index],
+                onTap: () {
+                  _toPerson(_list[index]);
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -140,7 +140,7 @@ class _MinePageState extends State<MinePage> with UtilsMixin, AutomaticKeepAlive
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CommonAvatar(avatar: _user?.avatar ?? '', sex: _user.gender),
+                CommonAvatar(avatar: _user?.avatar ?? '', sex: _user?.gender ?? 1),
                 SizedBox(width: 14.w),
                 Expanded(
                   child: Column(
