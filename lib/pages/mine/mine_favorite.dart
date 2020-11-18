@@ -9,6 +9,7 @@ import 'package:molan_edu/widgets/card_mine_course.dart';
 import 'package:material_segmented_control/material_segmented_control.dart';
 import 'package:molan_edu/widgets/card_mine_teacher.dart';
 import 'package:molan_edu/widgets/common_search.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MineFavoritePage extends StatefulWidget {
   const MineFavoritePage({
@@ -29,19 +30,50 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
   bool _showSearch = false;
   CourseCollectionModel _courseData;
   TeacherCollectionModel _teacherDate;
+  var _futureBuilderFuture;
+  RefreshController _listController = RefreshController(initialRefresh: false);
+  List _dataList = [];
+  int _page = 1;
+  int _listRow = 10;
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
-    // delayed(() async {
-    //   // await _load();
-    // });
+    _futureBuilderFuture = _getCourseCollectionList();
+    delayed(() async {
+      await _load();
+    });
+  }
+
+  _load() async {
+    await _getCourseCollectionList();
+    _listController.requestRefresh();
+    setState(() {});
+  }
+
+  void _onRefresh() async {
+    _page = 1;
+    _dataList = await _getCourseCollectionList();
+    setState(() {});
+    _listController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    if (_courseData.lastPage == _page) {
+      _listController.loadNoData();
+    } else {
+      _page++;
+      _dataList.addAll(await _getCourseCollectionList());
+      _listController.loadComplete();
+    }
+    if (mounted) setState(() {});
   }
 
   Future _getCourseCollectionList() async {
     DataResult result = await MineApi.courseCollectionlist(
-      page: 1,
-      listRow: 10,
+      page: _page,
+      listRow: _listRow,
     );
     _courseData = result.data;
     return _courseData.data;
@@ -49,17 +81,12 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
 
   Future _getTeacherCollectionList() async {
     DataResult result = await MineApi.teacherCollectionList(
-      page: 1,
-      listRow: 10,
+      page: _page,
+      listRow: _listRow,
     );
     _teacherDate = result.data;
     return _teacherDate.data;
   }
-
-  // _load() async {
-  //   await _getCourseCollectionList();
-  //   setState(() {});
-  // }
 
   @override
   void dispose() {
@@ -134,24 +161,45 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
         onPageChanged: _onPageChanged,
         children: [
           FutureBuilder(
-            future: _getCourseCollectionList(),
+            future: _futureBuilderFuture,
             builder: (context, snapshot) {
-              return ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                itemCount: _courseData.data.length,
-                itemBuilder: (context, index) => CardMineCourse(
-                  showTags: true,
-                  data: _courseData.data,
-                  index: index,
-                ),
-              );
+              if (snapshot.connectionState == ConnectionState.done) {
+                return SmartRefresher(
+                  enablePullDown: true,
+                  enablePullUp: true,
+                  onRefresh: _onRefresh,
+                  onLoading: _onLoading,
+                  controller: _listController,
+                  header: myCustomHeader(),
+                  footer: myCustomFooter(),
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                    itemCount: _courseData.data.length,
+                    itemBuilder: (context, index) => CardMineCourse(
+                      showTags: true,
+                      data: _courseData.data,
+                      index: index,
+                    ),
+                  ),
+                );
+              } else {
+                return Container();
+              }
             },
           ),
           FutureBuilder(
             future: _getTeacherCollectionList(),
             builder: (context, snapshot) {
               var item = _teacherDate.data;
-              return ListView.builder(
+              return SmartRefresher(
+                enablePullDown: true,
+                enablePullUp: true,
+                onRefresh: _onRefresh,
+                onLoading: _onLoading,
+                controller: _listController,
+                header: myCustomHeader(),
+                footer: myCustomFooter(),
+                child: ListView.builder(
                   padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
                   itemCount: item.length,
                   itemBuilder: (context, index) {
@@ -159,7 +207,9 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                       data: item,
                       index: index,
                     );
-                  });
+                  },
+                ),
+              );
             },
           ),
         ],

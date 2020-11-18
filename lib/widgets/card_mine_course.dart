@@ -23,13 +23,6 @@ class _CardMineCourseState extends State<CardMineCourse> with UtilsMixin {
   @override
   void initState() {
     super.initState();
-    delayed(() async {
-      await _load();
-    });
-  }
-
-  _load() async {
-    await widget.data;
   }
 
   @override
