@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/group.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/apis/course.dart';
 import 'package:molan_edu/models/CourseModel.dart';
+import 'package:molan_edu/models/GroupModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -34,30 +36,16 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   ChewieController _chewieController;
   List<String> _tabList = ['课程简介', '课程目录', '课程规划'];
   int _selectedIndex = 0;
-  CourseDetailModel _data;
-  CourseCataloguelistModleListResp _courseCatalogueData;
-  String _vedioUrl;
   int _currentIndex = 0;
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(_vedioUrl);
-    _chewieController = ChewieController(
-      videoPlayerController: _controller,
-      aspectRatio: 750 / 500,
-      autoPlay: true,
-      looping: true,
-      customControls: CustomControls(),
-    );
     delayed(() async {
       await _load();
     });
   }
 
-  _load() async {
-    await _getCourseDetail();
-    setState(() {});
-  }
+  _load() async {}
 
   @override
   void dispose() {
@@ -67,22 +55,27 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     super.dispose();
   }
 
-  Future _getCourseCatalogueData() async {
+  Future<CourseCataloguelistModleListResp> _getCourseCatalogueData() async {
     DataResult result = await CourseAPI.coursecataloguelist(
       courseId: widget.courseId,
       page: 1,
       listRow: 10,
     );
-    _courseCatalogueData = result.data;
+    return result.data;
   }
 
   Future _getCourseDetail() async {
     DataResult result = await CourseAPI.coursedetail(
       courseId: widget.courseId,
     );
-    _data = result.data;
-    _vedioUrl = _data.currentHours['uel'];
-    return _data;
+    return result.data;
+  }
+
+  Future _getGroupCourseDetail() async {
+    DataResult result = await GroupAPI.groupCourseDetail(
+      courseId: widget.courseId,
+    );
+    return result.data;
   }
 
   String _formatTime(int timeNum) {
@@ -115,76 +108,93 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: StickyHeaderBuilder(
-                overlapHeaders: true,
-                builder: (context, stuckAmount) {
-                  stuckAmount = stuckAmount.clamp(-1.0, 0.0);
-                  return AppBar(
-                    brightness: Brightness.values[stuckAmount == -1 ? 1 : 0],
-                    backgroundColor: Color.fromRGBO(255, 255, 255, -stuckAmount),
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        size: 33.w,
-                        color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: ImageIcon(
-                          AssetImage('assets/images/course/icon_ear.png'),
-                          size: 40.w,
-                          color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
-                        ),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: ImageIcon(
-                          AssetImage('assets/images/course/icon_favorite.png'),
-                          size: 40.w,
-                          color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
-                        ),
-                        onPressed: () {},
-                      ),
-                    ],
-                  );
-                },
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _widgetVideo(),
-                    _widgetInfo(),
-                    _widgetDetail(),
-                    RateList(),
-                    FutureBuilder(
-                      future: _getCourseDetail(),
-                      builder: (BuildContext context, snapshot) {
-                        return RecommendList(
-                          typefaceId: _data.typefaceId,
-                          courseCateId: _data.courseIateId,
+      body: FutureBuilder(
+        future: widget.isGroup ? _getGroupCourseDetail() : _getCourseDetail(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            var data = widget.isGroup ? new GroupCourseDetailModel() : new CourseDetailModel();
+            data = snapshot.data;
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: StickyHeaderBuilder(
+                      overlapHeaders: true,
+                      builder: (context, stuckAmount) {
+                        stuckAmount = stuckAmount.clamp(-1.0, 0.0);
+                        return AppBar(
+                          brightness: Brightness.values[stuckAmount == -1 ? 1 : 0],
+                          backgroundColor: Color.fromRGBO(255, 255, 255, -stuckAmount),
+                          elevation: 0,
+                          leading: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_ios,
+                              size: 33.w,
+                              color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          actions: [
+                            IconButton(
+                              icon: ImageIcon(
+                                AssetImage('assets/images/course/icon_ear.png'),
+                                size: 40.w,
+                                color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
+                              ),
+                              onPressed: () {},
+                            ),
+                            IconButton(
+                              icon: ImageIcon(
+                                AssetImage('assets/images/course/icon_favorite.png'),
+                                size: 40.w,
+                                color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
                         );
                       },
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _widgetVideo(data),
+                          _widgetInfo(data),
+                          _widgetDetail(data),
+                          RateList(),
+                          RecommendList(
+                            typefaceId: data.typefaceId,
+                            courseCateId: data.courseIateId,
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-          _widgetBottom(),
-        ],
+                _widgetBottom(data),
+              ],
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
 
-  Widget _widgetVideo() {
+  Widget _widgetVideo(CourseDetailModel data) {
+    if (widget.isGroup) data = data as GroupCourseDetailModel;
+    _controller = VideoPlayerController.network(data.currentHours['url']);
+    _chewieController = ChewieController(
+      videoPlayerController: _controller,
+      aspectRatio: 750 / 500,
+      autoPlay: true,
+      looping: true,
+      customControls: CustomControls(),
+    );
     return Container(
       width: 750.w,
       height: 500.w,
@@ -214,142 +224,132 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     );
   }
 
-  Widget _widgetInfo() {
-    return FutureBuilder(
-        future: _getCourseDetail(),
-        builder: (BuildContext context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-                // child: CircularProgressIndicator(),
-                );
-          } else if (snapshot.connectionState == ConnectionState.done) {
-            return Container(
-              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+  Widget _widgetInfo(CourseDetailModel data) {
+    if (widget.isGroup) data = data as GroupCourseDetailModel;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(width: 1, color: Color(0xFFF5F5F5))),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () {
+              NavigatorUtils.pushNamed(context, '/teacher.info');
+            },
+            child: Container(
+              width: 135.w,
+              height: 165.w,
+              clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(width: 1, color: Color(0xFFF5F5F5))),
+                borderRadius: BorderRadius.circular(10.w),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      NavigatorUtils.pushNamed(context, '/teacher.info');
-                    },
+                  Image.network('${data?.avatar ?? null}', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
                     child: Container(
-                      width: 135.w,
-                      height: 165.w,
-                      clipBehavior: Clip.hardEdge,
+                      height: 36.w,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.w),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Color.fromRGBO(255, 255, 255, .54),
+                          ],
+                        ),
                       ),
-                      child: Stack(
-                        children: [
-                          Image.network('${_data?.avatar ?? null}', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              height: 36.w,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Color.fromRGBO(255, 255, 255, .54),
-                                  ],
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text("${_data?.totalHours ?? 0}课时", style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
-                            ),
-                          ),
-                        ],
-                      ),
+                      alignment: Alignment.center,
+                      child: Text("${data?.totalHours ?? 0}课时", style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
                     ),
                   ),
-                  SizedBox(width: 24.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(_data?.courseTitle ?? '', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
-                            SizedBox(width: 14.w),
-                            Text('【${_data?.typefaceTitle ?? ''}.${_data?.courseCateTitle ?? ''}】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                        SizedBox(height: 20.w),
-                        Text(
-                          '开课时间：${_data?.learningTime ?? ''} 11:00-12:00',
-                          style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 14.w),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
-                            SizedBox(width: 10.w),
-                            MiniRatingStar(rating: _data.courseDifficulty.toDouble()),
-                            InkWell(
-                              onTap: () {
-                                courseInfoPopup(context, _data);
-                              },
-                              child: Container(
-                                width: 30.w,
-                                height: 30.w,
-                                margin: EdgeInsets.all(10.w),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30.w),
-                                  color: Color(0xFF87B4FF),
-                                ),
-                                child: Text('?', style: TextStyle(fontSize: 24.sp, color: Colors.white)),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.w),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(34.w),
-                                color: Theme.of(context).accentColor,
-                              ),
-                              child: Text('日更${_data?.dailyUpdate ?? ''}课时', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white, height: 1.2)),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10.w),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('讲师：${_data?.teacherName ?? ''}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-                              children: [
-                                Image.asset('assets/images/common/icon_learn.png', width: 26.w, height: 20.w),
-                                SizedBox(width: 10.w),
-                                Text('学习人数：321W人', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorBlue)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  )
                 ],
               ),
-            );
-          } else {
-            return Container();
-          }
-        });
+            ),
+          ),
+          SizedBox(width: 24.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(data?.courseTitle ?? '', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(width: 14.w),
+                    Text('【${data?.typefaceTitle ?? ''}.${data?.courseCateTitle ?? ''}】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                SizedBox(height: 20.w),
+                Text(
+                  '${widget.isGroup ? "开课" : "学习"}时间：${data?.learningTime ?? ''} 11:00-12:00',
+                  style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 14.w),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                    SizedBox(width: 10.w),
+                    MiniRatingStar(rating: data.courseDifficulty.toDouble()),
+                    InkWell(
+                      onTap: () {
+                        courseInfoPopup(context, data);
+                      },
+                      child: Container(
+                        width: 30.w,
+                        height: 30.w,
+                        margin: EdgeInsets.all(10.w),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30.w),
+                          color: Color(0xFF87B4FF),
+                        ),
+                        child: Text('?', style: TextStyle(fontSize: 24.sp, color: Colors.white)),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(34.w),
+                        color: Theme.of(context).accentColor,
+                      ),
+                      child: Text('日更${data?.dailyUpdate ?? ''}课时', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white, height: 1.2)),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.w),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('讲师：${data?.teacherName ?? ''}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      children: [
+                        Image.asset('assets/images/common/icon_learn.png', width: 26.w, height: 20.w),
+                        SizedBox(width: 10.w),
+                        Text('学习人数：321W人', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorBlue)),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 
-  Widget _widgetDetail() {
+  Widget _widgetDetail(CourseDetailModel data) {
+    if (widget.isGroup) data = data as GroupCourseDetailModel;
     return StreamBuilder<int>(
         stream: _streamController.stream,
         initialData: _selectedIndex,
@@ -382,10 +382,10 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                     ),
                   ),
                   _selectedIndex == 0
-                      ? _widgetSummary()
+                      ? _widgetSummary(data)
                       : _selectedIndex == 1
                           ? _widgetIndex()
-                          : _widgetPlan(),
+                          : _widgetPlan(data),
                 ],
               ),
             ),
@@ -394,24 +394,16 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   }
 
   /// 课程简介
-  Widget _widgetSummary() {
-    return FutureBuilder(
-      future: _getCourseDetail(),
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Container(
-            width: 690.w,
-            height: 460.w,
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.w),
-            ),
-            child: Image.network('${_data?.courseDesc ?? ''}', fit: BoxFit.cover),
-          );
-        } else {
-          return Container();
-        }
-      },
+  Widget _widgetSummary(CourseDetailModel data) {
+    if (widget.isGroup) data = data as GroupCourseDetailModel;
+    return Container(
+      width: 690.w,
+      height: 460.w,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.w),
+      ),
+      child: Image.network('${data?.courseDesc ?? ''}', fit: BoxFit.cover),
     );
   }
 
@@ -421,7 +413,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
       future: _getCourseCatalogueData(),
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          var item = _courseCatalogueData.data;
+          CourseCataloguelistModleListResp item = snapshot.data;
           return Container(
             width: 690.w,
             height: 460.w,
@@ -443,7 +435,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text('${item[_currentIndex].courseArrangement} I ${item[_currentIndex].courseCatalogueTitle}', style: Styles.normalFont(fontSize: 30.sp)),
+                        child: Text('${item.data[_currentIndex].courseArrangement} I ${item.data[_currentIndex].courseCatalogueTitle}', style: Styles.normalFont(fontSize: 30.sp)),
                       ),
                       GestureDetector(
                         onTap: () {},
@@ -475,14 +467,14 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                   child: ListView.builder(
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
-                    itemCount: _courseCatalogueData.data.length,
+                    itemCount: item.data.length,
                     itemBuilder: (context, index) {
                       return RawMaterialButton(
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         padding: EdgeInsets.fromLTRB(25.w, 16.w, 63.w, 16.w),
                         onPressed: () {
                           // _currentIndex = index;
-                          // _vedioUrl = item[index].url;
+                          // _videoUrl = item[index].url;
                           // _streamController.sink.add(_currentIndex);
                         },
                         child: Row(
@@ -490,12 +482,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                             Expanded(
                               child: RichText(
                                 text: TextSpan(style: Styles.normalFont(fontSize: 28.sp), children: [
-                                  TextSpan(text: '${item[index].courseArrangement}'),
-                                  TextSpan(text: '  I  ${item[index].courseCatalogueTitle}', style: Styles.normalFont(color: Color(0xFF777777))),
+                                  TextSpan(text: '${item.data[index].courseArrangement}'),
+                                  TextSpan(text: '  I  ${item.data[index].courseCatalogueTitle}', style: Styles.normalFont(color: Color(0xFF777777))),
                                 ]),
                               ),
                             ),
-                            Text('${_constructTime(item[index].duration)}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                            Text('${_constructTime(item.data[index].duration)}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                           ],
                         ),
                       );
@@ -518,7 +510,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   }
 
   /// 规划
-  Widget _widgetPlan() {
+  Widget _widgetPlan(CourseDetailModel data) {
+    if (widget.isGroup) data = data as GroupCourseDetailModel;
     return Container(
       width: 690.w,
       height: 460.w,
@@ -526,76 +519,68 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: Image.network('${_data?.curriculumPlanning ?? ''}', fit: BoxFit.cover),
+      child: Image.network('${data?.curriculumPlanning ?? ''}', fit: BoxFit.cover),
     );
   }
 
-  Widget _widgetBottom() {
-    return FutureBuilder(
-      future: _getCourseDetail(),
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return SafeArea(
-            top: false,
-            bottom: true,
-            child: Container(
-              padding: EdgeInsets.only(left: 58.w, right: 32.w),
-              height: 130.w,
-              decoration: Styles.normalDecoration.copyWith(
-                color: Theme.of(context).primaryColor,
-              ),
-              child: Row(
-                children: [
-                  /// 是否拼团
-                  widget.isGroup
-                      ? Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('早鸟拼团价', style: Styles.normalFont(fontSize: 26.sp, fontWeight: FontWeight.bold)),
-                              SizedBox(height: 19.w),
-                              RichText(
-                                text: TextSpan(style: Styles.normalFont(fontSize: 36.sp, color: Styles.color999999), children: [
-                                  TextSpan(text: '￥999.00', style: Styles.normalFont(fontWeight: FontWeight.bold, color: Styles.colorRed)),
-                                  TextSpan(text: '/期  '),
-                                  TextSpan(text: '￥1899.00', style: TextStyle(fontSize: 28.sp, color: Styles.color999999, decoration: TextDecoration.lineThrough)),
-                                ]),
-                              ),
-                            ],
-                          ),
-                        )
-                      : Expanded(
-                          child: RichText(
-                            text: TextSpan(style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold, color: Styles.color999999), children: [
-                              TextSpan(text: '￥${_data?.coursePrice ?? ''}', style: Styles.normalFont(color: Styles.colorRed)),
-                              TextSpan(text: '/期'),
-                            ]),
-                          ),
+  Widget _widgetBottom(data) {
+    data = widget.isGroup ? data as GroupCourseDetailModel : data as CourseDetailModel;
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Container(
+        padding: EdgeInsets.only(left: 58.w, right: 32.w),
+        height: 130.w,
+        decoration: Styles.normalDecoration.copyWith(
+          color: Theme.of(context).primaryColor,
+        ),
+        child: Row(
+          children: [
+            /// 是否拼团
+            widget.isGroup
+                ? Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('早鸟拼团价', style: Styles.normalFont(fontSize: 26.sp, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 19.w),
+                        RichText(
+                          text: TextSpan(style: Styles.normalFont(fontSize: 36.sp, color: Styles.color999999), children: [
+                            TextSpan(text: '￥${data?.marketPrice}', style: Styles.normalFont(fontWeight: FontWeight.bold, color: Styles.colorRed)),
+                            TextSpan(text: '/期  '),
+                            TextSpan(text: '￥${data?.coursePrice}', style: TextStyle(fontSize: 28.sp, color: Styles.color999999, decoration: TextDecoration.lineThrough)),
+                          ]),
                         ),
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(75.w),
-                      color: Theme.of(context).accentColor,
+                      ],
                     ),
-                    child: RawMaterialButton(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: EdgeInsets.symmetric(horizontal: 60.w, vertical: 20.w),
-                      onPressed: () {
-                        _showPayPopup();
-                      },
-                      child: Text('立即${widget.isGroup ? '参团' : '购买'}', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                  )
+                : Expanded(
+                    child: RichText(
+                      text: TextSpan(style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold, color: Styles.color999999), children: [
+                        TextSpan(text: '￥${data?.coursePrice ?? ''}', style: Styles.normalFont(color: Styles.colorRed)),
+                        TextSpan(text: '/期'),
+                      ]),
                     ),
                   ),
-                ],
+            Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(75.w),
+                color: Theme.of(context).accentColor,
+              ),
+              child: RawMaterialButton(
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                padding: EdgeInsets.symmetric(horizontal: 60.w, vertical: 20.w),
+                onPressed: () {
+                  _showPayPopup();
+                },
+                child: Text('立即${widget.isGroup ? '参团' : '购买'}', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
-          );
-        } else {
-          return Container();
-        }
-      },
+          ],
+        ),
+      ),
     );
   }
 }

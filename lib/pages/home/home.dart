@@ -61,8 +61,8 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
       hasLogin = context.read<UserState>().hasLogin;
       await _getExperienceList();
       await _getNewCourseList();
+      setState(() {});
     });
-    setState(() {});
   }
 
   _onNavItemTap(BuildContext context, int index) {
@@ -90,13 +90,11 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
   _getExperienceList() async {
     DataResult res = await GroupAPI.getExperienceList(page: 1, listRow: 4);
     _experienceList = res.data.data;
-    setState(() {});
   }
 
   _getNewCourseList() async {
     DataResult res = await CourseAPI.newCourseList();
     _newCourseList = res.data;
-    setState(() {});
   }
 
   @override

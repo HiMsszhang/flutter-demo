@@ -48,6 +48,10 @@ class CourseModel {
   @JsonKey(defaultValue: '')
   String avatar;
 
+  /// 老师职业照
+  @JsonKey(defaultValue: '')
+  String image;
+
   /// 平台对老师的评价
   @JsonKey(defaultValue: '')
   String evaluate;
@@ -162,6 +166,9 @@ class CourseDetailModel {
   //课程分类标题
   @JsonKey(name: "course_cate_title", defaultValue: '')
   String courseCateTitle;
+  //学习人数
+  @JsonKey(name: "learn_num", defaultValue: 0)
+  num learnNum;
 
   //老师名称
   @JsonKey(name: "teacher_name", defaultValue: '')

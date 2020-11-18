@@ -19,6 +19,7 @@ CourseModel _$CourseModelFromJson(Map<String, dynamic> json) {
     ..courseCateTitle = json['course_cate_title'] as String ?? ''
     ..teacherName = json['teacher_name'] as String ?? ''
     ..avatar = json['avatar'] as String ?? ''
+    ..image = json['image'] as String ?? ''
     ..evaluate = json['evaluate'] as String ?? ''
     ..typefaceTitle = json['typeface_title'] as String ?? ''
     ..learnNum = json['learn_num'] as num ?? 0;
@@ -37,6 +38,7 @@ Map<String, dynamic> _$CourseModelToJson(CourseModel instance) =>
       'course_cate_title': instance.courseCateTitle,
       'teacher_name': instance.teacherName,
       'avatar': instance.avatar,
+      'image': instance.image,
       'evaluate': instance.evaluate,
       'typeface_title': instance.typefaceTitle,
       'learn_num': instance.learnNum,
@@ -92,6 +94,7 @@ CourseDetailModel _$CourseDetailModelFromJson(Map<String, dynamic> json) {
     ..courseDifficultyDesc = json['course_difficulty_desc'] as String ?? ''
     ..coursePrice = json['course_price'] as String ?? ''
     ..courseCateTitle = json['course_cate_title'] as String ?? ''
+    ..learnNum = json['learn_num'] as num ?? 0
     ..teacherName = json['teacher_name'] as String ?? ''
     ..avatar = json['avatar'] as String ?? ''
     ..typefaceTitle = json['typeface_title'] as String ?? ''
@@ -112,6 +115,7 @@ Map<String, dynamic> _$CourseDetailModelToJson(CourseDetailModel instance) =>
       'course_difficulty_desc': instance.courseDifficultyDesc,
       'course_price': instance.coursePrice,
       'course_cate_title': instance.courseCateTitle,
+      'learn_num': instance.learnNum,
       'teacher_name': instance.teacherName,
       'avatar': instance.avatar,
       'typeface_title': instance.typefaceTitle,
