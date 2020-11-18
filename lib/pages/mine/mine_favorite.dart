@@ -4,7 +4,6 @@ import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/models/CourseCollectionModel.dart';
 import 'package:molan_edu/models/teacherCollectionModel.dart';
 import 'package:molan_edu/utils/imports.dart';
-
 import 'package:molan_edu/widgets/card_mine_course.dart';
 import 'package:material_segmented_control/material_segmented_control.dart';
 import 'package:molan_edu/widgets/card_mine_teacher.dart';
@@ -30,31 +29,31 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
   bool _showSearch = false;
   CourseCollectionModel _courseData;
   TeacherCollectionModel _teacherDate;
-  var _futureBuilderFuture;
   RefreshController _listController = RefreshController(initialRefresh: false);
-  List _dataList = [];
+  List _courseDataList = [];
   int _page = 1;
   int _listRow = 10;
+  String _value = '';
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
-    _futureBuilderFuture = _getCourseCollectionList();
+
     delayed(() async {
       await _load();
     });
   }
 
   _load() async {
-    await _getCourseCollectionList();
+    await _getTeacherCollectionList();
     _listController.requestRefresh();
     setState(() {});
   }
 
   void _onRefresh() async {
     _page = 1;
-    _dataList = await _getCourseCollectionList();
+    _courseDataList = await _getCourseCollectionList();
     setState(() {});
     _listController.refreshCompleted();
   }
@@ -64,7 +63,8 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
       _listController.loadNoData();
     } else {
       _page++;
-      _dataList.addAll(await _getCourseCollectionList());
+      _courseDataList.addAll(await _getCourseCollectionList());
+
       _listController.loadComplete();
     }
     if (mounted) setState(() {});
@@ -149,7 +149,21 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                 margin: EdgeInsets.only(right: 30.w),
                 width: _showSearch ? 609.w : 0,
                 height: 64.w,
-                child: CommonSearch(),
+                child: CommonSearch(
+                  inputText: _value,
+                  onSubmitted: (value) {
+                    _value = value;
+                    setState(() {});
+                  },
+                  leading: Padding(
+                    padding: EdgeInsets.only(left: 30.w),
+                    child: Icon(
+                      MyIcons.Iconsearch,
+                      size: 30.w,
+                      color: Color(0xFFBCBCBC),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -160,11 +174,19 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
         controller: _pageController,
         onPageChanged: _onPageChanged,
         children: [
-          FutureBuilder(
-            future: _futureBuilderFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return SmartRefresher(
+          _courseData?.total == 0
+              ? Container(
+                  padding: EdgeInsets.only(top: 300.w),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
+                  ),
+                  child: Text(
+                    '还未收藏任何课程哦',
+                    style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
+                  ),
+                )
+              : SmartRefresher(
                   enablePullDown: true,
                   enablePullUp: true,
                   onRefresh: _onRefresh,
@@ -174,44 +196,46 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                   footer: myCustomFooter(),
                   child: ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                    itemCount: _courseData.data.length,
+                    itemCount: _courseData?.data?.length ?? 0,
                     itemBuilder: (context, index) => CardMineCourse(
                       showTags: true,
-                      data: _courseData.data,
+                      data: _courseData?.data,
                       index: index,
                     ),
                   ),
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-          FutureBuilder(
-            future: _getTeacherCollectionList(),
-            builder: (context, snapshot) {
-              var item = _teacherDate.data;
-              return SmartRefresher(
-                enablePullDown: true,
-                enablePullUp: true,
-                onRefresh: _onRefresh,
-                onLoading: _onLoading,
-                controller: _listController,
-                header: myCustomHeader(),
-                footer: myCustomFooter(),
-                child: ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                  itemCount: item.length,
-                  itemBuilder: (context, index) {
-                    return CardMineTeacher(
-                      data: item,
-                      index: index,
-                    );
-                  },
                 ),
-              );
-            },
-          ),
+          _teacherDate?.total == 0
+              ? Container(
+                  padding: EdgeInsets.only(top: 300.w),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_teacher.png'), fit: BoxFit.contain),
+                  ),
+                  child: Text(
+                    '还未收藏任何老师哦',
+                    style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
+                  ),
+                )
+              : SmartRefresher(
+                  enablePullDown: true,
+                  enablePullUp: true,
+                  onRefresh: _onRefresh,
+                  onLoading: _onLoading,
+                  controller: _listController,
+                  header: myCustomHeader(),
+                  footer: myCustomFooter(),
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                    itemCount: _teacherDate?.data?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      var item = _teacherDate?.data;
+                      return CardMineTeacher(
+                        data: item,
+                        index: index,
+                      );
+                    },
+                  ),
+                ),
         ],
       ),
     );

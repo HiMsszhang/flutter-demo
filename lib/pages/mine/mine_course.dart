@@ -24,18 +24,16 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
   int _page = 1;
   int _listRow = 10;
   List _dataList = [];
-  var _futureBuilderFuture;
+
   @override
   void initState() {
     super.initState();
-    _futureBuilderFuture = _getMineCourseData();
     delayed(() async {
       await _load();
     });
   }
 
   _load() async {
-    await _getMineCourseData();
     _listController.requestRefresh();
     setState(() {});
   }
@@ -79,6 +77,10 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
             height: 64.w,
             margin: EdgeInsets.only(right: 16.w),
             child: CommonSearch(
+              readOnly: true,
+              onTap: () {
+                NavigatorUtils.pushNamed(context, '/mine.course.search');
+              },
               leading: Padding(
                 padding: EdgeInsets.only(left: 30.w),
                 child: Icon(
@@ -92,11 +94,19 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
           ),
         ),
       ],
-      body: FutureBuilder(
-        future: _futureBuilderFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return SmartRefresher(
+      body: _courseData?.total == 0
+          ? Container(
+              padding: EdgeInsets.only(top: 300.w),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
+              ),
+              child: Text(
+                '还未收藏任何课程哦',
+                style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
+              ),
+            )
+          : SmartRefresher(
               enablePullDown: true,
               enablePullUp: true,
               onRefresh: _onRefresh,
@@ -106,142 +116,141 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
               footer: myCustomFooter(),
               child: ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                itemCount: _courseData?.total == 0 ? 1 : _courseData.data.length,
+                itemCount: _courseData?.data?.length ?? 0,
                 itemBuilder: (context, index) {
-                  var item = _courseData.data[index];
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 20.w),
-                    clipBehavior: Clip.hardEdge,
-                    decoration: Styles.normalDecoration.copyWith(
-                      borderRadius: BorderRadius.circular(16.w),
-                    ),
-                    child: RawMaterialButton(
-                      onPressed: () {
-                        NavigatorUtils.push(
-                          context,
-                          CourseDetailPage(courseId: item.courseId),
-                        );
-                      },
-                      child: Column(
+                  var item = _courseData?.data[index];
+                  return _mineCourseList(context, item);
+                },
+              ),
+            ),
+    );
+  }
+
+  Widget _mineCourseList(BuildContext context, MineCourseListModel item) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 20.w),
+      clipBehavior: Clip.hardEdge,
+      decoration: Styles.normalDecoration.copyWith(
+        borderRadius: BorderRadius.circular(16.w),
+      ),
+      child: RawMaterialButton(
+        onPressed: () {
+          NavigatorUtils.push(
+            context,
+            CourseDetailPage(courseId: item.courseId),
+          );
+        },
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.fromLTRB(30.w, 30.w, 0, 20.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(item.courseTitle, style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                            Text('【${item.typefaceTitle}.钢笔】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Theme.of(context).accentColor)),
+                          ],
+                        ),
+                      ),
+                      Text('${item.totalHours}课时', style: Styles.normalFont(fontSize: 26.sp)),
+                      SizedBox(width: 30.w),
+                    ],
+                  ),
+                  SizedBox(height: 17.w),
+                  Text('学习时间：${item.learningTime}', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666), overflow: TextOverflow.ellipsis),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
                         children: [
-                          Container(
-                            padding: EdgeInsets.fromLTRB(30.w, 30.w, 0, 20.w),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(item.courseTitle, style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
-                                          Text('【${item.typefaceTitle}.钢笔】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Theme.of(context).accentColor)),
-                                        ],
-                                      ),
-                                    ),
-                                    Text('${item.totalHours}课时', style: Styles.normalFont(fontSize: 26.sp)),
-                                    SizedBox(width: 30.w),
-                                  ],
-                                ),
-                                SizedBox(height: 17.w),
-                                Text('学习时间：${item.learningTime}', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666), overflow: TextOverflow.ellipsis),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                                      children: [
-                                        Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
-                                        SizedBox(width: 10.w),
-                                        MiniRatingStar(rating: item.courseDifficulty.toDouble()),
-                                      ],
-                                    ),
-                                    Container(
-                                      width: 140.w,
-                                      height: 56.w,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.horizontal(left: Radius.circular(56.w)),
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                      child: Text(
-                                          item.status == 1
-                                              ? '未学习'
-                                              : item.status == 2
-                                                  ? '学习中'
-                                                  : '已结束',
-                                          style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                          SizedBox(width: 10.w),
+                          MiniRatingStar(rating: item.courseDifficulty.toDouble()),
+                        ],
+                      ),
+                      Container(
+                        width: 140.w,
+                        height: 56.w,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.horizontal(left: Radius.circular(56.w)),
+                          color: Theme.of(context).accentColor,
+                        ),
+                        child: Text(
+                            item.status == 1
+                                ? '未学习'
+                                : item.status == 2
+                                    ? '学习中'
+                                    : '已结束',
+                            style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 15.w),
+              margin: EdgeInsets.symmetric(horizontal: 30.w),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(width: 0.5, color: Color(0xFFF5F5F5))),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CommonAvatar(
+                            size: 40.w,
+                            showSex: false,
+                            avatar: item.avatar,
                           ),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(vertical: 15.w),
-                            margin: EdgeInsets.symmetric(horizontal: 30.w),
-                            decoration: BoxDecoration(
-                              border: Border(top: BorderSide(width: 0.5, color: Color(0xFFF5F5F5))),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        CommonAvatar(
-                                          size: 40.w,
-                                          showSex: false,
-                                          avatar: item.avatar,
-                                        ),
-                                        SizedBox(width: 15.w),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(item.teacherName, style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
-                                            Row(
-                                              children: [
-                                                ...List.generate(3, (index) {
-                                                  return Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 4.w),
-                                                    margin: EdgeInsets.only(right: 20.w, top: 4.w),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(36.w),
-                                                      color: Color(0xFFEEEEEE),
-                                                    ),
-                                                    child: Text('12345', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999, height: 1.2)),
-                                                  );
-                                                }),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Text('已支付\n¥${item.orderPrice}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorRed, fontWeight: FontWeight.bold, height: 1.5), textAlign: TextAlign.right),
-                              ],
-                            ),
+                          SizedBox(width: 15.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(item.teacherName, style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                              // Row(
+                              //   children: [
+                              //     ...List.generate(3, (index) {
+                              //       return Container(
+                              //         padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 4.w),
+                              //         margin: EdgeInsets.only(right: 20.w, top: 4.w),
+                              //         decoration: BoxDecoration(
+                              //           borderRadius: BorderRadius.circular(36.w),
+                              //           color: Color(0xFFEEEEEE),
+                              //         ),
+                              //         child: Text('12345', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999, height: 1.2)),
+                              //       );
+                              //     }),
+                              //   ],
+                              // )
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                  );
-                },
+                    ],
+                  ),
+                  Text('已支付\n¥${item.orderPrice}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorRed, fontWeight: FontWeight.bold, height: 1.5), textAlign: TextAlign.right),
+                ],
               ),
-            );
-          } else {
-            return Container();
-          }
-        },
+            ),
+          ],
+        ),
       ),
     );
   }
