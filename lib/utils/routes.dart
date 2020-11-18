@@ -27,6 +27,7 @@ import 'package:molan_edu/pages/main.dart';
 import 'package:molan_edu/pages/guide.dart';
 import 'package:molan_edu/pages/other/webview.dart';
 import 'package:molan_edu/pages/home/course_experience.dart';
+import 'package:molan_edu/pages/home/group/group_list.dart';
 
 class MyRoutes {
   static routes(String name, Map arguments) {
@@ -41,6 +42,8 @@ class MyRoutes {
       '/course.rate': (context) => CourseRatePage(),
       // 拼团广场
       '/group': (context) => GroupPage(),
+      // 拼团课列表
+      '/group.list': (context) => GroupListPage(),
       // 我的课程
       '/mine.course': (context) => MineCoursePage(),
       // 我的收藏

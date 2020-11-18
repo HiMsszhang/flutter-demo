@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/models/GroupModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/pages/course/course_detail.dart';
@@ -6,10 +7,12 @@ import 'package:molan_edu/pages/course/course_detail.dart';
 class CardGroup extends StatefulWidget {
   final double width;
   final double height;
+  final GroupCourseModel data;
   CardGroup({
     Key key,
     this.width,
     this.height,
+    this.data,
   }) : super(key: key);
 
   _CardGroupState createState() => _CardGroupState();
@@ -18,9 +21,10 @@ class CardGroup extends StatefulWidget {
 class _CardGroupState extends State<CardGroup> {
   @override
   Widget build(BuildContext context) {
+    var data = widget.data;
     return GestureDetector(
       onTap: () {
-        NavigatorUtils.push(context, CourseDetailPage(isGroup: true));
+        NavigatorUtils.push(context, CourseDetailPage(isGroup: true, courseId: data.id));
       },
       child: Container(
         width: widget.width ?? double.infinity,
@@ -52,7 +56,13 @@ class _CardGroupState extends State<CardGroup> {
                     ),
                     child: Stack(
                       children: [
-                        Image.asset('assets/images/demo.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                        CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          imageUrl: data?.avatar ?? '',
+                          placeholder: (context, url) => Image.asset('assets/images/placeholder.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                        ),
                         Positioned(
                           bottom: 0,
                           left: 0,
@@ -61,7 +71,7 @@ class _CardGroupState extends State<CardGroup> {
                             height: 43.w,
                             color: Color.fromRGBO(162, 162, 162, .6),
                             alignment: Alignment.center,
-                            child: Text('30课时', style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
+                            child: Text('${data?.totalHours}课时', style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
                           ),
                         ),
                       ],
@@ -75,9 +85,9 @@ class _CardGroupState extends State<CardGroup> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           children: [
-                            Text('勤礼碑一系列', style: Styles.normalFont(fontSize: 30.sp, color: Styles.colorText, fontWeight: FontWeight.bold)),
+                            Text(data?.courseTitle ?? '', style: Styles.normalFont(fontSize: 30.sp, color: Styles.colorText, fontWeight: FontWeight.bold)),
                             SizedBox(width: 14.w),
-                            Text('【楷书.钢笔】', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                            Text('【${data?.typefaceTitle}.${data?.courseCateTitle}】', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                           ],
                         ),
                         SizedBox(height: 20.w),
@@ -88,11 +98,11 @@ class _CardGroupState extends State<CardGroup> {
                             spacing: 14.w, //主轴上子控件的间距
                             runSpacing: 16.w, //交叉轴上子控件之间的间距
                             children: List.generate(
-                              5,
+                              data?.teacherLabel?.length ?? 0,
                               (index) => Container(
                                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.w),
                                 decoration: BoxDecoration(color: Color(0xFFEDEDED), borderRadius: BorderRadius.circular(31.w)),
-                                child: Text('3年教龄', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color666666, height: 1.2)),
+                                child: Text(data?.teacherLabel[index] ?? '', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color666666, height: 1.2)),
                               ),
                             ),
                           ),
@@ -114,12 +124,12 @@ class _CardGroupState extends State<CardGroup> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '￥1899.00',
+                                      '￥${data?.marketPrice}',
                                       style: Styles.normalFont(fontSize: 30.sp, color: Styles.colorRed, fontWeight: FontWeight.bold),
                                     ),
                                     SizedBox(width: 10.w),
                                     Text(
-                                      '￥2199.00',
+                                      '￥${data?.coursePrice}',
                                       style: Styles.normalFont(fontSize: 22.sp, color: Color(0xFFB2B2B2), decoration: TextDecoration.lineThrough),
                                     ),
                                   ],
@@ -162,7 +172,7 @@ class _CardGroupState extends State<CardGroup> {
               children: [
                 Expanded(
                   child: Text(
-                    '开课时间：2020-01-02',
+                    '开课时间：${data?.openingTime}',
                     style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
                     textAlign: TextAlign.center,
                   ),
@@ -173,11 +183,13 @@ class _CardGroupState extends State<CardGroup> {
                   color: Styles.color666666,
                 ),
                 Expanded(
-                    child: Text(
-                  '周一至周五   日更3课时',
-                  style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
-                  textAlign: TextAlign.center,
-                )),
+                  child: Text(
+                    '${data?.learningTime}   日更${data?.dailyUpdate}课时',
+                    style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ],
