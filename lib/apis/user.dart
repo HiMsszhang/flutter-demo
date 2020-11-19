@@ -50,4 +50,14 @@ class UserAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 获取用户信息
+  static Future<DataResult> getUser() async {
+    try {
+      Response res = await http.post('/userinfo');
+      return DataResult(UserModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

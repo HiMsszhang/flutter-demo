@@ -5,6 +5,7 @@ import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/apis/course.dart';
 import 'package:molan_edu/models/CourseModel.dart';
 import 'package:molan_edu/models/GroupModel.dart';
+import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -37,9 +38,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   List<String> _tabList = ['课程简介', '课程目录', '课程规划'];
   int _selectedIndex = 0;
   int _currentIndex = 0;
+  bool hasLogin = false;
+
   @override
   void initState() {
     super.initState();
+    hasLogin = context.read<UserState>().hasLogin;
     delayed(() async {
       await _load();
     });
@@ -90,12 +94,16 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   }
 
   _showPayPopup() {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) => PopupPay(),
-    );
+    if (!hasLogin) {
+      toLoginPopup();
+    } else {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => PopupPay(id: widget.courseId),
+      );
+    }
   }
 
   _onChanged(int index) {

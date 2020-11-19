@@ -187,7 +187,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
                     height: 341.w,
                     child: CachedNetworkImage(
                       fit: BoxFit.contain,
-                      imageUrl: item?.avatar ?? '',
+                      imageUrl: item?.image ?? '',
                       placeholder: (context, url) => Container(color: Colors.transparent),
                     ),
                   ),

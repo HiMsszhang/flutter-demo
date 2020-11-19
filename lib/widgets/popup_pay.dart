@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/user.dart';
+import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/UserModel.dart';
+import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/apis/pay.dart';
@@ -7,30 +11,47 @@ import 'package:fluwx/fluwx.dart';
 import 'package:tobias/tobias.dart' as tobias;
 
 class PopupPay extends StatefulWidget {
-  final bool showTags;
+  final int id;
   PopupPay({
     Key key,
-    this.showTags = false,
+    this.id,
   }) : super(key: key);
 
   _PopupPayState createState() => _PopupPayState();
 }
 
-class _PopupPayState extends State<PopupPay> {
-  List<Map> _tabList = [
-    {'title': '自学模式'},
-    {'title': 'VIP模式'},
-  ];
+class _PopupPayState extends State<PopupPay> with UtilsMixin {
+  UserModel _user;
   int _tabIndex = 0;
-  List<Map> _radioList = [
-    {'title': '支付宝支付', 'name': 'alipay'},
-    {'title': '微信支付', 'name': 'wechat'},
-  ];
   int _radioIndex = 0;
   bool _useMo = false;
+  int _discount = 0;
+  num _price = 0;
 
-  /// 1支付宝 2微信
-  int _paymentMethodId = 1;
+  OrderModel _data;
+
+  @override
+  void initState() {
+    super.initState();
+    delayed(() async {
+      await _getUser();
+      await _getData();
+    });
+  }
+
+  _getUser() async {
+    DataResult res = await UserAPI.getUser();
+    UserModel user = res.data;
+    await context.read<UserState>().updateUser(user);
+  }
+
+  _getData() async {
+    DataResult res = await PayAPI.order(courseId: widget.id);
+    _data = res.data;
+    _price = _data.courseModel[_tabIndex].id == 2 ? _data.course.courseVipPrice : _data.course.coursePrice;
+    setState(() {});
+    _getDiscount();
+  }
 
   _onRadioChanged(int index) {
     _radioIndex = index;
@@ -43,14 +64,16 @@ class _PopupPayState extends State<PopupPay> {
   }
 
   _pay() async {
+    /// 1支付宝 2微信
+    var paymentId = _data.paymentMethod[_radioIndex].id;
     DataResult data = await PayAPI.payNow(
-      courseId: 2,
-      courseModelId: 1,
-      paymentMethodId: _paymentMethodId,
-      discountMoMoney: 0,
-      coursePrice: 0.01,
+      courseId: _data.course.id,
+      courseModelId: _data.courseModel[_tabIndex].id,
+      paymentMethodId: paymentId,
+      discountMoMoney: _discount,
+      coursePrice: _price,
     );
-    if (_paymentMethodId == 1) {
+    if (paymentId == 1) {
       try {
         AliPayModel res = data.data;
         print("The pay info is : " + res.sign);
@@ -59,7 +82,7 @@ class _PopupPayState extends State<PopupPay> {
       } catch (e) {
         print("error--->$e");
       }
-    } else if (_paymentMethodId == 2) {
+    } else if (paymentId == 2) {
       try {
         WechatPayModel res = data.data;
         var payResult = await payWithWeChat(
@@ -78,8 +101,29 @@ class _PopupPayState extends State<PopupPay> {
     }
   }
 
+  _getDiscount() {
+    List.generate(_data.courseOrderDiscount.length, (index) {
+      var preItem = index == 0 ? 0 : _data.courseOrderDiscount[index - 1].coursePrice;
+      var item = _data.courseOrderDiscount[index].coursePrice;
+      if (preItem <= _price && item > _price) {
+        _discount = _data.courseOrderDiscount[index].discount;
+      }
+    });
+    setState(() {});
+  }
+
+  _finalMoney() {
+    var price = _price;
+
+    if (_useMo) {
+      price = _price - _discount;
+    }
+    return price;
+  }
+
   @override
   Widget build(BuildContext context) {
+    _user = context.watch<UserState>().userInfo;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.w)),
@@ -108,16 +152,16 @@ class _PopupPayState extends State<PopupPay> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('【行书】勤礼碑一系列', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                Text('【${_data?.course?.typefaceTitle}】${_data?.course?.courseTitle}', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
                 SizedBox(height: 28.w),
                 Row(
                   children: List.generate(
-                    _tabList.length,
+                    _data?.courseModel?.length ?? 0,
                     (index) => _widgetTabItem(index),
                   ),
                 ),
                 SizedBox(height: 26.w),
-                Text('模拟介绍：自学模式适合自律性自主性较高且有一定基础的孩子，通过观看视频自行完成课后作业', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
+                Text(_data?.courseModel[_tabIndex].desc ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
               ],
             ),
           ),
@@ -126,7 +170,7 @@ class _PopupPayState extends State<PopupPay> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('金额', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
-                Text('金额￥999.00', style: Styles.normalFont(fontSize: 30.sp, color: Styles.color666666)),
+                Text('金额￥$_price', style: Styles.normalFont(fontSize: 30.sp, color: Styles.color666666)),
               ],
             ),
           ),
@@ -141,8 +185,8 @@ class _PopupPayState extends State<PopupPay> {
               ],
             ),
           ),
-          _widgetMo(),
-          ...List.generate(_radioList.length, (index) => _widgetRadioItem(index)),
+          _discount > 0 && _user.moMoney > _discount ? _widgetMo() : Container(),
+          ...List.generate(_data.paymentMethod.length ?? 0, (index) => _widgetRadioItem(index)),
           SizedBox(height: 20.w),
           SafeArea(
             top: false,
@@ -153,7 +197,7 @@ class _PopupPayState extends State<PopupPay> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text('￥799.00', style: Styles.normalFont(fontSize: 36.sp, color: Styles.colorRed, fontWeight: FontWeight.bold)),
+                    child: Text('￥${_finalMoney()}', style: Styles.normalFont(fontSize: 36.sp, color: Styles.colorRed, fontWeight: FontWeight.bold)),
                   ),
                   Container(
                     clipBehavior: Clip.hardEdge,
@@ -190,7 +234,7 @@ class _PopupPayState extends State<PopupPay> {
   }
 
   Widget _widgetTabItem(int index) {
-    var item = _tabList[index];
+    var item = _data?.courseModel[index];
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
@@ -206,10 +250,12 @@ class _PopupPayState extends State<PopupPay> {
         padding: EdgeInsets.symmetric(horizontal: 22.w),
         onPressed: () {
           _tabIndex = index;
+          _price = _data.courseModel[_tabIndex].id == 2 ? _data.course.courseVipPrice : _data.course.coursePrice;
           setState(() {});
+          _getDiscount();
         },
         child: Text(
-          item['title'],
+          item?.courseModelTitle ?? '',
           style: Styles.normalFont(fontSize: 26.sp, color: _tabIndex == index ? Colors.white : Color(0xFFFFC4A3), fontWeight: FontWeight.bold),
         ),
       ),
@@ -228,11 +274,11 @@ class _PopupPayState extends State<PopupPay> {
             Image.asset('assets/images/common/type_mo.png', width: 51.w, height: 51.w),
             SizedBox(width: 18.w),
             Expanded(
-              child: Text('可抵扣墨币：200\n(剩余400)', style: Styles.normalFont(fontSize: 28.sp)),
+              child: Text('可抵扣墨币：$_discount\n(剩余${_user.moMoney})', style: Styles.normalFont(fontSize: 28.sp)),
             ),
             Offstage(
               offstage: !_useMo,
-              child: Text('本单已减￥200.00', style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFFD71313))),
+              child: Text('本单已减￥$_discount', style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFFD71313))),
             ),
             SizedBox(width: 16.w),
             Container(
@@ -253,7 +299,7 @@ class _PopupPayState extends State<PopupPay> {
   }
 
   Widget _widgetRadioItem(int index) {
-    var item = _radioList[index];
+    var item = _data.paymentMethod[index];
     return Container(
       child: RawMaterialButton(
         padding: EdgeInsets.symmetric(vertical: 20.w, horizontal: 30.w),
@@ -262,14 +308,14 @@ class _PopupPayState extends State<PopupPay> {
         },
         child: Row(
           children: [
-            Image.asset('assets/images/common/type_${item['name']}.png', width: 51.w, height: 51.w),
+            Image.asset('assets/images/common/type_${item.id == 1 ? "alipay" : "wechat"}.png', width: 51.w, height: 51.w),
             SizedBox(width: 18.w),
             Expanded(
-              child: Text(item['title'], style: Styles.normalFont(fontSize: 28.sp)),
+              child: Text(item.payTitle, style: Styles.normalFont(fontSize: 28.sp)),
             ),
             Offstage(
               offstage: _radioIndex != index,
-              child: Text('实际支付￥799.00', style: Styles.normalFont(fontSize: 24.sp)),
+              child: Text('实际支付￥${_finalMoney()}', style: Styles.normalFont(fontSize: 24.sp)),
             ),
             SizedBox(width: 16.w),
             Container(
