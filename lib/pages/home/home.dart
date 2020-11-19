@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
         NavigatorUtils.pushNamed(context, '/group');
         break;
       case 3:
-        NavigatorUtils.pushNamed(context, hasLogin ? '/invite' : '/login');
+        hasLogin ? NavigatorUtils.pushNamed(context, '/invite') : toLoginPopup();
         break;
     }
   }
@@ -491,17 +491,20 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
             width: 690.w,
             height: 76.w,
             margin: EdgeInsets.only(top: 26.w),
-            color: Theme.of(context).buttonColor,
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(width: 1, color: Color(0xFFEAEAEA))),
+              color: Theme.of(context).primaryColor,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ImageIcon(
                   AssetImage('assets/images/chat/icon_warn.png'),
                   size: 30.w,
-                  color: Colors.white,
+                  color: Theme.of(context).buttonColor,
                 ),
                 SizedBox(width: 13.w),
-                Text('注意：开课后 3课时后 不可退款', style: Styles.normalFont(fontSize: 26.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                Text('注意：开课后 3课时后 不可退款', style: Styles.normalFont(fontSize: 26.sp, color: Theme.of(context).buttonColor, fontWeight: FontWeight.bold)),
               ],
             ),
           ),

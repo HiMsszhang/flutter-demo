@@ -385,7 +385,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                     child: CommonTabbar(
                       itemList: _tabList,
                       isCenter: true,
-                      isSpecial: true,
                       onChanged: _onChanged,
                     ),
                   ),

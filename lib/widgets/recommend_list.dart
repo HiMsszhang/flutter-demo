@@ -51,7 +51,7 @@ class _RecommendListState extends State<RecommendList> {
                       SizedBox(width: 28.w),
                       Image.asset('assets/images/common/icon_recommend.png', width: 30.w, height: 30.w),
                       SizedBox(width: 18.w),
-                      Text(S.current.recommend, style: Styles.specialFont(fontSize: 32.sp)),
+                      Text(S.current.recommend, style: Styles.normalFont(fontSize: 32.sp)),
                     ],
                   ),
                 ),
@@ -60,9 +60,7 @@ class _RecommendListState extends State<RecommendList> {
             ),
           );
         } else {
-          return Container(
-            child: Text('测试'),
-          );
+          return Container();
         }
       },
     );

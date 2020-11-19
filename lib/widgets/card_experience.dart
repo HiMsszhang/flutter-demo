@@ -44,7 +44,7 @@ class _CardExperienceState extends State<CardExperience> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     children: [
-                      Text(widget.data.courseTitle ?? '', style: Styles.specialFont(fontSize: 34.sp, color: Color(0xFFFF7E30), fontWeight: FontWeight.bold)),
+                      Text(widget.data.courseTitle ?? '', style: Styles.normalFont(fontSize: 34.sp, color: Color(0xFFFF7E30), fontWeight: FontWeight.bold)),
                       SizedBox(width: 10.w),
                       Text(widget.data.typefaceTitle ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFFFF7E30))),
                     ],
