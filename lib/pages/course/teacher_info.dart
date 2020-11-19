@@ -6,10 +6,17 @@ import 'package:molan_edu/widgets/card_all_course.dart';
 import 'package:molan_edu/widgets/card_mine_teacher.dart';
 import 'package:molan_edu/widgets/card_share.dart';
 import 'package:molan_edu/widgets/rate_list.dart';
+import 'package:molan_edu/apis/teacher.dart';
+import 'package:molan_edu/models/TeacherModel.dart';
+import 'package:molan_edu/pages/course/teacher_course.dart';
 
 class TeacherInfoPage extends StatefulWidget {
+  final int id;
+  final String teacherName;
   const TeacherInfoPage({
     Key key,
+    this.id,
+    this.teacherName = "",
   }) : super(key: key);
 
   @override
@@ -17,13 +24,30 @@ class TeacherInfoPage extends StatefulWidget {
 }
 
 class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
+  TeacherInfoModel _data;
+  bool _loadFlag = false;
+
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _load();
+    });
+  }
+
+  _load() async {
+    await _getInfo();
+  }
+
+  _getInfo() async {
+    DataResult res = await TeacherAPI.info(teacherId: widget.id);
+    _data = res.data;
+    _loadFlag = true;
+    setState(() {});
   }
 
   _toAllCourse() {
-    NavigatorUtils.pushNamed(context, '/teacher.course');
+    NavigatorUtils.push(context, TeacherCoursePage(id: _data?.teacher?.id));
   }
 
   @override
@@ -53,7 +77,7 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
                 centerTitle: true,
                 brightness: Brightness.dark,
                 title: Text(
-                  'Vicky老师的主页',
+                  '${widget.teacherName}的主页',
                   style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
                 leading: IconButton(
@@ -68,74 +92,80 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
                 ),
               ),
               Expanded(
-                child: ListView(
-                  padding: EdgeInsets.symmetric(vertical: 40.w),
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30.w),
-                      child: Column(
+                child: _loadFlag
+                    ? ListView(
+                        padding: EdgeInsets.symmetric(vertical: 40.w),
                         children: [
-                          CardMineTeacher(showTags: true),
-                          Container(
-                            width: 690.w,
-                            height: 109.w,
-                            clipBehavior: Clip.hardEdge,
-                            decoration: Styles.normalDecoration.copyWith(
-                              borderRadius: BorderRadius.circular(16.w),
-                            ),
-                            margin: EdgeInsets.only(bottom: 14.w),
-                            child: RawMaterialButton(
-                              padding: EdgeInsets.symmetric(horizontal: 30.w),
-                              onPressed: () {
-                                _toAllCourse();
-                              },
-                              child: Row(
-                                children: [
-                                  Image.asset('assets/images/course/icon_course.png', width: 30.w, height: 30.w),
-                                  SizedBox(width: 18.w),
-                                  Expanded(
-                                    child: Text('全部课程.22', style: Styles.normalFont(fontSize: 32.sp)),
-                                  ),
-                                  Text('查看更多', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color999999)),
-                                  SizedBox(width: 10.w),
-                                  Icon(Icons.arrow_forward_ios, size: 23.w, color: Styles.color999999),
-                                ],
-                              ),
-                            ),
-                          ),
-                          CardAllCourse(),
-                          CardAllCourse(),
-                          RateList(),
-                          SizedBox(height: 20.w),
-                          Container(
-                            width: 690.w,
-                            height: 109.w,
-                            clipBehavior: Clip.hardEdge,
+                          Padding(
                             padding: EdgeInsets.symmetric(horizontal: 30.w),
-                            decoration: Styles.normalDecoration.copyWith(
-                              borderRadius: BorderRadius.circular(16.w),
-                            ),
-                            child: Row(
+                            child: Column(
                               children: [
-                                ImageIcon(
-                                  AssetImage('assets/images/common/icon_share.png'),
-                                  size: 30.w,
-                                  color: Theme.of(context).accentColor,
+                                CardMineTeacher(showTags: true, data: _data?.teacher),
+                                Container(
+                                  width: 690.w,
+                                  height: 109.w,
+                                  clipBehavior: Clip.hardEdge,
+                                  decoration: Styles.normalDecoration.copyWith(
+                                    borderRadius: BorderRadius.circular(16.w),
+                                  ),
+                                  margin: EdgeInsets.only(bottom: 14.w),
+                                  child: RawMaterialButton(
+                                    padding: EdgeInsets.symmetric(horizontal: 30.w),
+                                    onPressed: () {
+                                      _toAllCourse();
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Image.asset('assets/images/course/icon_course.png', width: 30.w, height: 30.w),
+                                        SizedBox(width: 18.w),
+                                        Expanded(
+                                          child: Text('全部课程.${_data?.totalCourseNum}', style: Styles.normalFont(fontSize: 32.sp)),
+                                        ),
+                                        Text('查看更多', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color999999)),
+                                        SizedBox(width: 10.w),
+                                        Icon(Icons.arrow_forward_ios, size: 23.w, color: Styles.color999999),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                SizedBox(width: 18.w),
-                                Expanded(
-                                  child: Text('Vicky老师的分享', style: Styles.normalFont(fontSize: 32.sp)),
+                                ...List.generate(
+                                  _data?.course?.length ?? 0,
+                                  (index) => CardAllCourse(
+                                    data: _data?.course[index],
+                                  ),
+                                ),
+                                RateList(),
+                                SizedBox(height: 20.w),
+                                Container(
+                                  width: 690.w,
+                                  height: 109.w,
+                                  clipBehavior: Clip.hardEdge,
+                                  padding: EdgeInsets.symmetric(horizontal: 30.w),
+                                  decoration: Styles.normalDecoration.copyWith(
+                                    borderRadius: BorderRadius.circular(16.w),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      ImageIcon(
+                                        AssetImage('assets/images/common/icon_share.png'),
+                                        size: 30.w,
+                                        color: Theme.of(context).accentColor,
+                                      ),
+                                      SizedBox(width: 18.w),
+                                      Expanded(
+                                        child: Text('Vicky老师的分享', style: Styles.normalFont(fontSize: 32.sp)),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
+                          SizedBox(height: 14.w),
+                          CardShare(),
                         ],
-                      ),
-                    ),
-                    SizedBox(height: 14.w),
-                    CardShare(),
-                  ],
-                ),
+                      )
+                    : MyLoading(),
               ),
             ],
           ),

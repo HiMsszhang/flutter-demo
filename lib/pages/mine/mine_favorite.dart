@@ -230,8 +230,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                     itemBuilder: (context, index) {
                       var item = _teacherDate?.data;
                       return CardMineTeacher(
-                        data: item,
-                        index: index,
+                        data: item[index],
                       );
                     },
                   ),

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/models/TeacherModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 
 class CardMineTeacher extends StatefulWidget {
   final bool showTags;
-  final data;
-  final index;
+  final TeacherModel data;
   CardMineTeacher({
     Key key,
     this.showTags = false,
     this.data,
-    this.index,
   }) : super(key: key);
 
   _CardMineTeacherState createState() => _CardMineTeacherState();
@@ -19,7 +18,7 @@ class CardMineTeacher extends StatefulWidget {
 class _CardMineTeacherState extends State<CardMineTeacher> {
   @override
   Widget build(BuildContext context) {
-    var item = widget.data[widget.index];
+    var item = widget.data;
     return Container(
       width: 690.w,
       margin: EdgeInsets.only(bottom: 20.w),
@@ -42,16 +41,16 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
                       CommonAvatar(
                         showSex: false,
                         size: 90.w,
-                        avatar: item.avatar,
+                        avatar: item?.avatar ?? '',
                       ),
                       SizedBox(width: 22.w),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(item.teacherName, style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
+                            Text(item?.teacherName ?? '', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
                             SizedBox(height: 18.w),
-                            Text('学生喜爱度${item.likeability}%', style: Styles.specialFont(fontSize: 26.sp, color: Theme.of(context).accentColor)),
+                            Text('学生喜爱度${item?.likeability}%', style: Styles.specialFont(fontSize: 26.sp, color: Theme.of(context).accentColor)),
                           ],
                         ),
                       ),
@@ -76,7 +75,7 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
             SizedBox(height: 36.w),
             Container(
               height: 80.w,
-              child: Text(item.introduce, style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666, height: 1.38)),
+              child: Text(item?.introduce ?? '', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666, height: 1.38)),
             ),
             widget.showTags
                 ? Container(
@@ -85,7 +84,7 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
                       spacing: 18.w,
                       runSpacing: 10.w,
                       children: List.generate(
-                        7,
+                        item?.teacherLabel?.length ?? 0,
                         (index) => Container(
                           padding: EdgeInsets.symmetric(horizontal: 14.w),
                           height: 41.w,
@@ -96,7 +95,7 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('博士', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                              Text(item?.teacherLabel[index] ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                             ],
                           ),
                         ),

@@ -5,6 +5,7 @@ import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/apis/course.dart';
 import 'package:molan_edu/models/CourseModel.dart';
 import 'package:molan_edu/models/GroupModel.dart';
+import 'package:molan_edu/pages/course/teacher_info.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:chewie/chewie.dart';
@@ -32,13 +33,14 @@ class CourseDetailPage extends StatefulWidget {
 }
 
 class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, SingleTickerProviderStateMixin {
-  final StreamController<int> _streamController = StreamController<int>();
   VideoPlayerController _controller;
   ChewieController _chewieController;
   List<String> _tabList = ['课程简介', '课程目录', '课程规划'];
   int _selectedIndex = 0;
   int _currentIndex = 0;
   bool hasLogin = false;
+  dynamic _data;
+  bool _loadFlag = false;
 
   @override
   void initState() {
@@ -46,16 +48,25 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     hasLogin = context.read<UserState>().hasLogin;
     delayed(() async {
       await _load();
+      _controller = VideoPlayerController.network(_data?.currentHours['url']);
+      _chewieController = ChewieController(
+        videoPlayerController: _controller,
+        aspectRatio: 750 / 500,
+        autoPlay: true,
+        looping: true,
+        customControls: CustomControls(),
+      );
     });
   }
 
-  _load() async {}
+  _load() async {
+    widget.isGroup ? await _getGroupCourseDetail() : await _getCourseDetail();
+  }
 
   @override
   void dispose() {
     _controller.dispose();
     _chewieController.dispose();
-    _streamController.close();
     super.dispose();
   }
 
@@ -68,18 +79,22 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     return result.data;
   }
 
-  Future _getCourseDetail() async {
+  _getCourseDetail() async {
     DataResult result = await CourseAPI.coursedetail(
       courseId: widget.courseId,
     );
-    return result.data;
+    _data = result.data as CourseDetailModel;
+    _loadFlag = true;
+    setState(() {});
   }
 
-  Future _getGroupCourseDetail() async {
+  _getGroupCourseDetail() async {
     DataResult result = await GroupAPI.groupCourseDetail(
       courseId: widget.courseId,
     );
-    return result.data;
+    _data = result.data as GroupCourseDetailModel;
+    _loadFlag = true;
+    setState(() {});
   }
 
   String _formatTime(int timeNum) {
@@ -108,21 +123,15 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
 
   _onChanged(int index) {
     _selectedIndex = index;
-
-    _streamController.sink.add(_selectedIndex);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: FutureBuilder(
-        future: widget.isGroup ? _getGroupCourseDetail() : _getCourseDetail(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            var data = widget.isGroup ? new GroupCourseDetailModel() : new CourseDetailModel();
-            data = snapshot.data;
-            return Column(
+      body: _loadFlag
+          ? Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
@@ -167,42 +176,27 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _widgetVideo(data),
-                          _widgetInfo(data),
-                          _widgetDetail(data),
+                          _widgetVideo(),
+                          _widgetInfo(),
+                          _widgetDetail(),
                           RateList(),
                           RecommendList(
-                            typefaceId: data.typefaceId,
-                            courseCateId: data.courseIateId,
+                            typefaceId: _data?.typefaceId,
+                            courseCateId: _data?.courseIateId,
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                _widgetBottom(data),
+                _widgetBottom(),
               ],
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+            )
+          : MyLoading(),
     );
   }
 
-  Widget _widgetVideo(CourseDetailModel data) {
-    if (widget.isGroup) data = data as GroupCourseDetailModel;
-    _controller = VideoPlayerController.network(data.currentHours['url']);
-    _chewieController = ChewieController(
-      videoPlayerController: _controller,
-      aspectRatio: 750 / 500,
-      autoPlay: true,
-      looping: true,
-      customControls: CustomControls(),
-    );
+  Widget _widgetVideo() {
     return Container(
       width: 750.w,
       height: 500.w,
@@ -232,8 +226,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     );
   }
 
-  Widget _widgetInfo(CourseDetailModel data) {
-    if (widget.isGroup) data = data as GroupCourseDetailModel;
+  Widget _widgetInfo() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
       decoration: BoxDecoration(
@@ -244,7 +237,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
         children: [
           GestureDetector(
             onTap: () {
-              NavigatorUtils.pushNamed(context, '/teacher.info');
+              hasLogin ? NavigatorUtils.push(context, TeacherInfoPage(id: _data?.teacherId, teacherName: _data?.teacherName)) : toLoginPopup();
             },
             child: Container(
               width: 135.w,
@@ -255,7 +248,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
               ),
               child: Stack(
                 children: [
-                  Image.network('${data?.avatar ?? null}', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                  CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    imageUrl: _data?.avatar ?? '',
+                    placeholder: (context, url) => Image.asset('assets/images/placeholder.png'),
+                  ),
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -273,7 +272,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                         ),
                       ),
                       alignment: Alignment.center,
-                      child: Text("${data?.totalHours ?? 0}课时", style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
+                      child: Text("${_data?.totalHours ?? 0}课时", style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
                     ),
                   ),
                 ],
@@ -288,14 +287,14 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(data?.courseTitle ?? '', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                    Text(_data?.courseTitle ?? '', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
                     SizedBox(width: 14.w),
-                    Text('【${data?.typefaceTitle ?? ''}.${data?.courseCateTitle ?? ''}】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
+                    Text('【${_data?.typefaceTitle ?? ''}.${_data?.courseCateTitle ?? ''}】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 SizedBox(height: 20.w),
                 Text(
-                  '${widget.isGroup ? "开课" : "学习"}时间：${data?.learningTime ?? ''} 11:00-12:00',
+                  '${widget.isGroup ? "开课" : "学习"}时间：${widget.isGroup ? _data?.openingTime : _data?.learningTime} 11:00-12:00',
                   style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -305,10 +304,10 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                   children: [
                     Text('课程难度', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     SizedBox(width: 10.w),
-                    MiniRatingStar(rating: data.courseDifficulty.toDouble()),
+                    MiniRatingStar(rating: _data?.courseDifficulty?.toDouble()),
                     InkWell(
                       onTap: () {
-                        courseInfoPopup(context, data);
+                        courseInfoPopup(context, _data);
                       },
                       child: Container(
                         width: 30.w,
@@ -328,7 +327,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                         borderRadius: BorderRadius.circular(34.w),
                         color: Theme.of(context).accentColor,
                       ),
-                      child: Text('日更${data?.dailyUpdate ?? ''}课时', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white, height: 1.2)),
+                      child: Text('日更${_data?.dailyUpdate ?? ''}课时', style: Styles.normalFont(fontSize: 22.sp, color: Colors.white, height: 1.2)),
                     ),
                   ],
                 ),
@@ -337,13 +336,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('讲师：${data?.teacherName ?? ''}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                    Text('讲师：${_data?.teacherName ?? ''}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       children: [
                         Image.asset('assets/images/common/icon_learn.png', width: 26.w, height: 20.w),
                         SizedBox(width: 10.w),
-                        Text('学习人数：321W人', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorBlue)),
+                        Text('学习人数：${formatNum(_data?.learnNum)}人', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorBlue)),
                       ],
                     ),
                   ],
@@ -356,53 +355,46 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     );
   }
 
-  Widget _widgetDetail(CourseDetailModel data) {
-    if (widget.isGroup) data = data as GroupCourseDetailModel;
-    return StreamBuilder<int>(
-        stream: _streamController.stream,
-        initialData: _selectedIndex,
-        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-          return Flexible(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 40.w, horizontal: 30.w).copyWith(bottom: 0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 690.w,
-                    height: 93.w,
-                    margin: EdgeInsets.only(bottom: 30.w),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.w),
-                      color: Theme.of(context).primaryColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(163, 163, 163, 0.2),
-                          blurRadius: 30.w,
-                        )
-                      ],
-                    ),
-                    child: CommonTabbar(
-                      itemList: _tabList,
-                      isCenter: true,
-                      onChanged: _onChanged,
-                    ),
-                  ),
-                  _selectedIndex == 0
-                      ? _widgetSummary(data)
-                      : _selectedIndex == 1
-                          ? _widgetIndex()
-                          : _widgetPlan(data),
+  Widget _widgetDetail() {
+    return Flexible(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 40.w, horizontal: 30.w).copyWith(bottom: 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 690.w,
+              height: 93.w,
+              margin: EdgeInsets.only(bottom: 30.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.w),
+                color: Theme.of(context).primaryColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromRGBO(163, 163, 163, 0.2),
+                    blurRadius: 30.w,
+                  )
                 ],
               ),
+              child: CommonTabbar(
+                itemList: _tabList,
+                isCenter: true,
+                onChanged: _onChanged,
+              ),
             ),
-          );
-        });
+            _selectedIndex == 0
+                ? _widgetSummary()
+                : _selectedIndex == 1
+                    ? _widgetIndex()
+                    : _widgetPlan(),
+          ],
+        ),
+      ),
+    );
   }
 
   /// 课程简介
-  Widget _widgetSummary(CourseDetailModel data) {
-    if (widget.isGroup) data = data as GroupCourseDetailModel;
+  Widget _widgetSummary() {
     return Container(
       width: 690.w,
       height: 460.w,
@@ -410,7 +402,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: Image.network('${data?.courseDesc ?? ''}', fit: BoxFit.cover),
+      child: CachedNetworkImage(
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        imageUrl: _data?.courseDesc ?? '',
+        placeholder: (context, url) => Image.asset('assets/images/placeholder.png'),
+      ),
     );
   }
 
@@ -476,14 +474,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                     padding: EdgeInsets.zero,
                     itemCount: item.data.length,
                     itemBuilder: (context, index) {
-                      return RawMaterialButton(
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      return Container(
                         padding: EdgeInsets.fromLTRB(25.w, 16.w, 63.w, 16.w),
-                        onPressed: () {
-                          // _currentIndex = index;
-                          // _videoUrl = item[index].url;
-                          // _streamController.sink.add(_currentIndex);
-                        },
                         child: Row(
                           children: [
                             Expanded(
@@ -517,8 +509,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   }
 
   /// 规划
-  Widget _widgetPlan(CourseDetailModel data) {
-    if (widget.isGroup) data = data as GroupCourseDetailModel;
+  Widget _widgetPlan() {
     return Container(
       width: 690.w,
       height: 460.w,
@@ -526,12 +517,17 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: Image.network('${data?.curriculumPlanning ?? ''}', fit: BoxFit.cover),
+      child: CachedNetworkImage(
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        imageUrl: _data?.curriculumPlanning ?? '',
+        placeholder: (context, url) => Image.asset('assets/images/placeholder.png'),
+      ),
     );
   }
 
-  Widget _widgetBottom(data) {
-    data = widget.isGroup ? data as GroupCourseDetailModel : data as CourseDetailModel;
+  Widget _widgetBottom() {
     return SafeArea(
       top: false,
       bottom: true,
@@ -554,9 +550,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                         SizedBox(height: 19.w),
                         RichText(
                           text: TextSpan(style: Styles.normalFont(fontSize: 36.sp, color: Styles.color999999), children: [
-                            TextSpan(text: '￥${data?.marketPrice}', style: Styles.normalFont(fontWeight: FontWeight.bold, color: Styles.colorRed)),
+                            TextSpan(text: '￥${_data?.marketPrice}', style: Styles.normalFont(fontWeight: FontWeight.bold, color: Styles.colorRed)),
                             TextSpan(text: '/期  '),
-                            TextSpan(text: '￥${data?.coursePrice}', style: TextStyle(fontSize: 28.sp, color: Styles.color999999, decoration: TextDecoration.lineThrough)),
+                            TextSpan(text: '￥${_data?.coursePrice}', style: TextStyle(fontSize: 28.sp, color: Styles.color999999, decoration: TextDecoration.lineThrough)),
                           ]),
                         ),
                       ],
@@ -565,7 +561,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                 : Expanded(
                     child: RichText(
                       text: TextSpan(style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold, color: Styles.color999999), children: [
-                        TextSpan(text: '￥${data?.coursePrice ?? ''}', style: Styles.normalFont(color: Styles.colorRed)),
+                        TextSpan(text: '￥${_data?.coursePrice ?? ''}', style: Styles.normalFont(color: Styles.colorRed)),
                         TextSpan(text: '/期'),
                       ]),
                     ),

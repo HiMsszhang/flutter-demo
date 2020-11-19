@@ -174,4 +174,13 @@ mixin UtilsMixin<T extends StatefulWidget> on State<T> {
         NavigatorUtils.pushNamed(context, '/webview', arguments: {'url': item.url});
     }
   }
+
+  ///数字转为万
+  formatNum(int value) {
+    if (value > 9999) {
+      return '${value ~/ 10000}w';
+    } else {
+      return value;
+    }
+  }
 }

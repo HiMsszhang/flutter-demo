@@ -166,9 +166,14 @@ class CourseDetailModel {
   //课程分类标题
   @JsonKey(name: "course_cate_title", defaultValue: '')
   String courseCateTitle;
-  //学习人数
+
+  ///学习人数
   @JsonKey(name: "learn_num", defaultValue: 0)
   num learnNum;
+
+  ///老师编号
+  @JsonKey(name: "teacher_id", defaultValue: 0)
+  num teacherId;
 
   //老师名称
   @JsonKey(name: "teacher_name", defaultValue: '')
