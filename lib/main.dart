@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
 
   /// init微信sdk
   _initFluwx() async {
-    await registerWxApi(appId: Config.WECHAT_APPID, doOnAndroid: true, doOnIOS: true, universalLink: "https://your.univerallink.com/link/");
+    await registerWxApi(appId: Config.WECHAT_APPID, doOnAndroid: true, doOnIOS: true, universalLink: Config.WECHAT_LINK);
     var result = await isWeChatInstalled;
     print("is installed $result");
   }

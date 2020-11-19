@@ -58,6 +58,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
   void initState() {
     super.initState();
     delayed(() async {
+      await context.read<UserState>().getLogin();
       hasLogin = context.read<UserState>().hasLogin;
       await _getExperienceList();
       await _getNewCourseList();

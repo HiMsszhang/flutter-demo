@@ -7,6 +7,8 @@ import 'package:molan_edu/widgets/invite_card.dart';
 import 'dart:ui';
 
 import 'package:molan_edu/widgets/invite_share.dart';
+import 'package:molan_edu/apis/invite.dart';
+import 'package:molan_edu/models/InviteModel.dart';
 
 class InvitePage extends StatefulWidget {
   final bool isInvite;
@@ -20,9 +22,29 @@ class InvitePage extends StatefulWidget {
 }
 
 class _InvitePageState extends State<InvitePage> with UtilsMixin {
+  InviteInfoModel _info;
+
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _getInfo();
+    });
+  }
+
+  _getInfo() async {
+    DataResult res = await InviteAPI.info();
+    _info = res.data;
+    setState(() {});
+  }
+
+  _buildShowDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return InviteShare();
+      },
+    );
   }
 
   @override
@@ -67,30 +89,14 @@ class _InvitePageState extends State<InvitePage> with UtilsMixin {
             ),
           ),
           body: SingleChildScrollView(
-            child: InviteWidget(),
+            child: _widgetBox(),
           ),
         ),
       ],
     );
   }
-}
 
-class InviteWidget extends StatelessWidget {
-  const InviteWidget({
-    Key key,
-  }) : super(key: key);
-
-  _buildShowDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return InviteShare();
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _widgetBox() {
     return Container(
       margin: EdgeInsets.only(top: 396.w),
       child: Stack(
@@ -137,9 +143,7 @@ class InviteWidget extends StatelessWidget {
                 InviteCard(),
                 JumpButton(
                   onTap: (value) {
-                    if (value == 0) {
-                      _buildShowDialog(context);
-                    }
+                    _buildShowDialog(context);
                   },
                 ),
                 SizedBox(height: 14.w)
@@ -151,7 +155,7 @@ class InviteWidget extends StatelessWidget {
             child: Container(
               child: Center(
                 child: Text(
-                  '好友注册 各得300墨币',
+                  '好友注册 各得${_info?.moMoney ?? 0}墨币',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 1),
