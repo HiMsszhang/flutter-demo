@@ -58,4 +58,19 @@ class TeacherAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 老师分享点赞
+  static Future<DataResult> likeAction({
+    int teacherShareId,
+  }) async {
+    try {
+      var params = {
+        'teacher_share_id': teacherShareId,
+      };
+      Response res = await http.post('/teachersharepraise', queryParameters: params);
+      return DataResult(res.data, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

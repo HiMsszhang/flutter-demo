@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/teacher.dart';
+import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/models/TeacherModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
@@ -13,7 +15,33 @@ class CardShare extends StatefulWidget {
   _CardShareState createState() => _CardShareState();
 }
 
-class _CardShareState extends State<CardShare> {
+class _CardShareState extends State<CardShare> with UtilsMixin {
+  bool _isLike = false;
+  int _watchNum = 0;
+
+  _likeTap() async {
+    DataResult res = await TeacherAPI.likeAction();
+    if (res.result) {
+      if (_isLike) {
+        _isLike = false;
+        _watchNum--;
+        showToast('取消点赞成功');
+      } else {
+        _isLike = true;
+        _watchNum++;
+        showToast('点赞成功');
+      }
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _isLike = widget.data.isPraise == 1;
+    _watchNum = widget.data.praiseNum;
+  }
+
   @override
   Widget build(BuildContext context) {
     var data = widget.data;
@@ -67,21 +95,28 @@ class _CardShareState extends State<CardShare> {
               children: [
                 Expanded(
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset('assets/images/course/icon_share_see.png', width: 38.w, height: 23.w, fit: BoxFit.contain),
                       SizedBox(width: 13.w),
-                      Text('${data?.visiteNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                      Text('${_watchNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     ],
                   ),
                 ),
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Image.asset('assets/images/course/icon_share_like.png', width: 30.w, height: 30.w, fit: BoxFit.contain),
-                      SizedBox(width: 13.w),
-                      Text('${data?.praiseNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
-                    ],
+                  child: GestureDetector(
+                    onTap: () {
+                      _likeTap();
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset('assets/images/course/icon_share_like${data?.isPraise == 1 ? "d" : ""}.png', width: 30.w, height: 30.w, fit: BoxFit.contain),
+                        SizedBox(width: 13.w),
+                        Text('${data?.praiseNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                      ],
+                    ),
                   ),
                 ),
                 // Expanded(
