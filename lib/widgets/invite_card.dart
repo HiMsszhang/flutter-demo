@@ -48,7 +48,7 @@ class InviteCard extends StatelessWidget {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/invite/bg_research.png'),
-                fit: BoxFit.cover,
+                fit: BoxFit.fitWidth,
               ),
             ),
             child: Center(

@@ -134,11 +134,14 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
             actions: [
               Offstage(
                 offstage: false,
-                child: IconButton(
-                  icon: Text('跳过', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                child: Padding(
+                  padding: EdgeInsets.only(right: 8.w),
+                  child: IconButton(
+                    icon: Text('跳过', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
               ),
             ],

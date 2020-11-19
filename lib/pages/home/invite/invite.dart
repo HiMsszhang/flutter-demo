@@ -155,15 +155,15 @@ class InviteWidget extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color.fromRGBO(255, 255, 255, 1),
-                    fontSize: 32.w,
+                    fontSize: 32.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              width: 405.w,
+              padding: EdgeInsets.symmetric(horizontal: 40.w),
               height: 65.w,
               decoration: BoxDecoration(
-                color: Color(0xFFEAA685),
+                color: Color(0xFFffb794),
                 borderRadius: BorderRadius.circular(33.w),
               ),
             ),

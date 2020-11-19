@@ -36,3 +36,94 @@ Map<String, dynamic> _$AliPayModelToJson(AliPayModel instance) =>
     <String, dynamic>{
       'sign': instance.sign,
     };
+
+OrderModel _$OrderModelFromJson(Map<String, dynamic> json) {
+  return OrderModel()
+    ..course = json['course'] == null
+        ? null
+        : OrderCourseModel.fromJson(json['course'] as Map<String, dynamic>)
+    ..courseModel = (json['courseModel'] as List)
+        ?.map((e) => e == null
+            ? null
+            : OrderCourseModeModel.fromJson(e as Map<String, dynamic>))
+        ?.toList()
+    ..paymentMethod = (json['payment_method'] as List)
+        ?.map((e) => e == null
+            ? null
+            : OrderPaymentModel.fromJson(e as Map<String, dynamic>))
+        ?.toList()
+    ..courseOrderDiscount = (json['course_order_discount'] as List)
+        ?.map((e) => e == null
+            ? null
+            : OrderDiscountModel.fromJson(e as Map<String, dynamic>))
+        ?.toList();
+}
+
+Map<String, dynamic> _$OrderModelToJson(OrderModel instance) =>
+    <String, dynamic>{
+      'course': instance.course,
+      'courseModel': instance.courseModel,
+      'payment_method': instance.paymentMethod,
+      'course_order_discount': instance.courseOrderDiscount,
+    };
+
+OrderCourseModel _$OrderCourseModelFromJson(Map<String, dynamic> json) {
+  return OrderCourseModel()
+    ..id = json['id'] as int
+    ..courseTitle = json['course_title'] as String ?? ''
+    ..coursePrice = json['course_price'] as num ?? 0
+    ..courseVipPrice = json['course_vip_price'] as num ?? 0
+    ..typefaceTitle = json['typeface_title'] as String ?? '';
+}
+
+Map<String, dynamic> _$OrderCourseModelToJson(OrderCourseModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'course_title': instance.courseTitle,
+      'course_price': instance.coursePrice,
+      'course_vip_price': instance.courseVipPrice,
+      'typeface_title': instance.typefaceTitle,
+    };
+
+OrderCourseModeModel _$OrderCourseModeModelFromJson(Map<String, dynamic> json) {
+  return OrderCourseModeModel()
+    ..id = json['id'] as int
+    ..courseModelTitle = json['course_model_title'] as String ?? ''
+    ..desc = json['desc'] as String ?? '';
+}
+
+Map<String, dynamic> _$OrderCourseModeModelToJson(
+        OrderCourseModeModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'course_model_title': instance.courseModelTitle,
+      'desc': instance.desc,
+    };
+
+OrderPaymentModel _$OrderPaymentModelFromJson(Map<String, dynamic> json) {
+  return OrderPaymentModel()
+    ..id = json['id'] as int
+    ..payTitle = json['pay_title'] as String ?? '';
+}
+
+Map<String, dynamic> _$OrderPaymentModelToJson(OrderPaymentModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'pay_title': instance.payTitle,
+    };
+
+OrderDiscountModel _$OrderDiscountModelFromJson(Map<String, dynamic> json) {
+  return OrderDiscountModel()
+    ..id = json['id'] as int
+    ..ruleTitle = json['rule_title'] as String ?? ''
+    ..coursePrice = json['course_price'] as num ?? 0
+    ..discount = json['discount'] as num ?? 0;
+}
+
+Map<String, dynamic> _$OrderDiscountModelToJson(OrderDiscountModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'rule_title': instance.ruleTitle,
+      'course_price': instance.coursePrice,
+      'discount': instance.discount,
+    };

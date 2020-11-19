@@ -33,7 +33,6 @@ class Config {
 
   /// 第一次进入APP
   static const String S_FIRST = 'first';
-  static const String S_USERINFO = 'userInfo';
   static const String IM_SIGN = 'imSign';
   static const String S_HISTORY = 'searchHistory';
 }

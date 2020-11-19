@@ -206,7 +206,7 @@ class _CourseSearchPageState extends State<CourseSearchPage> with UtilsMixin {
           Image.asset('assets/images/common/icon_search_$name.png', width: 38.w, height: 38.w, fit: BoxFit.contain),
           SizedBox(width: 18.w),
           Expanded(
-            child: Text(title, style: Styles.specialFont(fontSize: 32.sp)),
+            child: Text(title, style: Styles.normalFont(fontSize: 32.sp)),
           ),
           hasClear
               ? GestureDetector(

@@ -111,8 +111,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener 
 
   _load() {
     delayed(() async {
-      await context.read<UserState>().getUser();
-      _user = context.read<UserState>().userInfo;
+      await context.read<UserState>().getLogin();
       if (widget.page != 0) {
         _jumpToPage(widget.page);
       }
@@ -122,6 +121,8 @@ class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener 
       }
       hasLogin = context.read<UserState>().hasLogin;
       if (hasLogin) {
+        await context.read<UserState>().getUser();
+        _user = context.read<UserState>().userInfo;
         await _imLogin();
       }
     });

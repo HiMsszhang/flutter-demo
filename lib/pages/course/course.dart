@@ -420,7 +420,7 @@ class _FilterOverlayState extends State<FilterOverlay> with UtilsMixin {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item['title'], style: Styles.specialFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                Text(item['title'], style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
                 SizedBox(height: 26.w),
                 Wrap(
                   spacing: 20.w,

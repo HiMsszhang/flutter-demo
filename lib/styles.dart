@@ -41,7 +41,7 @@ abstract class Styles {
     TextDecoration decoration,
   }) {
     return TextStyle(
-      // fontFamily: 'HappyFont',
+      fontFamily: 'HappyFont',
       fontSize: fontSize,
       color: color,
       fontWeight: fontWeight,

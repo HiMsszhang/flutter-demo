@@ -94,7 +94,7 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
                                   Image.asset('assets/images/course/icon_course.png', width: 30.w, height: 30.w),
                                   SizedBox(width: 18.w),
                                   Expanded(
-                                    child: Text('全部课程.22', style: Styles.specialFont(fontSize: 32.sp)),
+                                    child: Text('全部课程.22', style: Styles.normalFont(fontSize: 32.sp)),
                                   ),
                                   Text('查看更多', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color999999)),
                                   SizedBox(width: 10.w),
@@ -124,7 +124,7 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
                                 ),
                                 SizedBox(width: 18.w),
                                 Expanded(
-                                  child: Text('Vicky老师的分享', style: Styles.specialFont(fontSize: 32.sp)),
+                                  child: Text('Vicky老师的分享', style: Styles.normalFont(fontSize: 32.sp)),
                                 ),
                               ],
                             ),

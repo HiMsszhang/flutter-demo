@@ -151,7 +151,7 @@ class _CardGroupState extends State<CardGroup> {
                                   ]),
                               child: Text(
                                 '立即参团',
-                                style: Styles.specialFont(fontSize: 28.sp, color: Colors.white),
+                                style: Styles.normalFont(fontSize: 28.sp, color: Colors.white),
                               ),
                             ),
                           ],

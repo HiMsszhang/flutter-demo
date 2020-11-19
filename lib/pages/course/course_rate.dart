@@ -53,7 +53,7 @@ class _CourseRatePageState extends State<CourseRatePage> with UtilsMixin {
                         children: [
                           Image.asset('assets/images/common/icon_edit.png', width: 34.w, height: 31.w),
                           SizedBox(width: 17.w),
-                          Text('学员评价', style: Styles.specialFont(fontSize: 32.sp)),
+                          Text('学员评价', style: Styles.normalFont(fontSize: 32.sp)),
                           SizedBox(width: 6.w),
                           Text('（17个评价）', style: Styles.normalFont(fontSize: 24.sp)),
                         ],

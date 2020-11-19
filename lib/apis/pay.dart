@@ -29,4 +29,19 @@ class PayAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 生成订单
+  static Future<DataResult> order({
+    int courseId,
+  }) async {
+    try {
+      var params = {
+        'course_id': courseId,
+      };
+      Response res = await http.post('/buynow', queryParameters: params);
+      return DataResult(OrderModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

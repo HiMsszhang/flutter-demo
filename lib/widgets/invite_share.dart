@@ -79,7 +79,7 @@ class _InviteShareState extends State<InviteShare> {
                           Container(
                             child: Row(
                               children: [
-                                Image.asset("assets/images/logo.png", width: 40.w, height: 50.w),
+                                Image.asset("assets/images/logo_invite.png", width: 40.w, height: 50.w),
                                 SizedBox(width: 20.w),
                                 Container(
                                   child: Column(
