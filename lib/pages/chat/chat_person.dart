@@ -44,10 +44,10 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
 
   @override
   void dispose() {
-    super.dispose();
+    _inputController.clear();
+    _inputController.dispose();
     TencentImPlugin.removeListener(_imListener);
-    String text = _inputController.text.trim();
-    TencentImPlugin.setConversationDraft(conversationID: widget.id, draftText: text.trim() != '' ? text : null);
+    super.dispose();
   }
 
   /// IM监听器
@@ -107,7 +107,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
       ),
     );
 
-    this.setState(() {});
+    setState(() {});
   }
 
   @override
@@ -242,7 +242,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
         children: [
           _returnMessage(item),
           SizedBox(width: 20.w),
-          CommonAvatar(size: 72.w, showSex: false, avatar: item.faceUrl),
+          CommonAvatar(size: 72.w, showSex: false, avatar: item?.faceUrl ?? ''),
         ],
       ),
     );
