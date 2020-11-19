@@ -17,18 +17,18 @@ class CardShare extends StatefulWidget {
 
 class _CardShareState extends State<CardShare> with UtilsMixin {
   bool _isLike = false;
-  int _watchNum = 0;
+  int _likeNum = 0;
 
   _likeTap() async {
-    DataResult res = await TeacherAPI.likeAction();
+    DataResult res = await TeacherAPI.likeAction(teacherShareId: widget.data.id);
     if (res.result) {
       if (_isLike) {
         _isLike = false;
-        _watchNum--;
+        _likeNum--;
         showToast('取消点赞成功');
       } else {
         _isLike = true;
-        _watchNum++;
+        _likeNum++;
         showToast('点赞成功');
       }
     }
@@ -39,7 +39,8 @@ class _CardShareState extends State<CardShare> with UtilsMixin {
   void initState() {
     super.initState();
     _isLike = widget.data.isPraise == 1;
-    _watchNum = widget.data.praiseNum;
+    _likeNum = widget.data.praiseNum;
+    setState(() {});
   }
 
   @override
@@ -51,9 +52,8 @@ class _CardShareState extends State<CardShare> with UtilsMixin {
         border: Border(bottom: BorderSide(width: 1, color: Color(0xFFF5F5F5))),
         color: Theme.of(context).primaryColor,
       ),
-      child: RawMaterialButton(
+      child: Container(
         padding: EdgeInsets.symmetric(vertical: 40.w, horizontal: 30.w).copyWith(bottom: 30.w),
-        onPressed: () {},
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -99,12 +99,13 @@ class _CardShareState extends State<CardShare> with UtilsMixin {
                     children: [
                       Image.asset('assets/images/course/icon_share_see.png', width: 38.w, height: 23.w, fit: BoxFit.contain),
                       SizedBox(width: 13.w),
-                      Text('${_watchNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                      Text('${data?.visiteNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     ],
                   ),
                 ),
                 Expanded(
                   child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       _likeTap();
                     },
@@ -112,9 +113,9 @@ class _CardShareState extends State<CardShare> with UtilsMixin {
                       mainAxisAlignment: MainAxisAlignment.end,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.asset('assets/images/course/icon_share_like${data?.isPraise == 1 ? "d" : ""}.png', width: 30.w, height: 30.w, fit: BoxFit.contain),
+                        Image.asset('assets/images/course/icon_share_like${_isLike ? "d" : ""}.png', width: 30.w, height: 30.w, fit: BoxFit.contain),
                         SizedBox(width: 13.w),
-                        Text('${data?.praiseNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                        Text('${_likeNum ?? 0}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                       ],
                     ),
                   ),

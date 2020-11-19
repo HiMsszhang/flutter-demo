@@ -201,7 +201,7 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: _dataList?.length ?? 0,
-                              itemBuilder: (context, index) => CardShare(),
+                              itemBuilder: (context, index) => CardShare(data: _dataList[index]),
                             ),
                           ],
                         ),
