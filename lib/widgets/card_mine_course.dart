@@ -86,7 +86,7 @@ class _CardMineCourseState extends State<CardMineCourse> with UtilsMixin {
                           borderRadius: BorderRadius.horizontal(left: Radius.circular(56.w)),
                           color: Theme.of(context).accentColor,
                         ),
-                        child: Text(item.isBuy == 1 ? '学习中' : '未购买', style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
+                        child: Text(item.isBuy == 1 ? '已购买' : '未购买', style: Styles.normalFont(fontSize: 26.sp, color: Colors.white)),
                       ),
                     ],
                   ),

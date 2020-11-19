@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:molan_edu/models/CourseCollectionModel.dart';
 import 'package:molan_edu/models/MineCourseModel.dart';
+import 'package:molan_edu/models/MineHeadMasterModel.dart';
 import 'package:molan_edu/models/teacherCollectionModel.dart';
 import 'package:molan_edu/utils/net/http.dart';
 import 'result.dart';
@@ -40,11 +41,27 @@ class MineApi {
   static Future<DataResult> mineCourseList({
     int page,
     int listRow,
+    String courseTitle,
+  }) async {
+    try {
+      var params = {'page': page, 'list_row': listRow, 'coursr_title': courseTitle};
+      Response res = await http.post('/mycourselist', queryParameters: params);
+      var result = MineCourseModel.fromJson(res.data ?? {});
+      return DataResult(result, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  //我的班主任
+  static Future<DataResult> mineHeadMasterList({
+    int page,
+    int listRow,
   }) async {
     try {
       var params = {'page': page, 'list_row': listRow};
-      Response res = await http.post('/mycourselist', queryParameters: params);
-      var result = MineCourseModel.fromJson(res.data ?? {});
+      Response res = await http.post('/myclassteacherlist', queryParameters: params);
+      var result = MineHeadMasterModel.fromJson(res.data ?? {});
       return DataResult(result, true);
     } catch (e) {
       return DataResult(e, false);

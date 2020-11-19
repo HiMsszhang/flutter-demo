@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:molan_edu/apis/mine.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/MineHeadMasterModel.dart';
+import 'package:molan_edu/pages/chat/chat_person.dart';
+import 'package:molan_edu/pages/course/teacher_info.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/custom_rating_bar.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MineHeadMasterPage extends StatefulWidget {
   const MineHeadMasterPage({
@@ -13,24 +19,78 @@ class MineHeadMasterPage extends StatefulWidget {
 }
 
 class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin {
+  MineHeadMasterModel _data;
+  RefreshController _listController = RefreshController(initialRefresh: false);
+  int _page = 1;
+  int _listRow = 10;
+  List _dataList = [];
+
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _load();
+    });
+  }
+
+  _load() async {
+    // await _getMineHeadMasterData();
+    _listController.requestRefresh();
+    setState(() {});
+  }
+
+  void _onRefresh() async {
+    _page = 1;
+    _dataList = await _getMineHeadMasterData();
+    setState(() {});
+    _listController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    if (_data.lastPage == _page) {
+      _listController.loadNoData();
+    } else {
+      _page++;
+      _dataList.addAll(await _getMineHeadMasterData());
+      _listController.loadComplete();
+    }
+    if (mounted) setState(() {});
+  }
+
+  Future _getMineHeadMasterData() async {
+    DataResult result = await MineApi.mineHeadMasterList(
+      page: _page,
+      listRow: _listRow,
+    );
+    _data = result.data;
   }
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithAppbar(
-        backgroundColor: Theme.of(context).primaryColor,
-        title: '我的班主任',
-        body: ListView.builder(
+      backgroundColor: Theme.of(context).primaryColor,
+      title: '我的班主任',
+      body: SmartRefresher(
+        enablePullDown: true,
+        enablePullUp: true,
+        onRefresh: _onRefresh,
+        onLoading: _onLoading,
+        controller: _listController,
+        header: myCustomHeader(),
+        footer: myCustomFooter(),
+        child: ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 34.w),
-          itemCount: 10,
-          itemBuilder: (context, index) => _widgetItem(),
-        ));
+          itemCount: _data?.data?.length ?? 0,
+          itemBuilder: (context, index) {
+            var item = _data?.data[index];
+            return _widgetItem(item);
+          },
+        ),
+      ),
+    );
   }
 
-  Widget _widgetItem() {
+  Widget _widgetItem(item) {
     return Container(
       width: 690.w,
       height: 265.w,
@@ -49,33 +109,38 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16.w),
             ),
-            child: Stack(
-              children: [
-                Image.asset('assets/images/demo.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 40.w,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color.fromRGBO(0, 0, 0, 0),
-                          Color.fromRGBO(0, 0, 0, 1),
-                        ],
+            child: InkWell(
+              onTap: () {
+                NavigatorUtils.push(context, TeacherInfoPage());
+              },
+              child: Stack(
+                children: [
+                  Image.network(item.avatar, width: double.infinity, height: double.infinity, fit: BoxFit.cover),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 40.w,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromRGBO(0, 0, 0, 0),
+                            Color.fromRGBO(0, 0, 0, 1),
+                          ],
+                        ),
+                      ),
+                      child: Text(
+                        item.classTeacherName,
+                        style: Styles.normalFont(fontSize: 24.sp, color: Colors.white),
                       ),
                     ),
-                    child: Text(
-                      '林云老师',
-                      style: Styles.normalFont(fontSize: 24.sp, color: Colors.white),
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -85,21 +150,28 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   children: [
-                    Text('勤礼碑一系列', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold, height: 1.2)),
-                    Text('【楷书】', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
+                    Text(item.courseTitle, style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold, height: 1.2)),
+                    Text('【${item.typefaceTitle}】', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
                   ],
                 ),
                 SizedBox(height: 22.w),
                 Row(
                   children: [
-                    Text('微信号：323', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
+                    Text('微信号：${item.wechat}', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
                     SizedBox(width: 36.w),
-                    Container(
-                      width: 78.w,
-                      height: 34.w,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.w), color: Theme.of(context).accentColor),
-                      child: Text('复制', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
+                    InkWell(
+                      onTap: () {
+                        ClipboardData data = new ClipboardData(text: item.wechat);
+                        Clipboard.setData(data);
+                        showToast('已复制到剪切板');
+                      },
+                      child: Container(
+                        width: 78.w,
+                        height: 34.w,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.w), color: Theme.of(context).accentColor),
+                        child: Text('复制', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
+                      ),
                     ),
                   ],
                 ),
@@ -110,7 +182,12 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
                     children: [
                       GestureDetector(
                         onTap: () {
-                          _popupRate(context);
+                          NavigatorUtils.push(
+                              context,
+                              ChatPersonPage(
+                                id: item.classTeacherId,
+                                name: item.classTeacherName,
+                              ));
                         },
                         child: Container(
                           width: 196.w,
@@ -124,7 +201,9 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          _popupRate(context);
+                        },
                         child: Container(
                           width: 196.w,
                           height: 55.w,
