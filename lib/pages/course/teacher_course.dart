@@ -55,7 +55,7 @@ class _TeacherCoursePageState extends State<TeacherCoursePage> with UtilsMixin {
   }
 
   void _onLoading() async {
-    if (_data.lastPage == _page) {
+    if (_data.lastPage == _page || _data.lastPage == 0) {
       _listController.loadNoData();
     } else {
       _page++;

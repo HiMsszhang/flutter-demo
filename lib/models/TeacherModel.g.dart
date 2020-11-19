@@ -116,3 +116,57 @@ Map<String, dynamic> _$TeacherCourseListRespToJson(
       'last_page': instance.lastPage,
       'data': instance.data,
     };
+
+TeacherShareModel _$TeacherShareModelFromJson(Map<String, dynamic> json) {
+  return TeacherShareModel()
+    ..id = json['id'] as int
+    ..shareTitle = json['share_title'] as String ?? ''
+    ..type = json['type'] as num ?? 0
+    ..image = json['image'] as String ?? ''
+    ..video = json['video'] as String ?? ''
+    ..visiteNum = json['visite_num'] as num ?? 0
+    ..praiseNum = json['praise_num'] as num ?? 0
+    ..createTime = json['create_time'] as String ?? ''
+    ..teacherName = json['teacher_name'] as String ?? ''
+    ..avatar = json['avatar'] as String ?? ''
+    ..isPraise = json['is_praise'] as num ?? 0;
+}
+
+Map<String, dynamic> _$TeacherShareModelToJson(TeacherShareModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'share_title': instance.shareTitle,
+      'type': instance.type,
+      'image': instance.image,
+      'video': instance.video,
+      'visite_num': instance.visiteNum,
+      'praise_num': instance.praiseNum,
+      'create_time': instance.createTime,
+      'teacher_name': instance.teacherName,
+      'avatar': instance.avatar,
+      'is_praise': instance.isPraise,
+    };
+
+TeacherShareListResp _$TeacherShareListRespFromJson(Map<String, dynamic> json) {
+  return TeacherShareListResp()
+    ..total = json['total'] as int ?? 0
+    ..perPage = json['per_page'] as int ?? 0
+    ..currentPage = json['current_page'] as int ?? 0
+    ..lastPage = json['last_page'] as int ?? 0
+    ..data = (json['data'] as List)
+            ?.map((e) => e == null
+                ? null
+                : TeacherShareModel.fromJson(e as Map<String, dynamic>))
+            ?.toList() ??
+        [];
+}
+
+Map<String, dynamic> _$TeacherShareListRespToJson(
+        TeacherShareListResp instance) =>
+    <String, dynamic>{
+      'total': instance.total,
+      'per_page': instance.perPage,
+      'current_page': instance.currentPage,
+      'last_page': instance.lastPage,
+      'data': instance.data,
+    };

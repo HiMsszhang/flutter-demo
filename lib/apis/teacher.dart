@@ -39,4 +39,23 @@ class TeacherAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 老师分享列表
+  static Future<DataResult> shareList({
+    int teacherId,
+    int page,
+    int listRow,
+  }) async {
+    try {
+      var params = {
+        'teacher_id': teacherId,
+        'page': page,
+        'list_row': listRow,
+      };
+      Response res = await http.post('/teachersharelist', queryParameters: params);
+      return DataResult(TeacherShareListResp.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

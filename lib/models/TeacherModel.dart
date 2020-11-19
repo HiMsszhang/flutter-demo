@@ -108,3 +108,81 @@ class TeacherCourseListResp {
   // 命名构造函数
   TeacherCourseListResp.empty();
 }
+
+@JsonSerializable()
+class TeacherShareModel {
+  ///老师分享编号
+  int id;
+
+  ///老师分享标题
+  @JsonKey(name: 'share_title', defaultValue: '')
+  String shareTitle;
+
+  ///分享类型
+  @JsonKey(defaultValue: 0)
+  num type;
+
+  ///分享图片
+  @JsonKey(defaultValue: '')
+  String image;
+
+  ///分享视频
+  @JsonKey(defaultValue: '')
+  String video;
+
+  ///浏览数量
+  @JsonKey(name: 'visite_num', defaultValue: 0)
+  num visiteNum;
+
+  ///点赞数量
+  @JsonKey(name: 'praise_num', defaultValue: 0)
+  num praiseNum;
+
+  ///创建时间
+  @JsonKey(name: 'create_time', defaultValue: '')
+  String createTime;
+
+  ///老师名称
+  @JsonKey(name: 'teacher_name', defaultValue: '')
+  String teacherName;
+
+  ///老师图像
+  @JsonKey(defaultValue: '')
+  String avatar;
+
+  ///是否点赞
+  @JsonKey(name: 'is_praise', defaultValue: 0)
+  num isPraise;
+
+  TeacherShareModel();
+
+  //反序列化
+  factory TeacherShareModel.fromJson(Map<String, dynamic> json) => _$TeacherShareModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$TeacherShareModelToJson(this);
+
+  TeacherShareModel.empty();
+}
+
+@JsonSerializable()
+class TeacherShareListResp {
+  @JsonKey(defaultValue: 0)
+  int total;
+  @JsonKey(defaultValue: 0, name: 'per_page')
+  int perPage;
+  @JsonKey(defaultValue: 0, name: 'current_page')
+  int currentPage;
+  @JsonKey(defaultValue: 0, name: 'last_page')
+  int lastPage;
+  @JsonKey(defaultValue: [])
+  List<TeacherShareModel> data;
+
+  TeacherShareListResp();
+
+  factory TeacherShareListResp.fromJson(Map<String, dynamic> json) => _$TeacherShareListRespFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TeacherShareListRespToJson(this);
+
+  // 命名构造函数
+  TeacherShareListResp.empty();
+}
