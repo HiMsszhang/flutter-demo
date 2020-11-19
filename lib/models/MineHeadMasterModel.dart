@@ -39,6 +39,8 @@ class MineHeadMasterListModel {
   String wechat;
   @JsonKey(name: 'typeface_title', defaultValue: '')
   String typefaceTitle;
+  @JsonKey(name: 'course_id', defaultValue: 0)
+  num courseId;
   MineHeadMasterListModel();
 
   factory MineHeadMasterListModel.fromJson(Map<String, dynamic> json) => _$MineHeadMasterListModelFromJson(json);
