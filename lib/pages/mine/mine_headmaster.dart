@@ -19,11 +19,18 @@ class MineHeadMasterPage extends StatefulWidget {
 }
 
 class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin {
+  TextEditingController _contentController = TextEditingController();
   MineHeadMasterModel _data;
   RefreshController _listController = RefreshController(initialRefresh: false);
   int _page = 1;
   int _listRow = 10;
   List _dataList = [];
+  int _courseId;
+  int _classTeacherId;
+  double _evaluate;
+  String _content;
+  var _evaluateData;
+  // String _value;
 
   @override
   void initState() {
@@ -34,7 +41,6 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
   }
 
   _load() async {
-    // await _getMineHeadMasterData();
     _listController.requestRefresh();
     setState(() {});
   }
@@ -63,6 +69,28 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
       listRow: _listRow,
     );
     _data = result.data;
+  }
+
+  Future _getmineHeadTeacherEvaluate(item) async {
+    DataResult result = await MineApi.mineHeadTeacherEvaluate(
+      courseId: _courseId,
+      classTeacherId: _classTeacherId,
+      evaluate: _evaluate,
+      content: _content,
+    );
+    return result;
+  }
+
+  _submitComments(item) async {
+    setState(() {
+      _classTeacherId = item.classTeacherId;
+      _content = _contentController.text;
+      _courseId = item.courseId;
+    });
+
+    await _getmineHeadTeacherEvaluate(item);
+
+    NavigatorUtils.pop(context);
   }
 
   @override
@@ -202,7 +230,7 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
                       ),
                       GestureDetector(
                         onTap: () {
-                          _popupRate(context);
+                          _popupRate(context, item);
                         },
                         child: Container(
                           width: 196.w,
@@ -227,7 +255,7 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
   }
 
   /// 评价弹窗
-  _popupRate(BuildContext context) {
+  _popupRate(BuildContext context, item) {
     showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -253,7 +281,11 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
                   size: 43.w,
                   spacing: 7.w,
                   color: Theme.of(context).accentColor,
-                  onRatingCallback: (value, i) {},
+                  onRatingCallback: (value, i) {
+                    setState(() {
+                      _evaluate = value;
+                    });
+                  },
                 ),
                 SizedBox(width: 7.w),
                 Text('很赞！', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold, color: Theme.of(context).accentColor, height: 1.2)),
@@ -284,6 +316,7 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
               color: Color(0xFFF5F5F5),
               padding: EdgeInsets.all(10.w),
               child: TextField(
+                controller: _contentController,
                 maxLength: 30,
                 maxLines: 5,
                 style: Styles.normalFont(fontSize: 26.sp),
@@ -295,15 +328,20 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
               ),
             ),
             SizedBox(height: 40.w),
-            Container(
-              width: 690.w,
-              height: 90.w,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(90.w),
-                color: Theme.of(context).accentColor,
+            InkWell(
+              onTap: () {
+                _submitComments(item);
+              },
+              child: Container(
+                width: 690.w,
+                height: 90.w,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(90.w),
+                  color: Theme.of(context).accentColor,
+                ),
+                child: Text('提 交', style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, fontWeight: FontWeight.bold)),
               ),
-              child: Text('提 交', style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),

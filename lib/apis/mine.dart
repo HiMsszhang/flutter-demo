@@ -67,4 +67,26 @@ class MineApi {
       return DataResult(e, false);
     }
   }
+
+  //我的班主任-评价及修改评价
+  static Future<DataResult> mineHeadTeacherEvaluate({
+    int courseId,
+    int classTeacherId,
+    double evaluate,
+    String content,
+  }) async {
+    try {
+      var params = {
+        'course_id': courseId,
+        'class_teacher_id': classTeacherId,
+        'evaluate': evaluate,
+        'content': content,
+      };
+      Response res = await http.post('/myclassteacherevaluate', queryParameters: params);
+
+      return DataResult(res, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }
