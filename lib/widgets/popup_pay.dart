@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:molan_edu/apis/user.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/models/UserModel.dart';
 import 'package:molan_edu/providers/user_state.dart';
@@ -34,21 +33,15 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
   void initState() {
     super.initState();
     delayed(() async {
-      await _getUser();
+      await context.read<UserState>().getUser();
       await _getData();
     });
-  }
-
-  _getUser() async {
-    DataResult res = await UserAPI.getUser();
-    UserModel user = res.data;
-    await context.read<UserState>().updateUser(user);
   }
 
   _getData() async {
     DataResult res = await PayAPI.order(courseId: widget.id);
     _data = res.data;
-    _price = _data.courseModel[_tabIndex].id == 2 ? _data.course.courseVipPrice : _data.course.coursePrice;
+    _price = _data?.courseModel[_tabIndex]?.id == 2 ? _data?.course?.courseVipPrice : _data?.course?.coursePrice;
     setState(() {});
     _getDiscount();
   }
@@ -65,10 +58,10 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
 
   _pay() async {
     /// 1支付宝 2微信
-    var paymentId = _data.paymentMethod[_radioIndex].id;
+    var paymentId = _data?.paymentMethod[_radioIndex]?.id;
     DataResult data = await PayAPI.payNow(
       courseId: _data.course.id,
-      courseModelId: _data.courseModel[_tabIndex].id,
+      courseModelId: _data?.courseModel[_tabIndex]?.id,
       paymentMethodId: paymentId,
       discountMoMoney: _discount,
       coursePrice: _price,
@@ -102,11 +95,11 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
   }
 
   _getDiscount() {
-    List.generate(_data.courseOrderDiscount.length, (index) {
-      var preItem = index == 0 ? 0 : _data.courseOrderDiscount[index - 1].coursePrice;
-      var item = _data.courseOrderDiscount[index].coursePrice;
+    List.generate(_data?.courseOrderDiscount?.length, (index) {
+      var preItem = index == 0 ? 0 : _data?.courseOrderDiscount[index - 1]?.coursePrice;
+      var item = _data?.courseOrderDiscount[index]?.coursePrice;
       if (preItem <= _price && item > _price) {
-        _discount = _data.courseOrderDiscount[index].discount;
+        _discount = _data?.courseOrderDiscount[index]?.discount;
       }
     });
     setState(() {});
@@ -161,7 +154,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
                   ),
                 ),
                 SizedBox(height: 26.w),
-                Text(_data?.courseModel[_tabIndex].desc ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
+                Text(_data?.courseModel[_tabIndex]?.desc ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
               ],
             ),
           ),
@@ -186,7 +179,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
             ),
           ),
           _discount > 0 && _user.moMoney > _discount ? _widgetMo() : Container(),
-          ...List.generate(_data.paymentMethod.length ?? 0, (index) => _widgetRadioItem(index)),
+          ...List.generate(_data?.paymentMethod?.length ?? 0, (index) => _widgetRadioItem(index)),
           SizedBox(height: 20.w),
           SafeArea(
             top: false,
@@ -250,7 +243,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
         padding: EdgeInsets.symmetric(horizontal: 22.w),
         onPressed: () {
           _tabIndex = index;
-          _price = _data.courseModel[_tabIndex].id == 2 ? _data.course.courseVipPrice : _data.course.coursePrice;
+          _price = _data?.courseModel[_tabIndex]?.id == 2 ? _data?.course?.courseVipPrice : _data?.course?.coursePrice;
           setState(() {});
           _getDiscount();
         },
@@ -274,7 +267,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
             Image.asset('assets/images/common/type_mo.png', width: 51.w, height: 51.w),
             SizedBox(width: 18.w),
             Expanded(
-              child: Text('可抵扣墨币：$_discount\n(剩余${_user.moMoney})', style: Styles.normalFont(fontSize: 28.sp)),
+              child: Text('可抵扣墨币：$_discount\n(剩余${_user?.moMoney})', style: Styles.normalFont(fontSize: 28.sp)),
             ),
             Offstage(
               offstage: !_useMo,
@@ -299,7 +292,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
   }
 
   Widget _widgetRadioItem(int index) {
-    var item = _data.paymentMethod[index];
+    var item = _data?.paymentMethod[index];
     return Container(
       child: RawMaterialButton(
         padding: EdgeInsets.symmetric(vertical: 20.w, horizontal: 30.w),
