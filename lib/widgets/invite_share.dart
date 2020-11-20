@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:molan_edu/utils/imports.dart';
@@ -6,6 +8,10 @@ import 'package:molan_edu/widgets/invite_jump_button.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
+
+import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/apis/invite.dart';
+import 'package:molan_edu/models/InviteModel.dart';
 
 GlobalKey globalKey = GlobalKey();
 
@@ -17,7 +23,11 @@ class InviteShare extends StatefulWidget {
   _InviteShareState createState() => _InviteShareState();
 }
 
-class _InviteShareState extends State<InviteShare> {
+class _InviteShareState extends State<InviteShare> with UtilsMixin {
+  InviteInfoModel _info;
+  Uint8List _qr;
+  bool _loadFlag = false;
+
   _onButtonTab(GlobalKey globalKey) async {
     //检查是否有存储权限
     var status = await Permission.storage.status;
@@ -45,6 +55,29 @@ class _InviteShareState extends State<InviteShare> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    delayed(() async {
+      await _getInfo();
+      await _getQr();
+    });
+  }
+
+  _getInfo() async {
+    DataResult res = await InviteAPI.info();
+    _info = res.data;
+    setState(() {});
+  }
+
+  _getQr() async {
+    DataResult res = await InviteAPI.qrCode();
+    var uri = res.data['qrcode'];
+    _qr = base64Decode(uri.split(',').last);
+    _loadFlag = true;
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
@@ -68,7 +101,7 @@ class _InviteShareState extends State<InviteShare> {
                   children: [
                     Container(
                       margin: EdgeInsets.only(top: 95.w),
-                      child: Text('公爵大人', style: Styles.normalFont(fontSize: 22.w, color: Color.fromRGBO(137, 86, 61, 1), fontWeight: FontWeight.w500)),
+                      child: Text(_info?.name ?? '', style: Styles.normalFont(fontSize: 22.w, color: Color.fromRGBO(137, 86, 61, 1), fontWeight: FontWeight.w500)),
                     ),
                     Container(
                       margin: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 50.w),
@@ -87,14 +120,22 @@ class _InviteShareState extends State<InviteShare> {
                                     children: [
                                       Text('识别二维码注册领取 >>', style: Styles.normalFont(fontSize: 18.w, color: Colors.white, fontWeight: FontWeight.w600)),
                                       SizedBox(height: 12.w),
-                                      Text('价值¥300新人大礼包', style: Styles.normalFont(fontSize: 16.w, color: Colors.white, fontWeight: FontWeight.w400)),
+                                      Text('价值¥${_info?.moMoney ?? 0}新人大礼包', style: Styles.normalFont(fontSize: 16.w, color: Colors.white, fontWeight: FontWeight.w400)),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          Image.asset('assets/images/demo.png', width: 75.w, height: 75.w, fit: BoxFit.fill),
+                          _loadFlag
+                              ? Image.memory(
+                                  _qr,
+                                  width: 75.w,
+                                  height: 75.w,
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey),
+                                )
+                              : Container(width: 75.w, height: 75.w, color: Colors.grey),
                         ],
                       ),
                     ),

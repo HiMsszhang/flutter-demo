@@ -103,7 +103,7 @@ class _RecommendListState extends State<RecommendList> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('${item.courseTitle}', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                            Text('${item.courseTitle}', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
                             Text('【${item.typefaceTitle}.${item.courseCateTitle}】', style: Styles.normalFont(fontSize: 24.sp, fontWeight: FontWeight.bold)),
                           ],
                         ),

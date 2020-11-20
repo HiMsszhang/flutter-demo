@@ -145,6 +145,7 @@ GroupCourseDetailModel _$GroupCourseDetailModelFromJson(
     ..coursePrice = json['course_price'] as String ?? ''
     ..courseCateTitle = json['course_cate_title'] as String ?? ''
     ..learnNum = json['learn_num'] as num ?? 0
+    ..teacherId = json['teacher_id'] as num ?? 0
     ..teacherName = json['teacher_name'] as String ?? ''
     ..avatar = json['avatar'] as String ?? ''
     ..typefaceTitle = json['typeface_title'] as String ?? ''
@@ -169,6 +170,7 @@ Map<String, dynamic> _$GroupCourseDetailModelToJson(
       'course_price': instance.coursePrice,
       'course_cate_title': instance.courseCateTitle,
       'learn_num': instance.learnNum,
+      'teacher_id': instance.teacherId,
       'teacher_name': instance.teacherName,
       'avatar': instance.avatar,
       'typeface_title': instance.typefaceTitle,

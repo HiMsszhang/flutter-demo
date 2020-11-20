@@ -47,7 +47,7 @@ class ScaffoldWithAppbar extends StatelessWidget {
           bottom: BorderSide(width: 0.5, color: showBorder ? Styles.colorBorder : Colors.transparent),
         ),
         backgroundColor: Colors.transparent,
-        title: actionTitle ?? Text(title, style: Styles.normalFont(fontSize: 36.sp)),
+        title: actionTitle ?? Text(title, style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
         leading: Offstage(
           offstage: hideBack,
           child: IconButton(

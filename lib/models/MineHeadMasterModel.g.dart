@@ -12,10 +12,17 @@ MineHeadMasterModel _$MineHeadMasterModelFromJson(Map<String, dynamic> json) {
     ..perPage = json['perPage'] as int ?? 0
     ..currentPage = json['current_page'] as int ?? 0
     ..lastPage = json['last_page'] as int ?? 0
-    ..data = (json['data'] as List)?.map((e) => e == null ? null : MineHeadMasterListModel.fromJson(e as Map<String, dynamic>))?.toList() ?? [];
+    ..data = (json['data'] as List)
+            ?.map((e) => e == null
+                ? null
+                : MineHeadMasterListModel.fromJson(e as Map<String, dynamic>))
+            ?.toList() ??
+        [];
 }
 
-Map<String, dynamic> _$MineHeadMasterModelToJson(MineHeadMasterModel instance) => <String, dynamic>{
+Map<String, dynamic> _$MineHeadMasterModelToJson(
+        MineHeadMasterModel instance) =>
+    <String, dynamic>{
       'total': instance.total,
       'perPage': instance.perPage,
       'current_page': instance.currentPage,
@@ -23,7 +30,8 @@ Map<String, dynamic> _$MineHeadMasterModelToJson(MineHeadMasterModel instance) =
       'data': instance.data,
     };
 
-MineHeadMasterListModel _$MineHeadMasterListModelFromJson(Map<String, dynamic> json) {
+MineHeadMasterListModel _$MineHeadMasterListModelFromJson(
+    Map<String, dynamic> json) {
   return MineHeadMasterListModel()
     ..classTeacherId = json['class_teacher_id'] as int ?? 0
     ..classTeacherName = json['class_teacher_name'] as String ?? ''
@@ -34,7 +42,9 @@ MineHeadMasterListModel _$MineHeadMasterListModelFromJson(Map<String, dynamic> j
     ..courseId = json['course_id'] as num ?? 0;
 }
 
-Map<String, dynamic> _$MineHeadMasterListModelToJson(MineHeadMasterListModel instance) => <String, dynamic>{
+Map<String, dynamic> _$MineHeadMasterListModelToJson(
+        MineHeadMasterListModel instance) =>
+    <String, dynamic>{
       'class_teacher_id': instance.classTeacherId,
       'class_teacher_name': instance.classTeacherName,
       'course_title': instance.courseTitle,

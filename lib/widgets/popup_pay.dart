@@ -8,6 +8,7 @@ import 'package:molan_edu/apis/pay.dart';
 import 'package:molan_edu/models/PayModel.dart';
 import 'package:fluwx/fluwx.dart';
 import 'package:tobias/tobias.dart' as tobias;
+import 'package:molan_edu/pages/course/pay_result.dart';
 
 class PopupPay extends StatefulWidget {
   final int id;
@@ -72,8 +73,10 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
         print("The pay info is : " + res.sign);
         var payResult = await tobias.aliPay(res.sign);
         print("--->$payResult");
+        _paySuccess();
       } catch (e) {
         print("error--->$e");
+        _payFail();
       }
     } else if (paymentId == 2) {
       try {
@@ -88,10 +91,22 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
           sign: res.sign,
         );
         print("--->$payResult");
+        // _paySuccess();
       } catch (e) {
         print("error--->$e");
+        _payFail();
       }
     }
+  }
+
+  _paySuccess() {
+    showToast('支付成功');
+    NavigatorUtils.popAndPush(context, PayResultPage());
+  }
+
+  _payFail() {
+    showToast('支付失败');
+    NavigatorUtils.pop(context);
   }
 
   _getDiscount() {

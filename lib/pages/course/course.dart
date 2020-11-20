@@ -106,7 +106,7 @@ class _CoursePageState extends State<CoursePage> with UtilsMixin, AutomaticKeepA
   }
 
   void _onLoading() async {
-    if (_data.lastPage == _page) {
+    if (_data.lastPage == _page || _data.lastPage == 0) {
       _listController.loadNoData();
     } else {
       _page++;

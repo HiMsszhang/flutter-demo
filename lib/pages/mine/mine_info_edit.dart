@@ -171,7 +171,7 @@ class _MineInfoEditPageState extends State<MineInfoEditPage> with UtilsMixin {
         ),
         child: Row(
           children: [
-            Text(title ?? '', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.bold)),
+            Text(title ?? '', style: Styles.normalFont(fontSize: 32.sp, fontWeight: FontWeight.w500)),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,

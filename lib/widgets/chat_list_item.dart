@@ -101,7 +101,7 @@ class _ChatListItemState extends State<ChatListItem> with UtilsMixin {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(widget.data.showName ?? '', style: Styles.normalFont(fontSize: 32.sp, color: Styles.colorText, fontWeight: FontWeight.bold)),
+                      Text(widget.data.showName ?? '', style: Styles.normalFont(fontSize: 30.sp, color: Styles.colorText, fontWeight: FontWeight.bold)),
                       Text(DateDart.formatTimestamp(widget.data.lastMessage.timestamp * 1000, 'MM-dd HH:mm') ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                     ],
                   ),
