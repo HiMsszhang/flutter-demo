@@ -172,4 +172,19 @@ class CourseAPI {
       return DataResult(e, false);
     }
   }
+
+  //课程收藏
+  static Future<DataResult> courseCollection({
+    int courseId,
+  }) async {
+    try {
+      Map<String, int> params = {
+        'course_id': courseId,
+      };
+      Response res = await http.post('/coursecollection', queryParameters: params);
+      return DataResult(res, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

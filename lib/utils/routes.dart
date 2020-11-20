@@ -3,8 +3,9 @@ import 'package:molan_edu/pages/course/course_search.dart';
 import 'package:molan_edu/pages/course/course_detail.dart';
 import 'package:molan_edu/pages/course/course_rate.dart';
 import 'package:molan_edu/pages/home/group/group.dart';
+import 'package:molan_edu/pages/logout.dart';
+import 'package:molan_edu/pages/logout_detail.dart';
 import 'package:molan_edu/pages/mine/mine_course.dart';
-import 'package:molan_edu/pages/mine/mine_course_search.dart';
 import 'package:molan_edu/pages/mine/mine_favorite.dart';
 import 'package:molan_edu/pages/mine/mine_info_edit.dart';
 import 'package:molan_edu/pages/mine/mine_headmaster.dart';
@@ -92,8 +93,10 @@ class MyRoutes {
       '/webview': (context) => WebviewPage(url: arguments['url']),
       //体验课列表
       '/course.experience': (context) => CourseExperiencePage(),
-      //我的课程搜索
-      '/mine.course.search': (context) => MineCourseSeacher(),
+      //用户注销
+      '/user.logout': (context) => UserLogoutPage(),
+      //用户注销详情
+      '/logout.detail': (context) => LogoutDetailPage(),
     };
     return route[name];
   }

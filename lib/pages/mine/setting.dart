@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/mine.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
@@ -90,7 +91,7 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
               title: '注销账户',
               icon: 'delete',
               onTap: () {
-                _clear();
+                NavigatorUtils.pushNamed(context, "/user.logout");
               }),
           GestureDetector(
             onTap: _logOut,

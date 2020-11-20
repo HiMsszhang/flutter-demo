@@ -8,12 +8,10 @@ import 'result.dart';
 
 class MineApi {
   //我的收藏（课程）
-  static Future<DataResult> courseCollectionlist({
-    int page,
-    int listRow,
-  }) async {
+  static Future<DataResult> courseCollectionlist({int page, int listRow, String courseTitle}) async {
     try {
-      var params = {'page': page, 'list_row': listRow};
+      Map<String, dynamic> params = {'page': page, 'list_row': listRow};
+      if (courseTitle != '') params['course_title'] = courseTitle;
       Response res = await http.post('/coursecollectionlist', queryParameters: params);
       var result = CourseCollectionModel.fromJson(res.data ?? {});
       return DataResult(result, true);
@@ -26,9 +24,12 @@ class MineApi {
   static Future<DataResult> teacherCollectionList({
     int page,
     int listRow,
+    String teacherName,
   }) async {
     try {
-      var params = {'page': page, 'list_row': listRow};
+      Map<String, dynamic> params = {'page': page, 'list_row': listRow};
+      if (teacherName != '') params['teacher_name'] = teacherName;
+
       Response res = await http.post('/teachercollectionlist', queryParameters: params);
       var result = TeacherCollectionModel.fromJson(res.data ?? {});
       return DataResult(result, true);
@@ -44,7 +45,8 @@ class MineApi {
     String courseTitle,
   }) async {
     try {
-      var params = {'page': page, 'list_row': listRow, 'coursr_title': courseTitle};
+      Map<String, dynamic> params = {'page': page, 'list_row': listRow};
+      if (courseTitle != '') params['course_title'] = courseTitle;
       Response res = await http.post('/mycourselist', queryParameters: params);
       var result = MineCourseModel.fromJson(res.data ?? {});
       return DataResult(result, true);
@@ -84,6 +86,31 @@ class MineApi {
       };
       Response res = await http.post('/myclassteacherevaluate', queryParameters: params);
 
+      return DataResult(res, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  //老师收藏及取消收藏
+  static Future<DataResult> teacherCollection({
+    int teacherId,
+  }) async {
+    try {
+      var params = {
+        'teacher_id': teacherId,
+      };
+      Response res = await http.post('/teachercollection', queryParameters: params);
+      return DataResult(res, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  //学员注销
+  static Future<DataResult> cancelLation() async {
+    try {
+      Response res = await http.post('/cancellation');
       return DataResult(res, true);
     } catch (e) {
       return DataResult(e, false);
