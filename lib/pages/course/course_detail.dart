@@ -398,6 +398,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                 itemList: _tabList,
                 isCenter: true,
                 onChanged: _onChanged,
+                onFontSize: 30.sp,
+                fontSize: 28.sp,
               ),
             ),
             _selectedIndex == 0
