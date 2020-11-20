@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/rendering.dart';
+import 'package:fluwx/fluwx.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class _InviteShareState extends State<InviteShare> with UtilsMixin {
   Uint8List _qr;
   bool _loadFlag = false;
 
-  _onButtonTab(GlobalKey globalKey) async {
+  _onButtonTab(GlobalKey globalKey, int index) async {
     //检查是否有存储权限
     var status = await Permission.storage.status;
     if (!status.isGranted) {
@@ -47,10 +48,19 @@ class _InviteShareState extends State<InviteShare> with UtilsMixin {
 
       ui.Image image = await boundary.toImage(pixelRatio: dpr);
       ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final result = await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
+      // final result = await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
+      try {
+        await shareToWeChat(WeChatShareImageModel(
+          WeChatImage.binary(
+            byteData.buffer.asUint8List(),
+          ),
+          scene: index == 0 ? WeChatScene.SESSION : WeChatScene.TIMELINE,
+        ));
+      } catch (e) {
+        print(e);
+      }
 
-      print('海报已保存到相册');
-      return result;
+      // return result;
     }
   }
 
@@ -164,9 +174,7 @@ class _InviteShareState extends State<InviteShare> with UtilsMixin {
           SizedBox(height: 10.w),
           JumpButton(
             onTap: (value) {
-              if (value == 0) {
-                _onButtonTab(globalKey);
-              }
+              _onButtonTab(globalKey, value);
             },
           ),
           SizedBox(height: 14.w)
