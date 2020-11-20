@@ -28,7 +28,11 @@ class _NoDataState extends State<NoData> {
         children: [
           Image.asset(widget.url ?? 'assets/images/common/no_data_course.png', width: 435.w, height: 395.w, fit: BoxFit.contain),
           SizedBox(height: 80.w),
-          Text(widget.text ?? '', style: Styles.normalFont(fontSize: 30.sp, color: Styles.colorNoData)),
+          Text(
+            widget.text ?? '',
+            style: Styles.normalFont(fontSize: 30.sp, color: Styles.colorNoData),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/report.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/ReportModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/common_avatar.dart';
@@ -7,8 +9,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:molan_edu/widgets/growth_report_sharing.dart';
 
 class MineReportDetailPage extends StatefulWidget {
+  final int id;
   const MineReportDetailPage({
     Key key,
+    this.id,
   }) : super(key: key);
 
   @override
@@ -29,10 +33,44 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
     const Color(0xFFFFA06B),
     const Color(0xFF7CC3FF),
   ];
+  MyReportDetailModel _data;
 
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _getInfo();
+    });
+  }
+
+  _getInfo() async {
+    DataResult res = await ReportAPI.detail(courseId: widget.id);
+    _data = res.data;
+    setState(() {});
+  }
+
+  _labelItem(int index) {
+    switch (index) {
+      case 0:
+        return _data?.totalDuration;
+        break;
+      case 1:
+        return _data?.totalHours;
+        break;
+      case 2:
+        return _data?.totalWordNum;
+        break;
+      case 3:
+        return _data?.totalComplete;
+        break;
+      case 4:
+        return _data?.starsNum;
+        break;
+      case 5:
+        return _data?.excellentNum;
+        break;
+      default:
+    }
   }
 
   _showShare() {
@@ -66,7 +104,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                 brightness: Brightness.dark,
                 centerTitle: true,
                 title: Text(
-                  '公爵大人的成长分析报告',
+                  '${_data?.user?.name}的成长分析报告',
                   style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
                 leading: IconButton(
@@ -109,14 +147,16 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                         children: [
                           CommonAvatar(
                             size: 102.w,
+                            showSex: false,
+                            avatar: _data?.user?.avatar ?? '',
                           ),
                           SizedBox(width: 16.w),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('公爵大人', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold)),
+                              Text(_data?.user?.name ?? '', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold)),
                               SizedBox(height: 20.w),
-                              Text('10岁', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                              Text('${_data?.user?.age ?? 0}岁', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                             ],
                           ),
                         ],
@@ -143,7 +183,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('288', style: Styles.normalFont(fontSize: 40.sp, color: Color(0xFFFF835F), fontWeight: FontWeight.bold)),
+                                    Text('${_labelItem(index) ?? ""}', style: Styles.normalFont(fontSize: 40.sp, color: Color(0xFFFF835F), fontWeight: FontWeight.bold)),
                                     Text(_labelList[index]['label'], style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                                   ],
                                 ),
