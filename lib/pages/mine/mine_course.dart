@@ -24,6 +24,7 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
   int _page = 1;
   int _listRow = 10;
   List _dataList = [];
+  String _value = '';
 
   @override
   void initState() {
@@ -60,14 +61,22 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
     DataResult result = await MineApi.mineCourseList(
       page: _page,
       listRow: _listRow,
+      courseTitle: _value,
     );
     _courseData = result.data;
     return _courseData.data;
   }
 
+  _onSubmitted(String value) {
+    _value = value;
+    _listController.requestRefresh();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithAppbar(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).primaryColor,
       title: '',
       actions: [
@@ -77,9 +86,12 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
             height: 64.w,
             margin: EdgeInsets.only(right: 16.w),
             child: CommonSearch(
-              readOnly: true,
-              onTap: () {
-                NavigatorUtils.pushNamed(context, '/mine.course.search');
+              onSubmitted: _onSubmitted,
+              inputText: _value,
+              onClear: () {
+                setState(() {
+                  _value = '';
+                });
               },
               leading: Padding(
                 padding: EdgeInsets.only(left: 30.w),
@@ -94,35 +106,49 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
           ),
         ),
       ],
-      body: _courseData?.total == 0
+      body: _courseData?.total == 0 && _value == ''
           ? Container(
               padding: EdgeInsets.only(top: 300.w),
               alignment: Alignment.center,
+              width: double.infinity,
+              height: double.infinity,
               decoration: BoxDecoration(
                 image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
               ),
               child: Text(
-                '还未收藏任何课程哦',
+                '还未购买任何课程哦',
                 style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
               ),
             )
-          : SmartRefresher(
-              enablePullDown: true,
-              enablePullUp: true,
-              onRefresh: _onRefresh,
-              onLoading: _onLoading,
-              controller: _listController,
-              header: myCustomHeader(),
-              footer: myCustomFooter(),
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                itemCount: _courseData?.data?.length ?? 0,
-                itemBuilder: (context, index) {
-                  var item = _courseData?.data[index];
-                  return _mineCourseList(context, item);
-                },
-              ),
-            ),
+          : _courseData?.total == 0
+              ? Container(
+                  padding: EdgeInsets.only(top: 300.w),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
+                  ),
+                  child: Text(
+                    '未找到“$_value”相关课程哦',
+                    style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
+                  ),
+                )
+              : SmartRefresher(
+                  enablePullDown: true,
+                  enablePullUp: true,
+                  onRefresh: _onRefresh,
+                  onLoading: _onLoading,
+                  controller: _listController,
+                  header: myCustomHeader(),
+                  footer: myCustomFooter(),
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                    itemCount: _courseData?.data?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      var item = _courseData?.data[index];
+                      return _mineCourseList(context, item);
+                    },
+                  ),
+                ),
     );
   }
 

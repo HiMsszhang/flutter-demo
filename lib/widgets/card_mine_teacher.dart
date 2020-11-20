@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+import 'package:molan_edu/apis/mine.dart';
+=======
 import 'package:molan_edu/models/TeacherModel.dart';
+>>>>>>> 2c68d95022d95c33f6c167b6f790602bc581373c
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 
@@ -16,6 +20,14 @@ class CardMineTeacher extends StatefulWidget {
 }
 
 class _CardMineTeacherState extends State<CardMineTeacher> {
+  bool _isCollection = true;
+  Future _getTeacherCollection() async {
+    DataResult result = await MineApi.teacherCollection(
+      teacherId: 1,
+    );
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     var item = widget.data;
@@ -58,7 +70,12 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    _getTeacherCollection();
+                    setState(() {
+                      _isCollection = !_isCollection;
+                    });
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10.w),
                     height: 46.w,
@@ -67,7 +84,7 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
                       borderRadius: BorderRadius.circular(46.w),
                       border: Border.all(width: 2.w, color: Theme.of(context).accentColor),
                     ),
-                    child: Text('取消收藏', style: Styles.normalFont(fontSize: 26.sp, color: Theme.of(context).accentColor, height: 1.2)),
+                    child: Text(_isCollection == true ? '取消收藏' : '收藏', style: Styles.normalFont(fontSize: 26.sp, color: Theme.of(context).accentColor, height: 1.2)),
                   ),
                 ),
               ],

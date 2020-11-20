@@ -74,6 +74,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
     DataResult result = await MineApi.courseCollectionlist(
       page: _page,
       listRow: _listRow,
+      courseTitle: _value,
     );
     _courseData = result.data;
     return _courseData.data;
@@ -83,9 +84,10 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
     DataResult result = await MineApi.teacherCollectionList(
       page: _page,
       listRow: _listRow,
+      teacherName: _value,
     );
     _teacherDate = result.data;
-    return _teacherDate.data;
+    return result;
   }
 
   @override
@@ -105,9 +107,17 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
     setState(() {});
   }
 
+  _onSubmitted(String value) {
+    _value = value;
+    print(_value);
+    _listController.requestRefresh();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithAppbar(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).primaryColor,
       title: '',
       actions: [
@@ -151,9 +161,11 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                 height: 64.w,
                 child: CommonSearch(
                   inputText: _value,
-                  onSubmitted: (value) {
-                    _value = value;
-                    setState(() {});
+                  onSubmitted: _onSubmitted,
+                  onClear: () {
+                    setState(() {
+                      _value = '';
+                    });
                   },
                   leading: Padding(
                     padding: EdgeInsets.only(left: 30.w),
@@ -174,7 +186,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
         controller: _pageController,
         onPageChanged: _onPageChanged,
         children: [
-          _courseData?.total == 0
+          _courseData?.total == 0 && _value == ''
               ? Container(
                   padding: EdgeInsets.only(top: 300.w),
                   alignment: Alignment.center,
@@ -186,25 +198,37 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                     style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
                   ),
                 )
-              : SmartRefresher(
-                  enablePullDown: true,
-                  enablePullUp: true,
-                  onRefresh: _onRefresh,
-                  onLoading: _onLoading,
-                  controller: _listController,
-                  header: myCustomHeader(),
-                  footer: myCustomFooter(),
-                  child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                    itemCount: _courseData?.data?.length ?? 0,
-                    itemBuilder: (context, index) => CardMineCourse(
-                      showTags: true,
-                      data: _courseData?.data,
-                      index: index,
+              : _courseData?.total == 0
+                  ? Container(
+                      padding: EdgeInsets.only(top: 300.w),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
+                      ),
+                      child: Text(
+                        '未找到“$_value”相关课程哦',
+                        style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
+                      ),
+                    )
+                  : SmartRefresher(
+                      enablePullDown: true,
+                      enablePullUp: true,
+                      onRefresh: _onRefresh,
+                      onLoading: _onLoading,
+                      controller: _listController,
+                      header: myCustomHeader(),
+                      footer: myCustomFooter(),
+                      child: ListView.builder(
+                        padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                        itemCount: _courseData?.data?.length ?? 0,
+                        itemBuilder: (context, index) => CardMineCourse(
+                          showTags: true,
+                          data: _courseData?.data,
+                          index: index,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-          _teacherDate?.total == 0
+          _teacherDate?.total == 0 && _value == ''
               ? Container(
                   padding: EdgeInsets.only(top: 300.w),
                   alignment: Alignment.center,
@@ -216,6 +240,40 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                     style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
                   ),
                 )
+<<<<<<< HEAD
+              : _teacherDate?.total == 0
+                  ? Container(
+                      padding: EdgeInsets.only(top: 300.w),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
+                      ),
+                      child: Text(
+                        '未找到“$_value”相关老师哦',
+                        style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
+                      ),
+                    )
+                  : SmartRefresher(
+                      enablePullDown: true,
+                      enablePullUp: true,
+                      onRefresh: _onRefresh,
+                      onLoading: _onLoading,
+                      controller: _listController,
+                      header: myCustomHeader(),
+                      footer: myCustomFooter(),
+                      child: ListView.builder(
+                        padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                        itemCount: _teacherDate?.data?.length ?? 0,
+                        itemBuilder: (context, index) {
+                          var item = _teacherDate?.data;
+                          return CardMineTeacher(
+                            data: item,
+                            index: index,
+                          );
+                        },
+                      ),
+                    ),
+=======
               : SmartRefresher(
                   enablePullDown: true,
                   enablePullUp: true,
@@ -235,6 +293,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                     },
                   ),
                 ),
+>>>>>>> 2c68d95022d95c33f6c167b6f790602bc581373c
         ],
       ),
     );

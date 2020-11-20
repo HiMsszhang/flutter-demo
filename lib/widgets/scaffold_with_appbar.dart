@@ -16,6 +16,7 @@ class ScaffoldWithAppbar extends StatelessWidget {
   final Color backgroundColor;
   final bool showBorder;
   final FloatingActionButtonLocation floatingActionButtonLocation;
+  final bool resizeToAvoidBottomInset;
   ScaffoldWithAppbar({
     Key key,
     this.body,
@@ -31,11 +32,13 @@ class ScaffoldWithAppbar extends StatelessWidget {
     this.backgroundColor = Colors.transparent,
     this.showBorder = true,
     this.floatingActionButtonLocation,
+    this.resizeToAvoidBottomInset = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: this.resizeToAvoidBottomInset,
       backgroundColor: this.backgroundColor,
       appBar: AppBar(
         centerTitle: true,

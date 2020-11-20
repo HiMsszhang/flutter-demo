@@ -39,8 +39,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   int _selectedIndex = 0;
   int _currentIndex = 0;
   bool hasLogin = false;
+<<<<<<< HEAD
+  bool isCollection = false;
+=======
   dynamic _data;
   bool _loadFlag = false;
+>>>>>>> 2c68d95022d95c33f6c167b6f790602bc581373c
 
   @override
   void initState() {
@@ -95,6 +99,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     _data = result.data as GroupCourseDetailModel;
     _loadFlag = true;
     setState(() {});
+  }
+
+  Future _getCourseCollection() async {
+    DataResult result = await CourseAPI.courseCollection(
+      courseId: widget.courseId,
+    );
+    return result.data;
   }
 
   String _formatTime(int timeNum) {
@@ -164,11 +175,16 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                             ),
                             IconButton(
                               icon: ImageIcon(
-                                AssetImage('assets/images/course/icon_favorite.png'),
+                                AssetImage('assets/images/course/icon_${isCollection == true ? 'ear' : 'favorite'}.png'),
                                 size: 40.w,
                                 color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                _getCourseCollection();
+                                setState(() {
+                                  isCollection = !isCollection;
+                                });
+                              },
                             ),
                           ],
                         );
