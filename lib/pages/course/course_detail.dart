@@ -253,7 +253,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                     width: double.infinity,
                     height: double.infinity,
                     imageUrl: _data?.avatar ?? '',
-                    placeholder: (context, url) => Image.asset('assets/images/placeholder.png'),
+                    placeholder: (context, url) => Image.asset(
+                      'assets/images/placeholder.png',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
                   ),
                   Positioned(
                     bottom: 0,

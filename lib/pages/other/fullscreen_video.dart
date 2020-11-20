@@ -42,7 +42,7 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
       autoPlay: true,
       looping: false,
       autoInitialize: true,
-      aspectRatio: 16 / 9,
+      aspectRatio: _controller.value.aspectRatio ?? (16 / 9),
       allowFullScreen: false,
       allowedScreenSleep: false,
       deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
@@ -61,6 +61,7 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
           ),
         );
       },
+      placeholder: Container(color: Colors.black),
     );
     _controller.addListener(_videoListener);
     super.initState();

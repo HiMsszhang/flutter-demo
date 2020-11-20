@@ -1,12 +1,21 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/pages/main.dart';
+import 'package:molan_edu/apis/pay.dart';
+import 'package:molan_edu/models/PayModel.dart';
 
 class PayResultPage extends StatefulWidget {
+  final int id;
   const PayResultPage({
     Key key,
+    this.id,
   }) : super(key: key);
 
   @override
@@ -14,9 +23,36 @@ class PayResultPage extends StatefulWidget {
 }
 
 class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
+  PaySuccessModel _info;
+  Uint8List _qr;
+  bool _loadFlag = false;
+
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _getInfo();
+    });
+  }
+
+  _getInfo() async {
+    DataResult res = await PayAPI.paySuccess(classTeacherId: widget.id);
+    _info = res.data;
+    var uri = _info.wechatCode;
+    _qr = base64Decode(uri.split(',').last);
+    _loadFlag = true;
+    setState(() {});
+  }
+
+  _save() async {
+    // ui.Image image = _qr;
+    // ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    try {
+      await ImageGallerySaver.saveImage(_qr, name: DateTime.now().millisecondsSinceEpoch.toString() + ".png");
+      showToast('保存成功');
+    } catch (e) {
+      showToast(e);
+    }
   }
 
   @override
@@ -90,7 +126,15 @@ class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
                             Container(
                               width: 328.w,
                               height: 328.w,
-                              child: Placeholder(),
+                              child: _loadFlag
+                                  ? Image.memory(
+                                      _qr,
+                                      width: 328.w,
+                                      height: 328.w,
+                                      fit: BoxFit.fill,
+                                      errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey),
+                                    )
+                                  : Center(child: CircularProgressIndicator()),
                             ),
                             Container(
                               width: 572.w,
@@ -122,7 +166,9 @@ class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
                               child: RawMaterialButton(
                                 constraints: BoxConstraints(minHeight: 88.w, minWidth: 572.w),
                                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await _save();
+                                },
                                 child: Text('保存二维码至相册', style: Styles.normalFont(fontSize: 34.sp, color: Colors.white)),
                               ),
                             ),

@@ -44,4 +44,34 @@ class PayAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 获取微信支付订单状态
+  static Future<DataResult> wxResult({
+    int courseOrderId,
+  }) async {
+    try {
+      var params = {
+        'course_order_id': courseOrderId,
+      };
+      Response res = await http.post('/courseorderstatus', queryParameters: params);
+      return DataResult(res.data ?? {}, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  /// 购买成功
+  static Future<DataResult> paySuccess({
+    int classTeacherId,
+  }) async {
+    try {
+      var params = {
+        'class_teacher_id': classTeacherId,
+      };
+      Response res = await http.post('/buysuccessful', queryParameters: params);
+      return DataResult(PaySuccessModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

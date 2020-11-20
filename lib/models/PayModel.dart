@@ -11,6 +11,8 @@ class WechatPayModel {
   String noncestr;
   String package;
   String sign;
+  @JsonKey(name: 'course_order_id')
+  num courseOrderId;
 
   WechatPayModel();
 
@@ -61,6 +63,10 @@ class OrderModel {
 class OrderCourseModel {
   /// 课程编号
   int id;
+
+  /// 班主任编号
+  @JsonKey(name: 'class_teacher_id', defaultValue: 0)
+  num classTeacherId;
 
   /// 课程标题
   @JsonKey(name: 'course_title', defaultValue: '')
@@ -155,4 +161,32 @@ class OrderDiscountModel {
   Map<String, dynamic> toJson() => _$OrderDiscountModelToJson(this);
 
   OrderDiscountModel.empty();
+}
+
+@JsonSerializable()
+class PaySuccessModel {
+  /// 班主任名称
+  @JsonKey(name: 'class_teacher_name', defaultValue: '')
+  String classTeacherName;
+
+  /// 班主任图像
+  @JsonKey(defaultValue: '')
+  String avatar;
+
+  /// 班主任微信号
+  @JsonKey(defaultValue: '')
+  String wechat;
+
+  /// 班主任微信二维码
+  @JsonKey(name: 'wechat_code', defaultValue: '')
+  String wechatCode;
+
+  PaySuccessModel();
+
+  //反序列化
+  factory PaySuccessModel.fromJson(Map<String, dynamic> json) => _$PaySuccessModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$PaySuccessModelToJson(this);
+
+  PaySuccessModel.empty();
 }

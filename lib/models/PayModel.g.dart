@@ -14,7 +14,8 @@ WechatPayModel _$WechatPayModelFromJson(Map<String, dynamic> json) {
     ..timestamp = json['timestamp'] as String
     ..noncestr = json['noncestr'] as String
     ..package = json['package'] as String
-    ..sign = json['sign'] as String;
+    ..sign = json['sign'] as String
+    ..courseOrderId = json['course_order_id'] as num;
 }
 
 Map<String, dynamic> _$WechatPayModelToJson(WechatPayModel instance) =>
@@ -26,6 +27,7 @@ Map<String, dynamic> _$WechatPayModelToJson(WechatPayModel instance) =>
       'noncestr': instance.noncestr,
       'package': instance.package,
       'sign': instance.sign,
+      'course_order_id': instance.courseOrderId,
     };
 
 AliPayModel _$AliPayModelFromJson(Map<String, dynamic> json) {
@@ -70,6 +72,7 @@ Map<String, dynamic> _$OrderModelToJson(OrderModel instance) =>
 OrderCourseModel _$OrderCourseModelFromJson(Map<String, dynamic> json) {
   return OrderCourseModel()
     ..id = json['id'] as int
+    ..classTeacherId = json['class_teacher_id'] as num ?? 0
     ..courseTitle = json['course_title'] as String ?? ''
     ..coursePrice = json['course_price'] as num ?? 0
     ..courseVipPrice = json['course_vip_price'] as num ?? 0
@@ -79,6 +82,7 @@ OrderCourseModel _$OrderCourseModelFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$OrderCourseModelToJson(OrderCourseModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'class_teacher_id': instance.classTeacherId,
       'course_title': instance.courseTitle,
       'course_price': instance.coursePrice,
       'course_vip_price': instance.courseVipPrice,
@@ -126,4 +130,20 @@ Map<String, dynamic> _$OrderDiscountModelToJson(OrderDiscountModel instance) =>
       'rule_title': instance.ruleTitle,
       'course_price': instance.coursePrice,
       'discount': instance.discount,
+    };
+
+PaySuccessModel _$PaySuccessModelFromJson(Map<String, dynamic> json) {
+  return PaySuccessModel()
+    ..classTeacherName = json['class_teacher_name'] as String ?? ''
+    ..avatar = json['avatar'] as String ?? ''
+    ..wechat = json['wechat'] as String ?? ''
+    ..wechatCode = json['wechat_code'] as String ?? '';
+}
+
+Map<String, dynamic> _$PaySuccessModelToJson(PaySuccessModel instance) =>
+    <String, dynamic>{
+      'class_teacher_name': instance.classTeacherName,
+      'avatar': instance.avatar,
+      'wechat': instance.wechat,
+      'wechat_code': instance.wechatCode,
     };

@@ -17,6 +17,7 @@ class UserState with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future updateUser(UserModel user) async {
     _hasLogin = true;
+    _user = user;
     if (user.token != null && user.token != '') LocalStorage.setJSON(Config.S_TOKEN, user.token);
     notifyListeners();
   }
