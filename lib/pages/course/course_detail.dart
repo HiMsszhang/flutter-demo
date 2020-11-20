@@ -179,7 +179,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                           _widgetVideo(),
                           _widgetInfo(),
                           _widgetDetail(),
-                          RateList(),
+                          RateList(teacherId: _data?.teacherId, courseId: widget.courseId),
                           RecommendList(
                             typefaceId: _data?.typefaceId,
                             courseCateId: _data?.courseIateId,

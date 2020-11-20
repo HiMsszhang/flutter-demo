@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 
+import 'package:molan_edu/models/TeacherModel.dart';
+
 class CardRate extends StatefulWidget {
+  final RateModel data;
   CardRate({
     Key key,
+    this.data,
   }) : super(key: key);
 
   _CardRateState createState() => _CardRateState();
@@ -13,14 +17,14 @@ class CardRate extends StatefulWidget {
 class _CardRateState extends State<CardRate> {
   @override
   Widget build(BuildContext context) {
-    return RawMaterialButton(
+    var data = widget.data;
+    return Container(
       padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 22.w),
-      onPressed: () {},
       child: Container(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CommonAvatar(size: 70.w),
+            CommonAvatar(size: 70.w, showSex: false, avatar: data?.avatar ?? ''),
             SizedBox(width: 17.w),
             Expanded(
               child: Column(
@@ -33,9 +37,9 @@ class _CardRateState extends State<CardRate> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text('公爵', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold)),
+                          Text(data?.name ?? '', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold)),
                           SizedBox(width: 26.w),
-                          Text('10-12', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color666666, fontWeight: FontWeight.bold)),
+                          Text(data?.createTime ?? '', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color666666, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
@@ -47,15 +51,17 @@ class _CardRateState extends State<CardRate> {
                             color: Theme.of(context).accentColor,
                           ),
                           SizedBox(width: 9.w),
-                          Text('超棒！', style: Styles.normalFont(fontSize: 22.sp, color: Theme.of(context).accentColor, height: 1.5)),
+                          Text('${data?.comprehensive}！', style: Styles.normalFont(fontSize: 22.sp, color: Theme.of(context).accentColor, height: 1.5)),
                         ],
                       ),
                     ],
                   ),
                   SizedBox(height: 15.w),
-                  Text('来源：第一节', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999)),
+                  Text('来源：${data?.courseArrangement}', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999)),
                   SizedBox(height: 22.w),
                   RichText(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     text: TextSpan(
                       children: [
                         WidgetSpan(
@@ -66,10 +72,10 @@ class _CardRateState extends State<CardRate> {
                               borderRadius: BorderRadius.circular(40.w),
                               color: Color(0xFFF5F5F5),
                             ),
-                            child: Text('生动活泼', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999, height: 1.2)),
+                            child: Text(data?.labelTitle ?? '', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999, height: 1.2)),
                           ),
                         ),
-                        TextSpan(text: '好喜欢这个老师，讲课生动有趣一听就明白，因为老师讲的好我已经喜欢上书法了', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
+                        TextSpan(text: data?.content ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
                       ],
                     ),
                   ),

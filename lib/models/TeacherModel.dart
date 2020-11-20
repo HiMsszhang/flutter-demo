@@ -186,3 +186,114 @@ class TeacherShareListResp {
   // 命名构造函数
   TeacherShareListResp.empty();
 }
+
+@JsonSerializable()
+class RateListResp {
+  @JsonKey(defaultValue: 0)
+  int total;
+  @JsonKey(defaultValue: 0, name: 'per_page')
+  int perPage;
+  @JsonKey(defaultValue: 0, name: 'current_page')
+  int currentPage;
+  @JsonKey(defaultValue: 0, name: 'last_page')
+  int lastPage;
+  @JsonKey(defaultValue: [])
+  List<RateModel> data;
+
+  RateListResp();
+
+  factory RateListResp.fromJson(Map<String, dynamic> json) => _$RateListRespFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RateListRespToJson(this);
+
+  // 命名构造函数
+  RateListResp.empty();
+}
+
+@JsonSerializable()
+class RateModel {
+  ///总体
+  @JsonKey(defaultValue: '')
+  String comprehensive;
+
+  ///评价内容
+  @JsonKey(defaultValue: '')
+  String content;
+
+  ///评价时间
+  @JsonKey(name: 'create_time', defaultValue: '')
+  String createTime;
+
+  ///学员名称
+  @JsonKey(defaultValue: '')
+  String name;
+
+  ///学员图像
+  @JsonKey(defaultValue: '')
+  String avatar;
+
+  ///课时标题
+  @JsonKey(name: 'course_arrangement', defaultValue: '')
+  String courseArrangement;
+
+  ///老师评价标签标题
+  @JsonKey(name: 'label_title', defaultValue: '')
+  String labelTitle;
+
+  RateModel();
+
+  //反序列化
+  factory RateModel.fromJson(Map<String, dynamic> json) => _$RateModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$RateModelToJson(this);
+
+  RateModel.empty();
+}
+
+@JsonSerializable()
+class RateLabelModel {
+  int id;
+
+  ///老师评价标签标题
+  @JsonKey(name: 'label_title', defaultValue: '')
+  String labelTitle;
+
+  ///老师评价标签评价总数
+  @JsonKey(name: 'evaluate_num', defaultValue: 0)
+  num evaluateNum;
+
+  RateLabelModel();
+
+  //反序列化
+  factory RateLabelModel.fromJson(Map<String, dynamic> json) => _$RateLabelModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$RateLabelModelToJson(this);
+
+  RateLabelModel.empty();
+}
+
+@JsonSerializable()
+class TeacherRateModel {
+  ///评价总数
+  @JsonKey(name: 'tatal_evaluate_num', defaultValue: 0)
+  num tatalEvaluateNum;
+
+  ///喜爱度
+  @JsonKey(defaultValue: 0)
+  num likeability;
+
+  @JsonKey(name: 'teacher_label', defaultValue: [])
+  List<RateLabelModel> teacherLabel;
+
+  @JsonKey(name: 'evaluate_list')
+  RateListResp evaluateList;
+
+  TeacherRateModel();
+
+  //反序列化
+  factory TeacherRateModel.fromJson(Map<String, dynamic> json) => _$TeacherRateModelFromJson(json);
+//序列化
+  Map<String, dynamic> toJson() => _$TeacherRateModelToJson(this);
+
+  TeacherRateModel.empty();
+}

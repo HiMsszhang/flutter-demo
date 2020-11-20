@@ -170,3 +170,84 @@ Map<String, dynamic> _$TeacherShareListRespToJson(
       'last_page': instance.lastPage,
       'data': instance.data,
     };
+
+RateListResp _$RateListRespFromJson(Map<String, dynamic> json) {
+  return RateListResp()
+    ..total = json['total'] as int ?? 0
+    ..perPage = json['per_page'] as int ?? 0
+    ..currentPage = json['current_page'] as int ?? 0
+    ..lastPage = json['last_page'] as int ?? 0
+    ..data = (json['data'] as List)
+            ?.map((e) => e == null
+                ? null
+                : RateModel.fromJson(e as Map<String, dynamic>))
+            ?.toList() ??
+        [];
+}
+
+Map<String, dynamic> _$RateListRespToJson(RateListResp instance) =>
+    <String, dynamic>{
+      'total': instance.total,
+      'per_page': instance.perPage,
+      'current_page': instance.currentPage,
+      'last_page': instance.lastPage,
+      'data': instance.data,
+    };
+
+RateModel _$RateModelFromJson(Map<String, dynamic> json) {
+  return RateModel()
+    ..comprehensive = json['comprehensive'] as String ?? ''
+    ..content = json['content'] as String ?? ''
+    ..createTime = json['create_time'] as String ?? ''
+    ..name = json['name'] as String ?? ''
+    ..avatar = json['avatar'] as String ?? ''
+    ..courseArrangement = json['course_arrangement'] as String ?? ''
+    ..labelTitle = json['label_title'] as String ?? '';
+}
+
+Map<String, dynamic> _$RateModelToJson(RateModel instance) => <String, dynamic>{
+      'comprehensive': instance.comprehensive,
+      'content': instance.content,
+      'create_time': instance.createTime,
+      'name': instance.name,
+      'avatar': instance.avatar,
+      'course_arrangement': instance.courseArrangement,
+      'label_title': instance.labelTitle,
+    };
+
+RateLabelModel _$RateLabelModelFromJson(Map<String, dynamic> json) {
+  return RateLabelModel()
+    ..id = json['id'] as int
+    ..labelTitle = json['label_title'] as String ?? ''
+    ..evaluateNum = json['evaluate_num'] as num ?? 0;
+}
+
+Map<String, dynamic> _$RateLabelModelToJson(RateLabelModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'label_title': instance.labelTitle,
+      'evaluate_num': instance.evaluateNum,
+    };
+
+TeacherRateModel _$TeacherRateModelFromJson(Map<String, dynamic> json) {
+  return TeacherRateModel()
+    ..tatalEvaluateNum = json['tatal_evaluate_num'] as num ?? 0
+    ..likeability = json['likeability'] as num ?? 0
+    ..teacherLabel = (json['teacher_label'] as List)
+            ?.map((e) => e == null
+                ? null
+                : RateLabelModel.fromJson(e as Map<String, dynamic>))
+            ?.toList() ??
+        []
+    ..evaluateList = json['evaluate_list'] == null
+        ? null
+        : RateListResp.fromJson(json['evaluate_list'] as Map<String, dynamic>);
+}
+
+Map<String, dynamic> _$TeacherRateModelToJson(TeacherRateModel instance) =>
+    <String, dynamic>{
+      'tatal_evaluate_num': instance.tatalEvaluateNum,
+      'likeability': instance.likeability,
+      'teacher_label': instance.teacherLabel,
+      'evaluate_list': instance.evaluateList,
+    };

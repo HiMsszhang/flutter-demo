@@ -73,4 +73,27 @@ class TeacherAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 评论列表
+  static Future<DataResult> rateList({
+    int teacherId,
+    int courseId,
+    int teacherLabelId,
+    int page,
+    int listRow,
+  }) async {
+    try {
+      var params = {
+        'teacher_id': teacherId,
+        'teacher_label_id': teacherLabelId,
+        'page': page,
+        'list_row': listRow,
+      };
+      if (courseId != null) params['course_id'] = courseId;
+      Response res = await http.post('/usercourseevaluatelist', queryParameters: params);
+      return DataResult(TeacherRateModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

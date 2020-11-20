@@ -169,7 +169,7 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
                                       data: _data?.course[index],
                                     ),
                                   ),
-                                  RateList(),
+                                  RateList(teacherId: _data?.teacher?.id),
                                   SizedBox(height: 20.w),
                                   Container(
                                     width: 690.w,
