@@ -4,10 +4,12 @@ import 'package:molan_edu/utils/imports.dart';
 class NoData extends StatefulWidget {
   final String text;
   final String url;
+  final Color backgroundColor;
   NoData({
     Key key,
     this.text = '没搜索到相关的课程哦',
     this.url,
+    this.backgroundColor = Colors.transparent,
   }) : super(key: key);
 
   _NoDataState createState() => _NoDataState();
@@ -20,7 +22,7 @@ class _NoDataState extends State<NoData> {
       width: double.infinity,
       height: double.infinity,
       padding: EdgeInsets.only(top: 200.w),
-      color: Colors.transparent,
+      color: widget.backgroundColor,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

@@ -8,6 +8,7 @@ import 'package:molan_edu/widgets/card_mine_course.dart';
 import 'package:material_segmented_control/material_segmented_control.dart';
 import 'package:molan_edu/widgets/card_mine_teacher.dart';
 import 'package:molan_edu/widgets/common_search.dart';
+import 'package:molan_edu/widgets/no_data.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MineFavoritePage extends StatefulWidget {
@@ -187,29 +188,9 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
         onPageChanged: _onPageChanged,
         children: [
           _courseData?.total == 0 && _value == ''
-              ? Container(
-                  padding: EdgeInsets.only(top: 300.w),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
-                  ),
-                  child: Text(
-                    '还未收藏任何课程哦',
-                    style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
-                  ),
-                )
+              ? NoData(text: '还未购买任何课程哦', backgroundColor: Color(0xFFFFF7F3))
               : _courseData?.total == 0
-                  ? Container(
-                      padding: EdgeInsets.only(top: 300.w),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
-                      ),
-                      child: Text(
-                        '未找到“$_value”相关课程哦',
-                        style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
-                      ),
-                    )
+                  ? NoData(text: '未找到“$_value”相关课程哦', backgroundColor: Color(0xFFFFF7F3))
                   : SmartRefresher(
                       enablePullDown: true,
                       enablePullUp: true,
@@ -229,17 +210,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                       ),
                     ),
           _teacherDate?.total == 0 && _value == ''
-              ? Container(
-                  padding: EdgeInsets.only(top: 300.w),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_teacher.png'), fit: BoxFit.contain),
-                  ),
-                  child: Text(
-                    '还未收藏任何老师哦',
-                    style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
-                  ),
-                )
+              ? NoData(text: '还未收藏任何老师哦', backgroundColor: Color(0xFFFFF7F3), url: "assets/images/mine/favorite_no_teacher.png")
               : SmartRefresher(
                   enablePullDown: true,
                   enablePullUp: true,
