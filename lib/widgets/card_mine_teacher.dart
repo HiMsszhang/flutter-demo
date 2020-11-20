@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:molan_edu/apis/mine.dart';
-=======
 import 'package:molan_edu/models/TeacherModel.dart';
->>>>>>> 2c68d95022d95c33f6c167b6f790602bc581373c
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 

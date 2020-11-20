@@ -39,12 +39,9 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   int _selectedIndex = 0;
   int _currentIndex = 0;
   bool hasLogin = false;
-<<<<<<< HEAD
   bool isCollection = false;
-=======
   dynamic _data;
   bool _loadFlag = false;
->>>>>>> 2c68d95022d95c33f6c167b6f790602bc581373c
 
   @override
   void initState() {
