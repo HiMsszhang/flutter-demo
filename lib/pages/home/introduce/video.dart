@@ -1,56 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:chewie/chewie.dart';
 import 'package:molan_edu/widgets/custom_controls.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter/services.dart';
+import 'package:molan_edu/apis/introduce.dart';
+import 'package:molan_edu/models/IntroduceModel.dart';
 
-class FullscreenVideoPage extends StatefulWidget {
-  final String url;
-  final String title;
-  final VoidCallback onFinished;
-  const FullscreenVideoPage({
+class IntroduceVideoPage extends StatefulWidget {
+  final IntroduceModel data;
+  const IntroduceVideoPage({
     Key key,
-    this.url,
-    this.title = '',
-    this.onFinished,
+    this.data,
   }) : super(key: key);
 
   @override
-  _FullscreenVideoPageState createState() => _FullscreenVideoPageState();
+  _IntroduceVideoPageState createState() => _IntroduceVideoPageState();
 }
 
-class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMixin {
+class _IntroduceVideoPageState extends State<IntroduceVideoPage> with UtilsMixin {
   VideoPlayerController _controller;
   ChewieController _chewieController;
   Future<void> _future;
 
   @override
   void initState() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    SystemChrome.setEnabledSystemUIOverlays([]);
-    _controller = VideoPlayerController.network(widget.url);
+    super.initState();
+    _controller = VideoPlayerController.network(widget.data.videoUrl);
     if (_controller.value.hasError) {
       print(_controller.value.errorDescription);
     }
     _future = initVideoPlayer();
-    _controller.addListener(_videoListener);
-    super.initState();
+    delayed(() async {
+      await _addWatchNum();
+    });
   }
 
   @override
   void dispose() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     _chewieController.dispose();
-    _controller.removeListener(_videoListener);
     _controller.dispose();
     super.dispose();
   }
@@ -63,12 +53,12 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
         autoPlay: true,
         looping: false,
         autoInitialize: true,
-        aspectRatio: _controller.value.aspectRatio ?? (16 / 9),
+        aspectRatio: _controller.value.aspectRatio,
         allowFullScreen: false,
         allowedScreenSleep: false,
         deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
         customControls: CustomControls(
-          title: widget.title,
+          title: widget.data.title ?? '',
           showTopBar: true,
           onBack: () async {
             await _back();
@@ -87,19 +77,7 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
     });
   }
 
-  _videoListener() async {
-    var value = _controller.value.position.inSeconds;
-    var duration = _controller.value.duration.inSeconds;
-    if (value >= duration) {
-      if (widget.onFinished != null) widget.onFinished();
-      await _back();
-    }
-  }
-
   _back() async {
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
     NavigatorUtils.pop(context);
   }
 
@@ -108,19 +86,30 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
     return new Future.value(false);
   }
 
+  _addWatchNum() async {
+    try {
+      await IntroduceAPI.watch(videoId: widget.data.id);
+    } catch (e) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onPop,
-      child: FutureBuilder(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Chewie(controller: _chewieController);
-          } else {
-            return MyLoading();
-          }
-        },
+      child: Scaffold(
+        body: SafeArea(
+          top: true,
+          child: FutureBuilder(
+            future: _future,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return Chewie(controller: _chewieController);
+              } else {
+                return MyLoading();
+              }
+            },
+          ),
+        ),
       ),
     );
   }

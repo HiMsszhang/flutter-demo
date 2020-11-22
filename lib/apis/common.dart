@@ -57,4 +57,14 @@ class CommonAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 获取版本信息
+  static Future<DataResult> getVersion() async {
+    try {
+      Response res = await http.post('/version');
+      return DataResult(res.data ?? {}, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

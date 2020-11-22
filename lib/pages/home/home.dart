@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:molan_edu/apis/common.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/pages/home/introduce/introduce.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -337,66 +338,76 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
       child: Row(
         children: [
           Expanded(
-            child: Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 187.w,
-                  padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 40.w),
-                  clipBehavior: Clip.hardEdge,
-                  decoration: Styles.normalDecoration.copyWith(
-                    borderRadius: BorderRadius.circular(16.w),
-                    color: Color(0xFFFFF5F3),
+            child: GestureDetector(
+              onTap: () {
+                NavigatorUtils.push(context, IntroducePage(type: 1));
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 187.w,
+                    padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 40.w),
+                    clipBehavior: Clip.hardEdge,
+                    decoration: Styles.normalDecoration.copyWith(
+                      borderRadius: BorderRadius.circular(16.w),
+                      color: Color(0xFFFFF5F3),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('了解墨岚', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 19.w),
+                        Text('了解戏墨更多知识', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                      ],
+                    ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('了解墨岚', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 19.w),
-                      Text('了解戏墨更多知识', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
-                    ],
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Image.asset('assets/images/home/pic_learn_more.png', width: 113.w, height: 176.w),
                   ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Image.asset('assets/images/home/pic_learn_more.png', width: 113.w, height: 176.w),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           SizedBox(
             width: 28.w,
           ),
           Expanded(
-            child: Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 187.w,
-                  padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 40.w),
-                  clipBehavior: Clip.hardEdge,
-                  decoration: Styles.normalDecoration.copyWith(
-                    borderRadius: BorderRadius.circular(16.w),
-                    color: Color(0xFFFFFCF3),
+            child: GestureDetector(
+              onTap: () {
+                NavigatorUtils.push(context, IntroducePage(type: 2));
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 187.w,
+                    padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 40.w),
+                    clipBehavior: Clip.hardEdge,
+                    decoration: Styles.normalDecoration.copyWith(
+                      borderRadius: BorderRadius.circular(16.w),
+                      color: Color(0xFFFFFCF3),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('如何上课', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 19.w),
+                        Text('轻松了解上课渠道', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                      ],
+                    ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('如何上课', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 19.w),
-                      Text('轻松了解上课渠道', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
-                    ],
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Image.asset('assets/images/home/pic_learn_how.png', width: 108.w, height: 185.w),
                   ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Image.asset('assets/images/home/pic_learn_how.png', width: 108.w, height: 185.w),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

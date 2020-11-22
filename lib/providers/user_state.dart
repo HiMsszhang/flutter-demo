@@ -33,9 +33,13 @@ class UserState with ChangeNotifier, DiagnosticableTreeMixin {
       DataResult res = await UserAPI.getUser();
       if (res.result) {
         _user = res.data;
-      } else {}
-    } catch (e) {}
-    notifyListeners();
+        notifyListeners();
+      } else {
+        FlutterError.reportError(null);
+      }
+    } catch (e) {
+      FlutterError.reportError(null);
+    }
   }
 
   Future logOut() async {
