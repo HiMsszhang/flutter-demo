@@ -95,7 +95,7 @@ class _TimetableDetailPageState extends State<TimetableDetailPage> with UtilsMix
                         fit: BoxFit.cover,
                         imageUrl: data.image,
                         placeholder: (context, url) => Image.asset(
-                          'assets/images/demo.png',
+                          'assets/images/placeholder.png',
                           width: double.infinity,
                           height: double.infinity,
                           fit: BoxFit.cover,

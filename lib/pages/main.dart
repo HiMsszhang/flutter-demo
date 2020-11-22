@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:molan_edu/apis/common.dart';
@@ -20,6 +21,7 @@ import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/apis/user.dart';
 import 'package:molan_edu/models/UserModel.dart';
+import 'package:flutter_xupdate/flutter_xupdate.dart';
 
 class TabItem {
   String title;
@@ -134,11 +136,72 @@ class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener 
     });
   }
 
+  ///初始化更新检测
+  void initXUpdate() {
+    if (Platform.isAndroid) {
+      FlutterXUpdate.init(
+        ///是否输出日志
+        debug: true,
+
+        ///是否使用post请求
+        isPost: false,
+
+        ///post请求是否是上传json
+        isPostJson: true,
+
+        ///是否开启自动模式
+        isWifiOnly: false,
+
+        ///是否开启自动模式
+        isAutoMode: false,
+
+        ///需要设置的公共参数
+        supportSilentInstall: false,
+
+        ///在下载过程中，如果点击了取消的话，是否弹出切换下载方式的重试提示弹窗
+        enableRetry: false,
+      ).then((value) {
+        print("初始化成功: $value");
+      }).catchError((error) {
+        print("初始化失败: $error");
+      });
+
+      FlutterXUpdate.setUpdateHandler(onUpdateError: (Map<String, dynamic> message) async {
+        print("下载失败: $message");
+        //下载失败
+        if (message["code"] == 4000) {
+          FlutterXUpdate.showRetryUpdateTipDialog(retryContent: "该网址无法继续下载，是否考虑切换蒲公英下载？", retryUrl: "https://www.pgyer.com/uTpp");
+        }
+      });
+    } else {
+      print("ios暂不支持XUpdate更新");
+    }
+  }
+
+  ///将自定义的json内容解析为UpdateEntity实体类
+  UpdateEntity customParseJson(Map json) {
+    return UpdateEntity(
+      hasUpdate: true,
+      isIgnorable: json['update_status'] <= 3,
+      versionCode: json['version_code'],
+      versionName: json['version_name'],
+      updateContent: json['content'],
+      downloadUrl: json['down_url'],
+      apkSize: json['apk_size'],
+      apkMd5: json['apk_md5'],
+    );
+  }
+
   _getVersion() async {
+    initXUpdate();
     DataResult res = await CommonAPI.getVersion();
     if (res.result) {
-      print('version!!!!');
-      print(res.data);
+      FlutterXUpdate.updateByInfo(
+        updateEntity: customParseJson(res.data),
+        topImageRes: 'bg_update_top',
+        themeColor: "#FFFFA06B",
+        buttonTextColor: "#FFFFFFFF",
+      );
     }
   }
 
