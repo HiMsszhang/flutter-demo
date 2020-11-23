@@ -70,6 +70,14 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
   }
 
   _submit() async {
+    if (_mobile.isEmpty) {
+      showToast('请输入正确的手机号');
+      return;
+    }
+    if (_code.isEmpty) {
+      showToast('请输入验证码');
+      return;
+    }
     try {
       DataResult res = await UserAPI.login(mobile: _mobile, code: _code);
       UserModel user = res.data;

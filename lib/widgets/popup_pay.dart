@@ -143,7 +143,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
   _paySuccess() {
     showToast('支付成功');
     EasyLoading.dismiss();
-    NavigatorUtils.popAndPush(context, PayResultPage());
+    NavigatorUtils.popAndPush(context, PayResultPage(id: _data?.course?.classTeacherId));
   }
 
   _payFail() {

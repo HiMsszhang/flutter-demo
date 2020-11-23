@@ -48,6 +48,7 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
   }
 
   void _onRefresh() async {
+    _nextSeq = 0;
     _list = await _getList();
     setState(() {});
     _listController.refreshCompleted();
