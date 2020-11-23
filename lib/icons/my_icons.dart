@@ -8,6 +8,8 @@ class MyIcons {
   
   MyIcons._();
   
+  static const IconData Iconcamera = IconData(0xe632, fontFamily: _family); 
+  static const IconData Iconimage = IconData(0xe65b, fontFamily: _family); 
   static const IconData Iconmale = IconData(0xe7a0, fontFamily: _family); 
   static const IconData Iconfemale = IconData(0xe7a1, fontFamily: _family); 
   static const IconData IconkaiguanguanCopy = IconData(0xe600, fontFamily: _family); 

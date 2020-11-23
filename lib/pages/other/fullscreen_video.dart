@@ -25,6 +25,7 @@ class FullscreenVideoPage extends StatefulWidget {
 class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMixin {
   VideoPlayerController _controller;
   ChewieController _chewieController;
+  Future<void> _future;
 
   @override
   void initState() {
@@ -37,38 +38,13 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
     if (_controller.value.hasError) {
       print(_controller.value.errorDescription);
     }
-    _chewieController = ChewieController(
-      videoPlayerController: _controller,
-      autoPlay: true,
-      looping: false,
-      autoInitialize: true,
-      aspectRatio: 16 / 9,
-      allowFullScreen: false,
-      allowedScreenSleep: false,
-      deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-      customControls: CustomControls(
-        title: widget.title,
-        showTopBar: true,
-        onBack: () async {
-          await _back();
-        },
-      ),
-      errorBuilder: (context, errorMessage) {
-        return Center(
-          child: Text(
-            errorMessage,
-            style: TextStyle(color: Colors.white),
-          ),
-        );
-      },
-    );
+    _future = initVideoPlayer();
     _controller.addListener(_videoListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    _chewieController.videoPlayerController.value;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
@@ -77,6 +53,38 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
     _controller.removeListener(_videoListener);
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> initVideoPlayer() async {
+    await _controller.initialize();
+    setState(() {
+      _chewieController = ChewieController(
+        videoPlayerController: _controller,
+        autoPlay: true,
+        looping: false,
+        autoInitialize: true,
+        aspectRatio: _controller.value.aspectRatio ?? (16 / 9),
+        allowFullScreen: false,
+        allowedScreenSleep: false,
+        deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
+        customControls: CustomControls(
+          title: widget.title,
+          showTopBar: true,
+          onBack: () async {
+            await _back();
+          },
+        ),
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Text(
+              errorMessage,
+              style: TextStyle(color: Colors.white),
+            ),
+          );
+        },
+        placeholder: Container(color: Colors.black),
+      );
+    });
   }
 
   _videoListener() async {
@@ -104,7 +112,16 @@ class _FullscreenVideoPageState extends State<FullscreenVideoPage> with UtilsMix
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onPop,
-      child: Chewie(controller: _chewieController),
+      child: FutureBuilder(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Chewie(controller: _chewieController);
+          } else {
+            return MyLoading();
+          }
+        },
+      ),
     );
   }
 }

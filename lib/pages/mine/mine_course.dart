@@ -7,6 +7,7 @@ import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 import 'package:molan_edu/widgets/common_search.dart';
 import 'package:molan_edu/widgets/mini_rating_star.dart';
+import 'package:molan_edu/widgets/no_data.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MineCoursePage extends StatefulWidget {
@@ -107,31 +108,9 @@ class _MineCoursePageState extends State<MineCoursePage> with UtilsMixin {
         ),
       ],
       body: _courseData?.total == 0 && _value == ''
-          ? Container(
-              padding: EdgeInsets.only(top: 300.w),
-              alignment: Alignment.center,
-              width: double.infinity,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
-              ),
-              child: Text(
-                '还未购买任何课程哦',
-                style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
-              ),
-            )
+          ? NoData(text: '还未购买任何课程哦', backgroundColor: Color(0xFFFFF7F3))
           : _courseData?.total == 0
-              ? Container(
-                  padding: EdgeInsets.only(top: 300.w),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_course.png'), fit: BoxFit.contain),
-                  ),
-                  child: Text(
-                    '未找到“$_value”相关课程哦',
-                    style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
-                  ),
-                )
+              ? NoData(text: '未找到“$_value”相关课程哦', backgroundColor: Color(0xFFFFF7F3))
               : SmartRefresher(
                   enablePullDown: true,
                   enablePullUp: true,

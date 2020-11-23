@@ -11,6 +11,8 @@ class CommonTabbar extends StatefulWidget {
 
   /// 特殊字体
   final bool isSpecial;
+  final double onFontSize;
+  final double fontSize;
 
   CommonTabbar({
     Key key,
@@ -19,6 +21,8 @@ class CommonTabbar extends StatefulWidget {
     this.onChanged,
     this.isCenter = false,
     this.isSpecial = false,
+    this.onFontSize,
+    this.fontSize,
   }) : super(key: key);
 
   _CommonTabbarState createState() => _CommonTabbarState();
@@ -57,11 +61,11 @@ class _CommonTabbarState extends State<CommonTabbar> {
                     widget.itemList[index],
                     style: widget.isSpecial
                         ? _selectedIndex == index
-                            ? Styles.specialFont(fontSize: 36.sp, color: Styles.colorText, fontWeight: FontWeight.bold)
-                            : Styles.specialFont(fontSize: 30.sp, color: Styles.colorInfo)
+                            ? Styles.specialFont(fontSize: widget.onFontSize ?? 36.sp, color: Styles.colorText, fontWeight: FontWeight.bold)
+                            : Styles.specialFont(fontSize: widget.fontSize ?? 30.sp, color: Styles.colorInfo)
                         : _selectedIndex == index
-                            ? Styles.normalFont(fontSize: 36.sp, color: Styles.colorText, fontWeight: FontWeight.bold)
-                            : Styles.normalFont(fontSize: 30.sp, color: Styles.colorInfo),
+                            ? Styles.normalFont(fontSize: widget.onFontSize ?? 36.sp, color: Styles.colorText, fontWeight: FontWeight.bold)
+                            : Styles.normalFont(fontSize: widget.fontSize ?? 30.sp, color: Styles.colorInfo),
                   ),
                 ),
                 Positioned.fill(

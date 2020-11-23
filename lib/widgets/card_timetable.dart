@@ -70,7 +70,7 @@ class _CardTimetableState extends State<CardTimetable> {
                     height: double.infinity,
                     fit: BoxFit.cover,
                     imageUrl: data.image ?? '',
-                    placeholder: (context, url) => Image.asset('assets/images/demo.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
+                    placeholder: (context, url) => Image.asset('assets/images/placeholder.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
                   ),
                   Align(
                     alignment: Alignment.topCenter,

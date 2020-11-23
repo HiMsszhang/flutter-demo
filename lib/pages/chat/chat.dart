@@ -24,7 +24,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAliveClientMixin<ChatPage> {
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 
   List<ConversationEntity> _list = [];
   int _nextSeq = 0;
@@ -48,6 +48,7 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
   }
 
   void _onRefresh() async {
+    _nextSeq = 0;
     _list = await _getList();
     setState(() {});
     _listController.refreshCompleted();

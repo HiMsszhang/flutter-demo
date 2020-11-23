@@ -1,12 +1,24 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/pages/main.dart';
+import 'package:molan_edu/apis/pay.dart';
+import 'package:molan_edu/models/PayModel.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class PayResultPage extends StatefulWidget {
+  final int id;
   const PayResultPage({
     Key key,
+    this.id,
   }) : super(key: key);
 
   @override
@@ -14,9 +26,62 @@ class PayResultPage extends StatefulWidget {
 }
 
 class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
+  PaySuccessModel _info;
+  bool _loadFlag = false;
+
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _getInfo();
+    });
+  }
+
+  _getInfo() async {
+    DataResult res = await PayAPI.paySuccess(classTeacherId: widget.id);
+    _info = res.data;
+    _loadFlag = true;
+    setState(() {});
+  }
+
+  _save() async {
+    var imageUrl = _info.wechatCode;
+    try {
+      if (imageUrl == null) throw '保存失败，图片不存在！';
+
+      /// 权限检测
+      PermissionStatus storageStatus = await Permission.storage.status;
+      if (storageStatus != PermissionStatus.granted) {
+        storageStatus = await Permission.storage.request();
+        if (storageStatus != PermissionStatus.granted) {
+          throw '无法存储图片，请先授权！';
+        }
+      }
+
+      /// 保存的图片数据
+      Uint8List imageBytes;
+
+      /// 保存网络图片
+      CachedNetworkImage image = CachedNetworkImage(imageUrl: imageUrl);
+      DefaultCacheManager manager = image.cacheManager ?? DefaultCacheManager();
+      Map<String, String> headers = image.httpHeaders;
+      File file = await manager.getSingleFile(
+        image.imageUrl,
+        headers: headers,
+      );
+      imageBytes = await file.readAsBytes();
+
+      /// 保存图片
+      final result = await ImageGallerySaver.saveImage(imageBytes);
+
+      if (result == null || result == '') throw '图片保存失败';
+
+      print("保存成功");
+      showToast("保存成功");
+    } catch (e) {
+      print(e.toString());
+      showToast(e.toString());
+    }
   }
 
   @override
@@ -90,7 +155,15 @@ class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
                             Container(
                               width: 328.w,
                               height: 328.w,
-                              child: Placeholder(),
+                              child: _loadFlag
+                                  ? Image.network(
+                                      _info?.wechatCode,
+                                      width: 328.w,
+                                      height: 328.w,
+                                      fit: BoxFit.fill,
+                                      errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey),
+                                    )
+                                  : Center(child: CircularProgressIndicator()),
                             ),
                             Container(
                               width: 572.w,
@@ -122,7 +195,9 @@ class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
                               child: RawMaterialButton(
                                 constraints: BoxConstraints(minHeight: 88.w, minWidth: 572.w),
                                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await _save();
+                                },
                                 child: Text('保存二维码至相册', style: Styles.normalFont(fontSize: 34.sp, color: Colors.white)),
                               ),
                             ),

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
@@ -121,9 +120,13 @@ class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener 
       }
       hasLogin = context.read<UserState>().hasLogin;
       if (hasLogin) {
-        await context.read<UserState>().getUser();
-        _user = context.read<UserState>().userInfo;
-        await _imLogin();
+        try {
+          await context.read<UserState>().getUser();
+          _user = context.read<UserState>().userInfo;
+          await _imLogin();
+        } catch (e) {
+          return;
+        }
       }
     });
   }

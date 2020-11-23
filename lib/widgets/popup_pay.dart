@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/models/UserModel.dart';
@@ -27,8 +29,11 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
   bool _useMo = false;
   int _discount = 0;
   num _price = 0;
+  bool _loadFlag = false;
 
   OrderModel _data;
+
+  Timer _timer;
 
   @override
   void initState() {
@@ -39,10 +44,18 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
     });
   }
 
+  @override
+  void dispose() {
+    if (_timer != null) _timer.cancel();
+    EasyLoading.dismiss();
+    super.dispose();
+  }
+
   _getData() async {
     DataResult res = await PayAPI.order(courseId: widget.id);
     _data = res.data;
     _price = _data?.courseModel[_tabIndex]?.id == 2 ? _data?.course?.courseVipPrice : _data?.course?.coursePrice;
+    _loadFlag = true;
     setState(() {});
     _getDiscount();
   }
@@ -73,7 +86,11 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
         print("The pay info is : " + res.sign);
         var payResult = await tobias.aliPay(res.sign);
         print("--->$payResult");
-        _paySuccess();
+        if (payResult['resultStatus'] == 9000) {
+          _paySuccess();
+        } else {
+          _payFail();
+        }
       } catch (e) {
         print("error--->$e");
         _payFail();
@@ -91,6 +108,11 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
           sign: res.sign,
         );
         print("--->$payResult");
+        EasyLoading.show(status: '支付中', dismissOnTap: false, maskType: EasyLoadingMaskType.black);
+        _timer = Timer.periodic(new Duration(seconds: 1), (timer) async {
+          debugPrint(timer.tick.toString());
+          await _getWxResult(res.courseOrderId);
+        });
         // _paySuccess();
       } catch (e) {
         print("error--->$e");
@@ -99,13 +121,38 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
     }
   }
 
+  _getWxResult(int orderId) async {
+    DataResult res = await PayAPI.wxResult(courseOrderId: orderId);
+
+    ///课程订单状态(order_status):
+    ///1-------待支付
+    ///2-------取消订单
+    ///3-------订单完成
+    var status = res.data['order_status'];
+    switch (status) {
+      case 1:
+        return;
+        break;
+      case 2:
+        _payFail();
+        break;
+      case 3:
+        _paySuccess();
+        break;
+      default:
+        return;
+    }
+  }
+
   _paySuccess() {
     showToast('支付成功');
-    NavigatorUtils.popAndPush(context, PayResultPage());
+    EasyLoading.dismiss();
+    NavigatorUtils.popAndPush(context, PayResultPage(id: _data?.course?.classTeacherId));
   }
 
   _payFail() {
     showToast('支付失败');
+    EasyLoading.dismiss();
     NavigatorUtils.pop(context);
   }
 
@@ -135,99 +182,101 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.w)),
-        color: Theme.of(context).primaryColor,
+        color: _loadFlag ? Theme.of(context).primaryColor : Colors.transparent,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _widgetWrapper(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text('课程种类', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
-                ),
-                Image.asset('assets/images/course/icon_question.png', width: 32.w, height: 27.w),
-                SizedBox(width: 10.w),
-                Text(
-                  '我家宝贝适合哪种呢？',
-                  style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFF8898BA), fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-          _widgetWrapper(
-            child: Column(
+      child: _loadFlag
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('【${_data?.course?.typefaceTitle}】${_data?.course?.courseTitle}', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
-                SizedBox(height: 28.w),
-                Row(
-                  children: List.generate(
-                    _data?.courseModel?.length ?? 0,
-                    (index) => _widgetTabItem(index),
+                _widgetWrapper(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text('课程种类', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                      ),
+                      Image.asset('assets/images/course/icon_question.png', width: 32.w, height: 27.w),
+                      SizedBox(width: 10.w),
+                      Text(
+                        '我家宝贝适合哪种呢？',
+                        style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFF8898BA), fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 26.w),
-                Text(_data?.courseModel[_tabIndex]?.desc ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
-              ],
-            ),
-          ),
-          _widgetWrapper(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('金额', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
-                Text('金额￥$_price', style: Styles.normalFont(fontSize: 30.sp, color: Styles.color666666)),
-              ],
-            ),
-          ),
-          _widgetWrapper(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '支付方式',
-                  style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold),
+                _widgetWrapper(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('【${_data?.course?.typefaceTitle}】${_data?.course?.courseTitle}', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 28.w),
+                      Row(
+                        children: List.generate(
+                          _data?.courseModel?.length ?? 0,
+                          (index) => _widgetTabItem(index),
+                        ),
+                      ),
+                      SizedBox(height: 26.w),
+                      Text(_data?.courseModel[_tabIndex]?.desc ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.5)),
+                    ],
+                  ),
+                ),
+                _widgetWrapper(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('金额', style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold)),
+                      Text('金额￥$_price', style: Styles.normalFont(fontSize: 30.sp, color: Styles.color666666)),
+                    ],
+                  ),
+                ),
+                _widgetWrapper(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '支付方式',
+                        style: Styles.normalFont(fontSize: 36.sp, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                _discount > 0 && _user.moMoney > _discount ? _widgetMo() : Container(),
+                ...List.generate(_data?.paymentMethod?.length ?? 0, (index) => _widgetRadioItem(index)),
+                SizedBox(height: 20.w),
+                SafeArea(
+                  top: false,
+                  bottom: true,
+                  child: Container(
+                    decoration: Styles.normalDecoration,
+                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 12.w),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text('￥${_finalMoney()}', style: Styles.normalFont(fontSize: 36.sp, color: Styles.colorRed, fontWeight: FontWeight.bold)),
+                        ),
+                        Container(
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(75.w),
+                            color: Theme.of(context).accentColor,
+                          ),
+                          child: RawMaterialButton(
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            padding: EdgeInsets.symmetric(horizontal: 60.w, vertical: 20.w),
+                            onPressed: () {
+                              _pay();
+                            },
+                            child: Text('立即支付', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
-            ),
-          ),
-          _discount > 0 && _user.moMoney > _discount ? _widgetMo() : Container(),
-          ...List.generate(_data?.paymentMethod?.length ?? 0, (index) => _widgetRadioItem(index)),
-          SizedBox(height: 20.w),
-          SafeArea(
-            top: false,
-            bottom: true,
-            child: Container(
-              decoration: Styles.normalDecoration,
-              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 12.w),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text('￥${_finalMoney()}', style: Styles.normalFont(fontSize: 36.sp, color: Styles.colorRed, fontWeight: FontWeight.bold)),
-                  ),
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(75.w),
-                      color: Theme.of(context).accentColor,
-                    ),
-                    child: RawMaterialButton(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: EdgeInsets.symmetric(horizontal: 60.w, vertical: 20.w),
-                      onPressed: () {
-                        _pay();
-                      },
-                      child: Text('立即支付', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+            )
+          : Container(),
     );
   }
 

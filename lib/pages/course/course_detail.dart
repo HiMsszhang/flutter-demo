@@ -39,6 +39,10 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   int _selectedIndex = 0;
   int _currentIndex = 0;
   bool hasLogin = false;
+<<<<<<< HEAD
+=======
+  bool isCollection = false;
+>>>>>>> ba57ee1e27d12854f62033fde6f47acf9c0109a3
   dynamic _data;
   bool _loadFlag = false;
 
@@ -264,7 +268,12 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                     width: double.infinity,
                     height: double.infinity,
                     imageUrl: _data?.avatar ?? '',
-                    placeholder: (context, url) => Image.asset('assets/images/placeholder.png'),
+                    placeholder: (context, url) => Image.asset(
+                      'assets/images/placeholder.png',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
                   ),
                   Positioned(
                     bottom: 0,
@@ -391,6 +400,8 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                 itemList: _tabList,
                 isCenter: true,
                 onChanged: _onChanged,
+                onFontSize: 30.sp,
+                fontSize: 28.sp,
               ),
             ),
             _selectedIndex == 0
@@ -418,7 +429,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
         width: double.infinity,
         height: double.infinity,
         imageUrl: _data?.courseDesc ?? '',
-        placeholder: (context, url) => Image.asset('assets/images/placeholder.png'),
+        placeholder: (context, url) => Image.asset('assets/images/placeholder.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
       ),
     );
   }
@@ -533,7 +544,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
         width: double.infinity,
         height: double.infinity,
         imageUrl: _data?.curriculumPlanning ?? '',
-        placeholder: (context, url) => Image.asset('assets/images/placeholder.png'),
+        placeholder: (context, url) => Image.asset('assets/images/placeholder.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity),
       ),
     );
   }

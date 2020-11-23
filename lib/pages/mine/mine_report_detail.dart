@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/apis/report.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/ReportModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/widgets/common_avatar.dart';
@@ -7,8 +9,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:molan_edu/widgets/growth_report_sharing.dart';
 
 class MineReportDetailPage extends StatefulWidget {
+  final int id;
   const MineReportDetailPage({
     Key key,
+    this.id,
   }) : super(key: key);
 
   @override
@@ -29,14 +33,53 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
     const Color(0xFFFFA06B),
     const Color(0xFF7CC3FF),
   ];
+  MyReportDetailModel _data;
 
   @override
   void initState() {
     super.initState();
+    delayed(() async {
+      await _getInfo();
+    });
+  }
+
+  _getInfo() async {
+    DataResult res = await ReportAPI.detail(courseId: widget.id);
+    _data = res.data;
+    setState(() {});
+  }
+
+  _labelItem(int index) {
+    switch (index) {
+      case 0:
+        return _data?.totalDuration;
+        break;
+      case 1:
+        return _data?.totalHours;
+        break;
+      case 2:
+        return _data?.totalWordNum;
+        break;
+      case 3:
+        return _data?.totalComplete;
+        break;
+      case 4:
+        return _data?.starsNum;
+        break;
+      case 5:
+        return _data?.excellentNum;
+        break;
+      default:
+    }
   }
 
   _showShare() {
-    growthreportSharing(context);
+    showDialog(
+      context: context,
+      builder: (context) => ReportShare(
+        data: _data,
+      ),
+    );
   }
 
   @override
@@ -66,7 +109,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                 brightness: Brightness.dark,
                 centerTitle: true,
                 title: Text(
-                  '公爵大人的成长分析报告',
+                  '${_data?.user?.name}的成长分析报告',
                   style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold),
                 ),
                 leading: IconButton(
@@ -109,14 +152,23 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                         children: [
                           CommonAvatar(
                             size: 102.w,
+                            showSex: false,
+                            avatar: _data?.user?.avatar ?? '',
                           ),
                           SizedBox(width: 16.w),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('公爵大人', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold)),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(_data?.user?.name ?? '', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold, height: 1)),
+                                  SizedBox(width: 15.w),
+                                  _widgetSex(_data?.user?.gender ?? 1),
+                                ],
+                              ),
                               SizedBox(height: 20.w),
-                              Text('10岁', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                              Text('${_data?.user?.age ?? 0}岁', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                             ],
                           ),
                         ],
@@ -127,6 +179,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                       padding: EdgeInsets.symmetric(vertical: 30.w),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
+                        border: Border(bottom: BorderSide(width: 1, color: Colors.white)),
                       ),
                       child: Wrap(
                         runSpacing: 55.w,
@@ -143,7 +196,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('288', style: Styles.normalFont(fontSize: 40.sp, color: Color(0xFFFF835F), fontWeight: FontWeight.bold)),
+                                    Text('${_labelItem(index) ?? ""}', style: Styles.normalFont(fontSize: 40.sp, color: Color(0xFFFF835F), fontWeight: FontWeight.bold)),
                                     Text(_labelList[index]['label'], style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                                   ],
                                 ),
@@ -205,12 +258,18 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
             ],
           ),
           SizedBox(height: 60.w),
-          AspectRatio(
-            aspectRatio: 548 / 249,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 30.w),
-              child: LineChart(
-                mainData(),
+          Container(
+            width: 549.w,
+            height: 349.w,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.zero,
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                width: 800.w,
+                padding: EdgeInsets.symmetric(horizontal: 20.w).copyWith(bottom: 56.w, top: 30.w),
+                child: LineChart(
+                  mainData(),
+                ),
               ),
             ),
           ),
@@ -250,15 +309,35 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
           Positioned(
             top: 0,
             left: 30.w,
-            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w),
+            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w, fit: BoxFit.fill),
           ),
           Positioned(
             top: 0,
             right: 30.w,
-            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w),
+            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w, fit: BoxFit.fill),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _widgetSex(int sex) {
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: Container(
+          width: 30.w,
+          height: 30.w,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30.w),
+            color: sex == 1 ? Color(0xFF90D2F8) : Color(0xFFF8BE90),
+          ),
+          child: Icon(
+            sex == 1 ? MyIcons.Iconmale : MyIcons.Iconfemale,
+            size: 14.w,
+            color: Colors.white,
+          )),
     );
   }
 
@@ -298,7 +377,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
         leftTitles: SideTitles(showTitles: false),
       ),
       minX: 1,
-      maxX: 10,
+      // maxX: 10,
       minY: 0,
       maxY: 2,
       lineBarsData: [
@@ -306,16 +385,14 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
           spots: [
             FlSpot(1, 1),
             FlSpot(2, 1),
-            FlSpot(3, 2),
+            FlSpot(3, 0),
             FlSpot(4, 1),
             FlSpot(5, 2),
-            FlSpot(6, 2),
-            FlSpot(7, 1),
-            FlSpot(8, 1),
-            FlSpot(9, 1),
-            FlSpot(10, 2),
           ],
-          colors: [chartColors[0], chartColors[0]],
+          // List.generate(_data?.courseCatalogueList?.length ?? 0, (index) {
+          //   return FlSpot((index + 1).toDouble(), _data?.eveluateList[index]);
+          // }),
+          colors: [chartColors[0]],
           barWidth: 1,
           isStrokeCapRound: true,
           dotData: FlDotData(
@@ -327,6 +404,13 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                 strokeWidth: 0,
                 radius: 9.w,
               );
+            },
+            checkToShowDot: (spot, barData) {
+              if (spot.y == 0) {
+                return false;
+              } else {
+                return true;
+              }
             },
           ),
         ),

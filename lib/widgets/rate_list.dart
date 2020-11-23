@@ -90,7 +90,7 @@ class _RateListState extends State<RateList> with UtilsMixin {
                             children: [
                               Image.asset('assets/images/common/icon_edit.png', width: 34.w, height: 31.w),
                               SizedBox(width: 17.w),
-                              Text('学员评价', style: Styles.normalFont(fontSize: 32.sp)),
+                              Text('学员评价', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold)),
                               SizedBox(width: 6.w),
                               Text('（${_data?.tatalEvaluateNum}个评价）', style: Styles.normalFont(fontSize: 24.sp)),
                             ],

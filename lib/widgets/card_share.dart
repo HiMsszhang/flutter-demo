@@ -86,8 +86,11 @@ class _CardShareState extends State<CardShare> with UtilsMixin {
                 borderRadius: BorderRadius.circular(16.w),
               ),
               child: CachedNetworkImage(
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
                 imageUrl: data?.image ?? '',
-                placeholder: (context, url) => Image.asset('assets/images/placeholder.png', fit: BoxFit.cover),
+                placeholder: (context, url) => Image.asset('assets/images/placeholder.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
               ),
             ),
             SizedBox(height: 28.w),

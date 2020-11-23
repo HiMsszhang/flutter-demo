@@ -17,6 +17,7 @@ class UserState with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future updateUser(UserModel user) async {
     _hasLogin = true;
+    _user = user;
     if (user.token != null && user.token != '') LocalStorage.setJSON(Config.S_TOKEN, user.token);
     notifyListeners();
   }
@@ -32,9 +33,13 @@ class UserState with ChangeNotifier, DiagnosticableTreeMixin {
       DataResult res = await UserAPI.getUser();
       if (res.result) {
         _user = res.data;
-      } else {}
-    } catch (e) {}
-    notifyListeners();
+        notifyListeners();
+      } else {
+        FlutterError.reportError(null);
+      }
+    } catch (e) {
+      FlutterError.reportError(null);
+    }
   }
 
   Future logOut() async {
