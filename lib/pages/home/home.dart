@@ -267,12 +267,11 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
                     adTapAction(item);
                   },
                   child: CachedNetworkImage(
+                    width: double.infinity,
+                    height: double.infinity,
                     imageUrl: item.image,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Image.asset(
-                      "assets/images/placeholder.png",
-                      fit: BoxFit.cover,
-                    ),
+                    placeholder: (context, url) => Image.asset("assets/images/placeholder.png", fit: BoxFit.cover, width: double.infinity, height: double.infinity),
                   ),
                 );
               },

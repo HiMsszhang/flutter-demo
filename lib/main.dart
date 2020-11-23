@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:molan_edu/utils/local_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -65,6 +66,10 @@ class _MyAppState extends State<MyApp> {
     TencentImPlugin.initSDK(appid: Config.TENCENT_IM_APPID, logPrintLevel: LogPrintLevel.error);
     _initFluwx();
     Future.delayed(Duration.zero, () async {
+      var isFirst = await LocalStorage.getJSON(Config.S_FIRST) ?? null;
+      if (isFirst == null) {
+        return;
+      }
       await _getVersion();
     });
   }

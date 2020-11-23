@@ -68,7 +68,7 @@ class _MineInvitePageState extends State<MineInvitePage> with UtilsMixin {
                         height: double.infinity,
                         fit: BoxFit.fill,
                         imageUrl: _data?.inviteImg ?? '',
-                        placeholder: (context, url) => Image.asset('assets/images/placeholder.png', fit: BoxFit.cover),
+                        placeholder: (context, url) => Image.asset('assets/images/placeholder.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
                       ),
                     ),
                   ),

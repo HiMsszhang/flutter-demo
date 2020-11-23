@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -10,6 +11,8 @@ import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/pages/main.dart';
 import 'package:molan_edu/apis/pay.dart';
 import 'package:molan_edu/models/PayModel.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class PayResultPage extends StatefulWidget {
   final int id;
@@ -24,7 +27,6 @@ class PayResultPage extends StatefulWidget {
 
 class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
   PaySuccessModel _info;
-  Uint8List _qr;
   bool _loadFlag = false;
 
   @override
@@ -38,20 +40,47 @@ class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
   _getInfo() async {
     DataResult res = await PayAPI.paySuccess(classTeacherId: widget.id);
     _info = res.data;
-    var uri = _info.wechatCode;
-    _qr = base64Decode(uri.split(',').last);
     _loadFlag = true;
     setState(() {});
   }
 
   _save() async {
-    // ui.Image image = _qr;
-    // ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    var imageUrl = _info.wechatCode;
     try {
-      await ImageGallerySaver.saveImage(_qr, name: DateTime.now().millisecondsSinceEpoch.toString() + ".png");
-      showToast('保存成功');
+      if (imageUrl == null) throw '保存失败，图片不存在！';
+
+      /// 权限检测
+      PermissionStatus storageStatus = await Permission.storage.status;
+      if (storageStatus != PermissionStatus.granted) {
+        storageStatus = await Permission.storage.request();
+        if (storageStatus != PermissionStatus.granted) {
+          throw '无法存储图片，请先授权！';
+        }
+      }
+
+      /// 保存的图片数据
+      Uint8List imageBytes;
+
+      /// 保存网络图片
+      CachedNetworkImage image = CachedNetworkImage(imageUrl: imageUrl);
+      DefaultCacheManager manager = image.cacheManager ?? DefaultCacheManager();
+      Map<String, String> headers = image.httpHeaders;
+      File file = await manager.getSingleFile(
+        image.imageUrl,
+        headers: headers,
+      );
+      imageBytes = await file.readAsBytes();
+
+      /// 保存图片
+      final result = await ImageGallerySaver.saveImage(imageBytes);
+
+      if (result == null || result == '') throw '图片保存失败';
+
+      print("保存成功");
+      showToast("保存成功");
     } catch (e) {
-      showToast(e);
+      print(e.toString());
+      showToast(e.toString());
     }
   }
 
@@ -127,8 +156,8 @@ class _PayResultPageState extends State<PayResultPage> with UtilsMixin {
                               width: 328.w,
                               height: 328.w,
                               child: _loadFlag
-                                  ? Image.memory(
-                                      _qr,
+                                  ? Image.network(
+                                      _info?.wechatCode,
                                       width: 328.w,
                                       height: 328.w,
                                       fit: BoxFit.fill,

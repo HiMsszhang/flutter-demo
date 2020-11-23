@@ -42,7 +42,7 @@ class _MineReportPageState extends State<MineReportPage> with UtilsMixin {
     super.initState();
     delayed(() async {
       _courseList = await _getCourseList();
-      await _reportController.requestRefresh();
+      if (_courseData.total > 0) await _reportController.requestRefresh();
       setState(() {});
     });
   }
@@ -67,6 +67,7 @@ class _MineReportPageState extends State<MineReportPage> with UtilsMixin {
   Future<List<MyReportModel>> _getReportList() async {
     DataResult res = await ReportAPI.list(page: _reportPage, listRow: _reportLimit, courseId: _courseList?.elementAt(_selectedIndex)?.courseId);
     _reportData = res.data;
+    _loadFlag = true;
     return _reportData.data;
   }
 
@@ -151,13 +152,15 @@ class _MineReportPageState extends State<MineReportPage> with UtilsMixin {
                   footer: myCustomFooter(),
                   child: ListView(
                     children: [
-                      ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                        itemCount: _reportList?.length ?? 1,
-                        itemBuilder: (context, index) => CardReport(),
-                      ),
+                      _loadFlag
+                          ? ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                              itemCount: _reportList?.length ?? 1,
+                              itemBuilder: (context, index) => CardReport(data: _reportList?.elementAt(index)),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),

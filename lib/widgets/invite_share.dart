@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/rendering.dart';
 import 'package:fluwx/fluwx.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:flutter/material.dart';
 import 'package:molan_edu/widgets/invite_jump_button.dart';
@@ -34,13 +33,9 @@ class _InviteShareState extends State<InviteShare> with UtilsMixin {
     var status = await Permission.storage.status;
     if (!status.isGranted) {
       status = await Permission.storage.request();
-
-      // print(status);
       return;
     }
-
     BuildContext buildContext = globalKey.currentContext;
-
     if (null != buildContext) {
       RenderRepaintBoundary boundary = buildContext.findRenderObject();
       // 获取当前设备的像素比
@@ -48,7 +43,6 @@ class _InviteShareState extends State<InviteShare> with UtilsMixin {
 
       ui.Image image = await boundary.toImage(pixelRatio: dpr);
       ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      // final result = await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
       try {
         await shareToWeChat(WeChatShareImageModel(
           WeChatImage.binary(
@@ -59,8 +53,6 @@ class _InviteShareState extends State<InviteShare> with UtilsMixin {
       } catch (e) {
         print(e);
       }
-
-      // return result;
     }
   }
 

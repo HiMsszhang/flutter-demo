@@ -74,7 +74,12 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
   }
 
   _showShare() {
-    growthreportSharing(context);
+    showDialog(
+      context: context,
+      builder: (context) => ReportShare(
+        data: _data,
+      ),
+    );
   }
 
   @override
@@ -154,7 +159,14 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(_data?.user?.name ?? '', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold)),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(_data?.user?.name ?? '', style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.bold, height: 1)),
+                                  SizedBox(width: 15.w),
+                                  _widgetSex(_data?.user?.gender ?? 1),
+                                ],
+                              ),
                               SizedBox(height: 20.w),
                               Text('${_data?.user?.age ?? 0}岁', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                             ],
@@ -167,6 +179,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                       padding: EdgeInsets.symmetric(vertical: 30.w),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
+                        border: Border(bottom: BorderSide(width: 1, color: Colors.white)),
                       ),
                       child: Wrap(
                         runSpacing: 55.w,
@@ -245,12 +258,18 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
             ],
           ),
           SizedBox(height: 60.w),
-          AspectRatio(
-            aspectRatio: 548 / 249,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 30.w),
-              child: LineChart(
-                mainData(),
+          Container(
+            width: 549.w,
+            height: 349.w,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.zero,
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                width: 800.w,
+                padding: EdgeInsets.symmetric(horizontal: 20.w).copyWith(bottom: 56.w, top: 30.w),
+                child: LineChart(
+                  mainData(),
+                ),
               ),
             ),
           ),
@@ -290,15 +309,35 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
           Positioned(
             top: 0,
             left: 30.w,
-            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w),
+            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w, fit: BoxFit.fill),
           ),
           Positioned(
             top: 0,
             right: 30.w,
-            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w),
+            child: Image.asset('assets/images/mine/pic_report_chain.png', width: 52.w, height: 76.w, fit: BoxFit.fill),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _widgetSex(int sex) {
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: Container(
+          width: 30.w,
+          height: 30.w,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30.w),
+            color: sex == 1 ? Color(0xFF90D2F8) : Color(0xFFF8BE90),
+          ),
+          child: Icon(
+            sex == 1 ? MyIcons.Iconmale : MyIcons.Iconfemale,
+            size: 14.w,
+            color: Colors.white,
+          )),
     );
   }
 
@@ -338,7 +377,7 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
         leftTitles: SideTitles(showTitles: false),
       ),
       minX: 1,
-      maxX: 10,
+      // maxX: 10,
       minY: 0,
       maxY: 2,
       lineBarsData: [
@@ -346,16 +385,14 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
           spots: [
             FlSpot(1, 1),
             FlSpot(2, 1),
-            FlSpot(3, 2),
+            FlSpot(3, 0),
             FlSpot(4, 1),
             FlSpot(5, 2),
-            FlSpot(6, 2),
-            FlSpot(7, 1),
-            FlSpot(8, 1),
-            FlSpot(9, 1),
-            FlSpot(10, 2),
           ],
-          colors: [chartColors[0], chartColors[0]],
+          // List.generate(_data?.courseCatalogueList?.length ?? 0, (index) {
+          //   return FlSpot((index + 1).toDouble(), _data?.eveluateList[index]);
+          // }),
+          colors: [chartColors[0]],
           barWidth: 1,
           isStrokeCapRound: true,
           dotData: FlDotData(
@@ -367,6 +404,13 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
                 strokeWidth: 0,
                 radius: 9.w,
               );
+            },
+            checkToShowDot: (spot, barData) {
+              if (spot.y == 0) {
+                return false;
+              } else {
+                return true;
+              }
             },
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/models/ReportModel.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 import 'package:molan_edu/widgets/mini_rating_star.dart';
@@ -6,15 +7,28 @@ import 'package:molan_edu/widgets/mini_rating_star.dart';
 class CardReport extends StatefulWidget {
   /// 是否提交
   final bool hasLearn;
+  final MyReportModel data;
   CardReport({
     Key key,
     this.hasLearn = true,
+    this.data,
   }) : super(key: key);
 
   _CardReportState createState() => _CardReportState();
 }
 
 class _CardReportState extends State<CardReport> {
+  _isEpic() {
+    if (widget.data == null) return false;
+    var data = widget?.data;
+    var total = data.integrity + data.neatness + data.beauty;
+    if (total >= 13) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,14 +51,14 @@ class _CardReportState extends State<CardReport> {
             Expanded(
               child: Row(
                 children: [
-                  CommonAvatar(size: 60.w),
+                  CommonAvatar(size: 60.w, showSex: false, avatar: widget?.data?.avatar ?? ''),
                   SizedBox(width: 14.w),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('公爵大人', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
+                      Text(widget?.data?.name ?? '', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold)),
                       SizedBox(height: 10.w),
-                      Text('12-01 周一', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+                      Text('${widget?.data?.createTime} ${widget?.data?.week}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
                     ],
                   ),
                 ],
@@ -52,9 +66,9 @@ class _CardReportState extends State<CardReport> {
             ),
             Row(
               children: [
-                Image.asset('assets/images/mine/rank_epic.png', width: 32.w, height: 32.w),
+                Image.asset('assets/images/mine/rank_${_isEpic() ? "epic" : "good"}.png', width: 32.w, height: 32.w),
                 SizedBox(width: 12.w),
-                Text('优秀', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Color(0xFFFFA06B))),
+                Text(_isEpic() ? '优秀' : '良', style: Styles.normalFont(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Color(0xFFFFA06B))),
               ],
             ),
           ],
@@ -72,48 +86,49 @@ class _CardReportState extends State<CardReport> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('第一节', style: Styles.normalFont(fontSize: 30.sp, color: Styles.color666666, fontWeight: FontWeight.bold)),
+                  Text(widget?.data?.courseCatalogueTitle ?? '', style: Styles.normalFont(fontSize: 30.sp, color: Styles.color666666, fontWeight: FontWeight.bold)),
                   SizedBox(height: 16.w),
-                  Text('Vicky老师的点评', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
+                  Text('${widget?.data?.teacherName ?? ''}老师的点评', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999)),
                   SizedBox(height: 20.w),
                   Row(
                     children: [
                       Text('完整度：', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
-                      MiniRatingStar(rating: 3),
+                      MiniRatingStar(rating: widget?.data?.integrity?.toDouble()),
                     ],
                   ),
                   SizedBox(height: 20.w),
                   Row(
                     children: [
                       Text('工整度：', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
-                      MiniRatingStar(rating: 3),
+                      MiniRatingStar(rating: widget?.data?.neatness?.toDouble()),
                     ],
                   ),
                   SizedBox(height: 20.w),
                   Row(
                     children: [
                       Text('美观度：', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
-                      MiniRatingStar(rating: 3),
+                      MiniRatingStar(rating: widget?.data?.beauty?.toDouble()),
                     ],
                   ),
                 ],
               ),
             ),
-            Container(
-              width: 162.w,
-              height: 192.w,
-              margin: EdgeInsets.only(left: 14.w),
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.w)),
-              child: Image.asset('assets/images/demo.png', fit: BoxFit.cover),
-            ),
-            Container(
-              width: 162.w,
-              height: 192.w,
-              margin: EdgeInsets.only(left: 14.w),
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.w)),
-              child: Image.asset('assets/images/demo.png', fit: BoxFit.cover),
+            ...List.generate(
+              widget?.data?.image?.length ?? 0,
+              (index) => Container(
+                width: 162.w,
+                height: 192.w,
+                margin: EdgeInsets.only(left: 14.w),
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.w)),
+                child: CachedNetworkImage(
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                  imageUrl: widget?.data?.image[index] ?? '',
+                  placeholder: (context, url) => Image.asset('assets/images/placeholder.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
+                ),
+              ),
             ),
           ],
         ),

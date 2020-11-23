@@ -46,7 +46,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
 
   @override
   void dispose() {
-    _timer.cancel();
+    if (_timer != null) _timer.cancel();
     EasyLoading.dismiss();
     super.dispose();
   }
@@ -86,7 +86,11 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
         print("The pay info is : " + res.sign);
         var payResult = await tobias.aliPay(res.sign);
         print("--->$payResult");
-        _paySuccess();
+        if (payResult['resultStatus'] == 9000) {
+          _paySuccess();
+        } else {
+          _payFail();
+        }
       } catch (e) {
         print("error--->$e");
         _payFail();

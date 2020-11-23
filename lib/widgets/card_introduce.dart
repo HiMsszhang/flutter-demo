@@ -34,7 +34,7 @@ class _CardIntroduceState extends State<CardIntroduce> with UtilsMixin {
                   height: 394.w,
                   fit: BoxFit.cover,
                   imageUrl: data?.image,
-                  placeholder: (context, url) => Image.asset('assets/images/placeholder.png', width: double.infinity, height: double.infinity, fit: BoxFit.cover),
+                  placeholder: (context, url) => Image.asset('assets/images/placeholder.png', width: double.infinity, height: 394.w, fit: BoxFit.cover),
                 ),
                 Positioned(
                   right: 26.w,
