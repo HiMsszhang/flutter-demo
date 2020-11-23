@@ -31,6 +31,7 @@ class Config {
   static bool get isRelease => bool.fromEnvironment('dart.vm.product');
 
   static const String S_TOKEN = 'token';
+  static const String S_COLLECTION = 'courseCollection';
 
   /// 第一次进入APP
   static const String S_FIRST = 'first';

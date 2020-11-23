@@ -13,7 +13,7 @@ class CustomSwitch extends StatefulWidget {
 
   const CustomSwitch({
     Key key,
-    this.value,
+    this.value = false,
     this.onChanged,
     this.activeColor = const Color(0xFFFFA06B),
     this.inactiveColor = const Color(0xFFE5E5E5),

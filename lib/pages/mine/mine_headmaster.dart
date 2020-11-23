@@ -29,8 +29,6 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
   int _classTeacherId;
   double _evaluate;
   String _content;
-  var _evaluateData;
-  // String _value;
 
   @override
   void initState() {

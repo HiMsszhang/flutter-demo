@@ -173,7 +173,7 @@ class CourseAPI {
     }
   }
 
-  //课程收藏
+  //课程收藏及取消
   static Future<DataResult> courseCollection({
     int courseId,
   }) async {
@@ -182,7 +182,8 @@ class CourseAPI {
         'course_id': courseId,
       };
       Response res = await http.post('/coursecollection', queryParameters: params);
-      return DataResult(res, true);
+      var result = CourseCollectionOrCancelModel.fromJson(res ?? {});
+      return DataResult(result, true);
     } catch (e) {
       return DataResult(e, false);
     }

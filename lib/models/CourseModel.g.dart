@@ -203,3 +203,14 @@ Map<String, dynamic> _$CourseRecommendModleToJson(
       'typeface_title': instance.typefaceTitle,
       'learn_num': instance.learnNum,
     };
+
+CourseCollectionOrCancelModel _$CourseCollectionOrCancelModelFromJson(
+    Map<String, dynamic> json) {
+  return CourseCollectionOrCancelModel()..msg = json['msg'] as String ?? '';
+}
+
+Map<String, dynamic> _$CourseCollectionOrCancelModelToJson(
+        CourseCollectionOrCancelModel instance) =>
+    <String, dynamic>{
+      'msg': instance.msg,
+    };

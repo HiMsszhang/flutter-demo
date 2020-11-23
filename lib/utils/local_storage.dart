@@ -7,7 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalStorage {
   static set(String key, value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    if (value.runtimeType.toString() == 'bool') {
+      prefs.setBool(key, value);
+    } else {
+      prefs.setString(key, value);
+    }
   }
 
   static get(String key, {ValueChanged<String> callback}) async {

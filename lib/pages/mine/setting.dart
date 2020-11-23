@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:molan_edu/apis/mine.dart';
+import 'package:molan_edu/apis/setting.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/models/ConfigModel.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/utils/local_storage.dart';
-
 import 'package:molan_edu/widgets/custom_switch.dart';
 
 class SettingPage extends StatefulWidget {
@@ -21,19 +21,58 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
   bool _allowAutoPlay = false;
   bool _allowPlay = false;
   bool _allowDownload = false;
+  ConfigModel _data;
 
   @override
   void initState() {
+    // setState(() {});
     super.initState();
+    delayed(() async {
+      await _load();
+    });
   }
 
   _clear() {
     LocalStorage.clear();
   }
 
+  _load() async {
+    await _getSetting();
+    await _initFromCache();
+    setState(() {});
+  }
+
   _logOut() async {
     await context.read<UserState>().logOut();
     NavigatorUtils.pushNamedAndRemoveUntil(context, '/');
+  }
+
+  Future _getSetting() async {
+    DataResult result = await SettingAPI.config(
+      name: 'customer_service_center',
+    );
+    _data = result.data;
+  }
+
+  _initFromCache() async {
+    _allowAutoPlay = await LocalStorage.get('_allowAutoPlay') ?? false;
+    _allowPlay = await LocalStorage.get('_allowPlay') == null ? false : await LocalStorage.get('_allowPlay');
+    _allowDownload = await LocalStorage.get('_allowDownload') == null ? false : await LocalStorage.get('_allowDownload');
+
+    print('>>>>>>>>>>>>>>>>>>>>>>>');
+    print('$_allowAutoPlay+$_allowPlay+$_allowDownload');
+    setState(() {});
+  }
+
+  _saveInfo() async {
+    await LocalStorage.set('_allowAutoPlay', _allowAutoPlay);
+    await LocalStorage.set('_allowPlay', _allowPlay);
+    await LocalStorage.set('_allowDownload', _allowDownload);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -43,8 +82,18 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
       backgroundColor: Theme.of(context).primaryColor,
       body: ListView(
         children: [
-          _widgetItem(title: '关于墨岚', icon: 'about', onTap: () {}),
-          _widgetItem(title: '隐私策略', icon: 'privacy', onTap: () {}),
+          _widgetItem(
+              title: '关于墨岚',
+              icon: 'about',
+              onTap: () {
+                NavigatorUtils.pushNamed(context, '/webview', arguments: {'url': _data.value});
+              }),
+          _widgetItem(
+              title: '隐私策略',
+              icon: 'privacy',
+              onTap: () {
+                NavigatorUtils.pushNamed(context, '/webview', arguments: {'url': _data.value});
+              }),
           _widgetItem(
             title: '视频自动播放',
             icon: 'autoplay',
@@ -52,8 +101,9 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
               value: _allowAutoPlay,
               onChanged: (value) {
                 setState(() {
-                  _allowAutoPlay = !_allowAutoPlay;
+                  _allowAutoPlay = value;
                 });
+                _saveInfo();
               },
             ),
           ),
@@ -64,8 +114,9 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
               value: _allowPlay,
               onChanged: (value) {
                 setState(() {
-                  _allowPlay = !_allowPlay;
+                  _allowPlay = value;
                 });
+                _saveInfo();
               },
             ),
           ),
@@ -76,8 +127,9 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
               value: _allowDownload,
               onChanged: (value) {
                 setState(() {
-                  _allowDownload = !_allowDownload;
+                  _allowDownload = value;
                 });
+                _saveInfo();
               },
             ),
           ),
