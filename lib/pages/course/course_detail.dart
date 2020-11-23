@@ -39,7 +39,10 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   int _selectedIndex = 0;
   int _currentIndex = 0;
   bool hasLogin = false;
+<<<<<<< HEAD
+=======
   bool isCollection = false;
+>>>>>>> ba57ee1e27d12854f62033fde6f47acf9c0109a3
   dynamic _data;
   bool _loadFlag = false;
 
@@ -102,7 +105,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     DataResult result = await CourseAPI.courseCollection(
       courseId: widget.courseId,
     );
-    return result.data;
+    return result;
   }
 
   String _formatTime(int timeNum) {
@@ -172,15 +175,14 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                             ),
                             IconButton(
                               icon: ImageIcon(
-                                AssetImage('assets/images/course/icon_${isCollection == true ? 'ear' : 'favorite'}.png'),
+                                AssetImage('assets/images/course/icon_favorite.png'),
                                 size: 40.w,
                                 color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
                               ),
                               onPressed: () {
                                 _getCourseCollection();
-                                setState(() {
-                                  isCollection = !isCollection;
-                                });
+
+                                setState(() {});
                               },
                             ),
                           ],

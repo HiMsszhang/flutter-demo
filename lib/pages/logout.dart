@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:molan_edu/apis/mine.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/utils/imports.dart';
 
@@ -12,10 +11,6 @@ class UserLogoutPage extends StatefulWidget {
 
 class _UserLogoutPageState extends State<UserLogoutPage> with UtilsMixin {
   final TextEditingController _controller = new TextEditingController();
-  Future _getCancelLation() async {
-    DataResult result = await MineApi.courseCollectionlist();
-    return result;
-  }
 
   @override
   Widget build(BuildContext context) {
