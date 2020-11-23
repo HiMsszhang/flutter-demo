@@ -64,6 +64,7 @@ dependencies:
   flutter_material_pickers: ^1.8.1 #https://pub.flutter-io.cn/packages/flutter_material_pickers
   flutter_xupdate: ^1.0.0 #https://pub.flutter-io.cn/packages/flutter_xupdate
   image_pickers: ^1.0.8+7 #https://pub.flutter-io.cn/packages/image_pickers
+  flutter_sound: 4.0.6 #https://pub.flutter-io.cn/packages/flutter_sound
 
 dev_dependencies:
   flutter_test:

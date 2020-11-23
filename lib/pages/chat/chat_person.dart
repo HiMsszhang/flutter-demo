@@ -1,14 +1,27 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flauto.dart';
+import 'package:flutter_sound/flutter_sound_player.dart';
+import 'package:flutter_sound/flutter_sound_recorder.dart';
+import 'package:image_pickers/image_pickers.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:tencent_im_plugin/entity/find_message_entity.dart';
 import 'package:tencent_im_plugin/entity/message_entity.dart';
+import 'package:tencent_im_plugin/entity/user_entity.dart';
+import 'package:tencent_im_plugin/enums/image_type_enum.dart';
 import 'package:tencent_im_plugin/enums/message_elem_type_enum.dart';
 import 'package:tencent_im_plugin/enums/tencent_im_listener_type_enum.dart';
+import 'package:tencent_im_plugin/message_node/image_message_node.dart';
 import 'package:tencent_im_plugin/message_node/message_node.dart';
+import 'package:tencent_im_plugin/message_node/sound_message_node.dart';
 import 'package:tencent_im_plugin/message_node/text_message_node.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 
@@ -25,29 +38,71 @@ class ChatPersonPage extends StatefulWidget {
   _ChatPersonPageState createState() => _ChatPersonPageState();
 }
 
-class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
+class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, WidgetsBindingObserver {
   String _message = '';
 
   /// 消息列表
   List<MessageEntity> _list = [];
   TextEditingController _inputController;
+  int _userId;
+  UserEntity _userInfo;
+
+  /// 是否显示更多功能
+  bool _isMore = false;
+
+  ///是否录音
+  bool _isRecord = false;
+
+  ///正在录音
+  bool _recording = false;
+  List<Map> _toolsList = [
+    {'title': '照片', 'name': 'gallery', 'icon': MyIcons.Iconimage},
+    {'title': '拍照', 'name': 'camera', 'icon': MyIcons.Iconcamera},
+  ];
+
+  /// 临时目录
+  String _tempPath;
+  FlutterSoundRecorder recorderModule = FlutterSoundRecorder();
+  FlutterSoundPlayer playerModule = FlutterSoundPlayer();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _inputController = TextEditingController();
     TencentImPlugin.addListener(_imListener);
     delayed(() async {
-      _getData();
+      _tempPath = (await getTemporaryDirectory()).path;
+      await context.read<UserState>().getUser();
+      _userId = context.read<UserState>().userInfo.id;
+      await _getUser();
+      await _getData();
     });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _inputController.clear();
     _inputController.dispose();
     TencentImPlugin.removeListener(_imListener);
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print(MediaQuery.of(context).viewInsets.bottom);
+      setState(() {
+        if (MediaQuery.of(context).viewInsets.bottom == 0) {
+          //关闭键盘
+        } else {
+          //显示键盘
+          _isMore = false;
+        }
+      });
+    });
   }
 
   /// IM监听器
@@ -71,9 +126,26 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
     }
   }
 
+  _getUser() async {
+    List<UserEntity> res = await TencentImPlugin.getUsersInfo(userIDList: ['${_userId}user']);
+    _userInfo = res[0];
+    setState(() {});
+  }
+
   _getData() async {
     _list = await TencentImPlugin.getC2CHistoryMessageList(userID: widget.id, count: 20);
     print(_list[0].toJson());
+    // 下载语音
+    for (var item in _list) {
+      if (item.elemType == MessageElemTypeEnum.Sound) {
+        File file = new File(_tempPath + "/" + (item.node as SoundMessageNode).uuid);
+        if (!file.existsSync()) {
+          TencentImPlugin.downloadSound(message: FindMessageEntity(msgId: item.msgID), path: file.path).then((value) {
+            setState(() {});
+          });
+        }
+      }
+    }
     setState(() {});
   }
 
@@ -96,7 +168,6 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
       node: node,
       receiver: widget.id,
     );
-
     _list.insert(
       0,
       MessageEntity(
@@ -104,10 +175,71 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
         node: node,
         elemType: node.nodeType,
         self: true,
+        faceUrl: _userInfo.faceUrl,
       ),
     );
-
     setState(() {});
+  }
+
+  _onToolSelect(int index) {
+    var name = _toolsList[index]['name'];
+    switch (name) {
+      case 'gallery':
+        _onImageSelect(0);
+        break;
+      case 'camera':
+        _onImageSelect(1);
+        break;
+      default:
+    }
+  }
+
+  /// 图片选择按钮
+  _onImageSelect(int value) async {
+    // 图片
+    if (value == 0) {
+      final pickedFile = await ImagePickers.pickerPaths(galleryMode: GalleryMode.image, selectCount: 1);
+      if (pickedFile == null) return;
+      this._sendMessage(ImageMessageNode(path: pickedFile[0].path));
+    }
+    // 拍照
+    if (value == 1) {
+      final pickedFile = await ImagePickers.openCamera(cameraMimeType: CameraMimeType.photo);
+      if (pickedFile == null) return;
+      this._sendMessage(ImageMessageNode(path: pickedFile.path));
+    }
+  }
+
+  _recordStart() async {
+    try {
+      await Permission.microphone.request();
+      PermissionStatus status = await Permission.microphone.status;
+      if (status != PermissionStatus.granted) {
+        EasyLoading.showToast("未获取到麦克风权限");
+        throw RecordingPermissionException("未获取到麦克风权限");
+      }
+      print('===>  获取了权限');
+      var time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      print(t_CODEC.CODEC_AAC.index);
+      String path = '$_tempPath/$time${t_CODEC.CODEC_AAC.index.toInt()}';
+      print('===>  准备开始录音$path');
+      await recorderModule.startRecorder();
+      print('===>  开始录音');
+      print("path == $path");
+    } catch (err) {
+      setState(() {
+        _recordEnd();
+      });
+    }
+  }
+
+  _recordEnd() async {
+    try {
+      await recorderModule.stopRecorder();
+      print(">>>>>>>>>>>>>>done");
+    } catch (err) {
+      print('stopRecorder error: $err');
+    }
   }
 
   @override
@@ -133,71 +265,139 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
           SafeArea(
             top: false,
             bottom: true,
-            child: Container(
-              width: double.infinity,
-              height: 100.w,
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              decoration: Styles.normalDecoration.copyWith(
-                color: Color(0xFFF9F9F9),
-                border: Border(top: BorderSide(width: 1, color: Color(0xFFEEEEEE))),
-              ),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {},
-                    child: Image.asset('assets/images/chat/icon_voice.png', width: 56.w, height: 56.w),
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 100.w,
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  decoration: Styles.normalDecoration.copyWith(
+                    color: Color(0xFFF9F9F9),
+                    border: Border(top: BorderSide(width: 1, color: Color(0xFFEEEEEE))),
                   ),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 20.w),
-                      height: 64.w,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(64.w),
-                        border: Border.all(width: 1, color: Color(0xFFEEEEEE)),
-                        color: Colors.white,
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(borderSide: BorderSide.none),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                        ),
-                        onChanged: (value) {
-                          _onInput(value);
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isRecord = !_isRecord;
+                          });
+                          FocusScope.of(context).unfocus();
                         },
-                        onSubmitted: (value) async {
-                          await _send();
-                        },
-                        controller: _inputController,
-                        textInputAction: TextInputAction.send,
+                        child: Image.asset('assets/images/chat/icon_${_isRecord ? "keyboard" : "voice"}.png', width: 56.w, height: 56.w),
                       ),
-                    ),
-                  ),
-                  Image.asset('assets/images/chat/icon_emoji.png', width: 56.w, height: 56.w),
-                  SizedBox(width: 20.w),
-                  _message != ''
-                      ? Container(
-                          height: 56.w,
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 20.w),
+                          height: 64.w,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.w),
-                            color: Theme.of(context).accentColor,
+                            borderRadius: BorderRadius.circular(64.w),
+                            border: Border.all(width: 1, color: Color(0xFFEEEEEE)),
+                            color: Colors.white,
                           ),
-                          child: InkWell(
-                            // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            // padding: EdgeInsets.zero,
-                            onTap: () async {
-                              await _send();
-                            },
-                            child: Text(
-                              '发送',
-                              style: Styles.normalFont(color: Colors.white),
+                          alignment: Alignment.center,
+                          child: _isRecord
+                              ? GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () async {
+                                    _recording ? await _recordEnd() : await _recordStart();
+                                    setState(() {
+                                      _recording = !_recording;
+                                    });
+                                  },
+                                  child: Center(child: Text(_recording ? '正在录音' : '点击开始录音', style: Styles.normalFont(fontSize: 30.sp))),
+                                )
+                              : TextField(
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                                  ),
+                                  onChanged: (value) {
+                                    _onInput(value);
+                                  },
+                                  onSubmitted: (value) async {
+                                    await _send();
+                                  },
+                                  controller: _inputController,
+                                  textInputAction: TextInputAction.send,
+                                ),
+                        ),
+                      ),
+                      Image.asset('assets/images/chat/icon_emoji.png', width: 56.w, height: 56.w),
+                      SizedBox(width: 20.w),
+                      _message != ''
+                          ? Container(
+                              height: 56.w,
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.w),
+                                color: Theme.of(context).accentColor,
+                              ),
+                              child: InkWell(
+                                // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                // padding: EdgeInsets.zero,
+                                onTap: () async {
+                                  await _send();
+                                },
+                                child: Text(
+                                  '发送',
+                                  style: Styles.normalFont(color: Colors.white),
+                                ),
+                              ),
+                            )
+                          : GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isMore = !_isMore;
+                                });
+                                FocusScope.of(context).unfocus();
+                              },
+                              child: Image.asset('assets/images/chat/icon_${_isMore ? "keyboard" : "more"}.png', width: 56.w, height: 56.w),
                             ),
-                          ),
-                        )
-                      : Image.asset('assets/images/chat/icon_more.png', width: 56.w, height: 56.w),
-                ],
-              ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 750.w,
+                  height: _isMore ? 400.w : 0,
+                  padding: EdgeInsets.symmetric(horizontal: 35.w, vertical: 40.w),
+                  alignment: Alignment.topLeft,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    runSpacing: 30.w,
+                    children: List.generate(
+                        _toolsList.length,
+                        (index) => Container(
+                              width: 170.w,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 100.w,
+                                    height: 100.w,
+                                    clipBehavior: Clip.hardEdge,
+                                    decoration: Styles.normalDecoration.copyWith(
+                                      borderRadius: BorderRadius.circular(16.w),
+                                      color: Colors.white,
+                                    ),
+                                    child: RawMaterialButton(
+                                      padding: EdgeInsets.zero,
+                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      onPressed: () {
+                                        _onToolSelect(index);
+                                      },
+                                      child: Icon(_toolsList[index]['icon'], size: 40.w, color: Theme.of(context).buttonColor),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20.w),
+                                  Text(_toolsList[index]['title'], style: Styles.normalFont(fontSize: 24.sp)),
+                                ],
+                              ),
+                            )),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -208,6 +408,9 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
   _returnMessage(MessageEntity item) {
     switch (item.elemType) {
       case MessageElemTypeEnum.Text:
+        return _widgetMessageTalk(item, isMe: item.self);
+        break;
+      case MessageElemTypeEnum.Sound:
         return _widgetMessageTalk(item, isMe: item.self);
         break;
       case MessageElemTypeEnum.Image:
@@ -249,19 +452,17 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
   }
 
   Widget _widgetMessagePic(MessageEntity item) {
+    ImageMessageNode node = item.node;
     return Container(
-      width: 250.w,
-      height: 307.w,
+      constraints: BoxConstraints(
+        maxHeight: 307.w,
+        maxWidth: 250.w,
+      ),
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: Image.asset(
-        'assets/images/demo.png',
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.cover,
-      ),
+      child: (node.path == null || node.path == '') && node.imageData != null ? Image.network(node.imageData[ImageTypeEnum.Thumb]?.url) : Image.file(File(node.path)),
     );
   }
 
@@ -301,18 +502,27 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin {
                   ),
                 ),
               ),
-        Container(
-          constraints: BoxConstraints(maxWidth: 506.w),
-          padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 26.w),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.w),
-            color: isMe ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
-            // color: Color.fromRGBO(0, 0, 0, 0.2),
-          ),
-          child: Text(
-            (item.node as TextMessageNode).content,
-            style: Styles.normalFont(fontSize: 28.sp, height: 1.5, color: isMe ? Colors.white : Styles.colorText),
-            textAlign: isMe ? TextAlign.right : TextAlign.left,
+        GestureDetector(
+          onTap: () {
+            if (item.elemType == MessageElemTypeEnum.Sound) {
+              var node = item.node as SoundMessageNode;
+              String path = node.path == null || node.path == '' ? (_tempPath + "/" + node.uuid) : node.path;
+              playerModule.startPlayer(path);
+            }
+          },
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 506.w),
+            padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 26.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.w),
+              color: isMe ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+              // color: Color.fromRGBO(0, 0, 0, 0.2),
+            ),
+            child: Text(
+              item.elemType == MessageElemTypeEnum.Sound ? '[语音]' : (item.node as TextMessageNode).content,
+              style: Styles.normalFont(fontSize: 28.sp, height: 1.5, color: isMe ? Colors.white : Styles.colorText),
+              textAlign: isMe ? TextAlign.right : TextAlign.left,
+            ),
           ),
         ),
       ],

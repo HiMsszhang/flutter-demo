@@ -42,8 +42,14 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>$(APPNAME)需要您的同意,才能访问麦克风上传音频数据</string>
+    <key>NSCameraUsageDescription</key>
+    <string>$(APPNAME)需要您的同意,才能访问相机拍摄图片上传</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>$(APPNAME)需要您的同意,才能访问相册上传图片</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>请允许APP保存图片到相册</string>
+	<string>$(APPNAME)需要您的同意,才能保存图片到相册</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
