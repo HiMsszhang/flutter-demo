@@ -54,8 +54,8 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
 
   _initFromCache() async {
     _allowAutoPlay = await LocalStorage.get('_allowAutoPlay') ?? false;
-    _allowPlay = await LocalStorage.get('_allowPlay');
-    _allowDownload = await LocalStorage.get('_allowDownload');
+    _allowPlay = await LocalStorage.get('_allowPlay') ?? false;
+    _allowDownload = await LocalStorage.get('_allowDownload') ?? false;
 
     print('>>>>>>>>>>>>>>>>>>>>>>>');
     print('$_allowAutoPlay+$_allowPlay+$_allowDownload');

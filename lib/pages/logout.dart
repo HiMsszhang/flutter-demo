@@ -160,6 +160,14 @@ class _UserLogoutPageState extends State<UserLogoutPage> with UtilsMixin {
                   child: Text('确认注销', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
+              SizedBox(height: 30.h),
+              Container(
+                width: 690.w,
+                child: Text(
+                  '注：请谨慎注销账号。账户注销会清除账户所有信息，包括已购买课程！',
+                  style: Styles.normalFont(fontSize: 26.sp, fontWeight: FontWeight.w500, color: Colors.black, height: 3.w),
+                ),
+              ),
             ],
           ),
         ),
