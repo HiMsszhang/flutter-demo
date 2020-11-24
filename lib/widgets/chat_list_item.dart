@@ -35,6 +35,9 @@ class _ChatListItemState extends State<ChatListItem> with UtilsMixin {
       case MessageElemTypeEnum.Image:
         result = '[图片]';
         break;
+      case MessageElemTypeEnum.Sound:
+        result = '[语音]';
+        break;
       default:
         result = '[自定义消息]';
         break;
