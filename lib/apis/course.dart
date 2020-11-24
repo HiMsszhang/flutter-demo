@@ -182,8 +182,8 @@ class CourseAPI {
         'course_id': courseId,
       };
       Response res = await http.post('/coursecollection', queryParameters: params);
-      var result = CourseCollectionOrCancelModel.fromJson(res ?? {});
-      return DataResult(result, true);
+
+      return DataResult(res, true);
     } catch (e) {
       return DataResult(e, false);
     }

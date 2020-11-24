@@ -188,7 +188,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
         onPageChanged: _onPageChanged,
         children: [
           _courseData?.total == 0 && _value == ''
-              ? NoData(text: '还未购买任何课程哦', backgroundColor: Color(0xFFFFF7F3))
+              ? NoData(text: '还未收藏任何课程哦', backgroundColor: Color(0xFFFFF7F3))
               : _courseData?.total == 0
                   ? NoData(text: '未找到“$_value”相关课程哦', backgroundColor: Color(0xFFFFF7F3))
                   : SmartRefresher(
