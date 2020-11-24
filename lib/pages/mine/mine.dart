@@ -64,16 +64,12 @@ class _MinePageState extends State<MinePage> with UtilsMixin, AutomaticKeepAlive
   }
 
   _onListItemTapped(item) {
-    if (!hasLogin) {
-      toLoginPopup();
-      return;
-    }
     switch (item['name']) {
       case "headmaster":
-        NavigatorUtils.pushNamed(context, '/mine.headmaster');
+        hasLogin ? NavigatorUtils.pushNamed(context, '/mine.headmaster') : toLoginPopup();
         break;
       case "report":
-        NavigatorUtils.pushNamed(context, '/mine.report');
+        hasLogin ? NavigatorUtils.pushNamed(context, '/mine.report') : toLoginPopup();
         break;
       case "setting":
         NavigatorUtils.pushNamed(context, '/setting');
