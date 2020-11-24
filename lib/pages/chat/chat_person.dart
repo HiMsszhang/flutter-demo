@@ -201,13 +201,13 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   _onImageSelect(int value) async {
     // 图片
     if (value == 0) {
-      final pickedFile = await ImagePickers.pickerPaths(galleryMode: GalleryMode.image, selectCount: 1);
+      final pickedFile = await ImagePickers.pickerPaths(galleryMode: GalleryMode.image, selectCount: 1, compressSize: 1500, cropConfig: CropConfig(enableCrop: true));
       if (pickedFile == null) return;
       _sendMessage(ImageMessageNode(path: pickedFile[0].path));
     }
     // 拍照
     if (value == 1) {
-      final pickedFile = await ImagePickers.openCamera(cameraMimeType: CameraMimeType.photo);
+      final pickedFile = await ImagePickers.openCamera(cameraMimeType: CameraMimeType.photo, compressSize: 1500, cropConfig: CropConfig(enableCrop: true));
       if (pickedFile == null) return;
       _sendMessage(ImageMessageNode(path: pickedFile.path));
     }
@@ -480,6 +480,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
 
   Widget _widgetMessagePic(MessageEntity item) {
     ImageMessageNode node = item.node;
+    var path = (node.path == null || node.path == '') && node.imageData != null ? node.imageData[ImageTypeEnum.Thumb]?.url : node.path;
     return Container(
       constraints: BoxConstraints(
         maxHeight: 307.w,
@@ -489,7 +490,13 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: (node.path == null || node.path == '') && node.imageData != null ? Image.network(node.imageData[ImageTypeEnum.Thumb]?.url) : Image.file(File(node.path)),
+      child: RawMaterialButton(
+        onPressed: () {
+          ///预览图片 Preview picture
+          ImagePickers.previewImage(path);
+        },
+        child: (node.path == null || node.path == '') && node.imageData != null ? Image.network(path) : Image.file(File(path)),
+      ),
     );
   }
 
