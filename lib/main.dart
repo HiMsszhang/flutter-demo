@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:molan_edu/utils/local_storage.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -124,9 +125,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   ///将自定义的json内容解析为UpdateEntity实体类
-  UpdateEntity customParseJson(Map json) {
+  UpdateEntity customParseJson(Map json, int buildNumber) {
     return UpdateEntity(
-      hasUpdate: true,
+      hasUpdate: buildNumber < json['version_code'],
       isIgnorable: json['update_status'] <= 3,
       versionCode: json['version_code'],
       versionName: json['version_name'],
@@ -142,8 +143,9 @@ class _MyAppState extends State<MyApp> {
     DataResult res = await CommonAPI.getVersion();
     if (res.result) {
       if (Platform.isAndroid) {
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
         FlutterXUpdate.updateByInfo(
-          updateEntity: customParseJson(res.data),
+          updateEntity: customParseJson(res.data, int.parse(packageInfo.buildNumber)),
           topImageRes: 'bg_update_top',
           themeColor: "#FFFFBAA3",
           buttonTextColor: "#FFFFFFFF",
