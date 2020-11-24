@@ -6,7 +6,6 @@ import 'package:molan_edu/models/ConfigModel.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/utils/local_storage.dart';
-import 'package:molan_edu/widgets/custom_switch.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({
@@ -25,8 +24,8 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
 
   @override
   void initState() {
-    // setState(() {});
     super.initState();
+    _initFromCache();
     delayed(() async {
       await _load();
     });
@@ -38,7 +37,6 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
 
   _load() async {
     await _getSetting();
-    await _initFromCache();
     setState(() {});
   }
 
@@ -56,8 +54,8 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
 
   _initFromCache() async {
     _allowAutoPlay = await LocalStorage.get('_allowAutoPlay') ?? false;
-    _allowPlay = await LocalStorage.get('_allowPlay') == null ? false : await LocalStorage.get('_allowPlay');
-    _allowDownload = await LocalStorage.get('_allowDownload') == null ? false : await LocalStorage.get('_allowDownload');
+    _allowPlay = await LocalStorage.get('_allowPlay');
+    _allowDownload = await LocalStorage.get('_allowDownload');
 
     print('>>>>>>>>>>>>>>>>>>>>>>>');
     print('$_allowAutoPlay+$_allowPlay+$_allowDownload');
@@ -68,11 +66,6 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
     await LocalStorage.set('_allowAutoPlay', _allowAutoPlay);
     await LocalStorage.set('_allowPlay', _allowPlay);
     await LocalStorage.set('_allowDownload', _allowDownload);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -97,40 +90,64 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
           _widgetItem(
             title: '视频自动播放',
             icon: 'autoplay',
-            action: CustomSwitch(
-              value: _allowAutoPlay,
-              onChanged: (value) {
-                setState(() {
-                  _allowAutoPlay = value;
-                });
-                _saveInfo();
-              },
+            action: SizedBox(
+              width: 69.w,
+              height: 42.w,
+              child: Transform.scale(
+                scale: .7,
+                child: CupertinoSwitch(
+                  value: _allowAutoPlay,
+                  activeColor: Color(0xFFFFA06B),
+                  onChanged: (value) {
+                    setState(() {
+                      _allowAutoPlay = value;
+                    });
+                    _saveInfo();
+                  },
+                ),
+              ),
             ),
           ),
           _widgetItem(
             title: '允许非WiFi网络播放',
             icon: 'play',
-            action: CustomSwitch(
-              value: _allowPlay,
-              onChanged: (value) {
-                setState(() {
-                  _allowPlay = value;
-                });
-                _saveInfo();
-              },
+            action: SizedBox(
+              width: 69.w,
+              height: 42.w,
+              child: Transform.scale(
+                scale: .7,
+                child: CupertinoSwitch(
+                  value: _allowPlay,
+                  activeColor: Color(0xFFFFA06B),
+                  onChanged: (value) {
+                    setState(() {
+                      _allowPlay = value;
+                    });
+                    _saveInfo();
+                  },
+                ),
+              ),
             ),
           ),
           _widgetItem(
             title: '允许非WiFi网络下载',
             icon: 'download',
-            action: CustomSwitch(
-              value: _allowDownload,
-              onChanged: (value) {
-                setState(() {
-                  _allowDownload = value;
-                });
-                _saveInfo();
-              },
+            action: SizedBox(
+              width: 69.w,
+              height: 42.w,
+              child: Transform.scale(
+                scale: .7,
+                child: CupertinoSwitch(
+                  value: _allowDownload,
+                  activeColor: Color(0xFFFFA06B),
+                  onChanged: (value) {
+                    setState(() {
+                      _allowDownload = value;
+                    });
+                    _saveInfo();
+                  },
+                ),
+              ),
             ),
           ),
           _widgetItem(

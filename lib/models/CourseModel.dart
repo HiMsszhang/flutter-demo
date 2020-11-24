@@ -295,17 +295,3 @@ class CourseRecommendModle {
   Map<String, dynamic> toJson() => _$CourseRecommendModleToJson(this);
   CourseRecommendModle.enty();
 }
-
-//课程收藏及取消
-@JsonSerializable()
-class CourseCollectionOrCancelModel {
-  @JsonKey(defaultValue: '')
-  String msg;
-  CourseCollectionOrCancelModel();
-
-  //反序列化
-  factory CourseCollectionOrCancelModel.fromJson(Map<String, dynamic> json) => _$CourseCollectionOrCancelModelFromJson(json);
-//序列化
-  Map<String, dynamic> toJson() => _$CourseCollectionOrCancelModelToJson(this);
-  CourseCollectionOrCancelModel.enty();
-}

@@ -188,7 +188,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
         onPageChanged: _onPageChanged,
         children: [
           _courseData?.total == 0 && _value == ''
-              ? NoData(text: '还未购买任何课程哦', backgroundColor: Color(0xFFFFF7F3))
+              ? NoData(text: '还未收藏任何课程哦', backgroundColor: Color(0xFFFFF7F3))
               : _courseData?.total == 0
                   ? NoData(text: '未找到“$_value”相关课程哦', backgroundColor: Color(0xFFFFF7F3))
                   : SmartRefresher(
@@ -210,21 +210,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                       ),
                     ),
           _teacherDate?.total == 0 && _value == ''
-<<<<<<< HEAD
-              ? Container(
-                  padding: EdgeInsets.only(top: 300.w),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(image: AssetImage('assets/images/mine/favorite_no_teacher.png'), fit: BoxFit.contain),
-                  ),
-                  child: Text(
-                    '还未收藏任何老师哦',
-                    style: Styles.normalFont(fontSize: 30.sp, fontWeight: FontWeight.w500, color: Color(0xFFFFC9A7)),
-                  ),
-                )
-=======
               ? NoData(text: '还未收藏任何老师哦', backgroundColor: Color(0xFFFFF7F3), url: "assets/images/mine/favorite_no_teacher.png")
->>>>>>> ba57ee1e27d12854f62033fde6f47acf9c0109a3
               : SmartRefresher(
                   enablePullDown: true,
                   enablePullUp: true,

@@ -9,6 +9,7 @@ import 'package:molan_edu/pages/course/teacher_info.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:chewie/chewie.dart';
+import 'package:molan_edu/utils/local_storage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:molan_edu/widgets/custom_controls.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -39,10 +40,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
   int _selectedIndex = 0;
   int _currentIndex = 0;
   bool hasLogin = false;
-<<<<<<< HEAD
-=======
-  bool isCollection = false;
->>>>>>> ba57ee1e27d12854f62033fde6f47acf9c0109a3
+  bool _isCollection = false;
   dynamic _data;
   bool _loadFlag = false;
 
@@ -65,6 +63,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
 
   _load() async {
     widget.isGroup ? await _getGroupCourseDetail() : await _getCourseDetail();
+    await _initFromCache();
   }
 
   @override
@@ -72,6 +71,18 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     _controller.dispose();
     _chewieController.dispose();
     super.dispose();
+  }
+
+  _initFromCache() async {
+    _isCollection = await LocalStorage.get('_isCollection') ?? false;
+
+    print('>>>>>>>>>>>>>>>>>>>>>>>');
+    print(_isCollection);
+    setState(() {});
+  }
+
+  _saveInfo() async {
+    await LocalStorage.set('_isCollection', _isCollection);
   }
 
   Future<CourseCataloguelistModleListResp> _getCourseCatalogueData() async {
@@ -175,14 +186,15 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                             ),
                             IconButton(
                               icon: ImageIcon(
-                                AssetImage('assets/images/course/icon_favorite.png'),
+                                AssetImage(_isCollection ? 'assets/images/mine/icon_favorite.png' : 'assets/images/course/icon_favorite.png'),
                                 size: 40.w,
                                 color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
                               ),
                               onPressed: () {
                                 _getCourseCollection();
-
+                                _isCollection = !_isCollection;
                                 setState(() {});
+                                _saveInfo();
                               },
                             ),
                           ],
