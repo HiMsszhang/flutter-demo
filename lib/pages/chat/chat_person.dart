@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flauto.dart';
-import 'package:flutter_sound/flutter_sound_player.dart';
-import 'package:flutter_sound/flutter_sound_recorder.dart';
 import 'package:image_pickers/image_pickers.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/providers/user_state.dart';
@@ -24,6 +22,10 @@ import 'package:tencent_im_plugin/message_node/message_node.dart';
 import 'package:tencent_im_plugin/message_node/sound_message_node.dart';
 import 'package:tencent_im_plugin/message_node/text_message_node.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
+import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
+
+/// 临时目录
+String _tempPath;
 
 class ChatPersonPage extends StatefulWidget {
   final String id;
@@ -60,10 +62,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
     {'title': '拍照', 'name': 'camera', 'icon': MyIcons.Iconcamera},
   ];
 
-  /// 临时目录
-  String _tempPath;
-  FlutterSoundRecorder recorderModule = FlutterSoundRecorder();
-  FlutterSoundPlayer playerModule = FlutterSoundPlayer();
+  FlutterAudioRecorder _recorderModule;
 
   @override
   void initState() {
@@ -83,6 +82,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _recorderModule.stop();
     _inputController.clear();
     _inputController.dispose();
     TencentImPlugin.removeListener(_imListener);
@@ -93,7 +93,6 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   void didChangeMetrics() {
     super.didChangeMetrics();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print(MediaQuery.of(context).viewInsets.bottom);
       setState(() {
         if (MediaQuery.of(context).viewInsets.bottom == 0) {
           //关闭键盘
@@ -200,13 +199,13 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
     if (value == 0) {
       final pickedFile = await ImagePickers.pickerPaths(galleryMode: GalleryMode.image, selectCount: 1);
       if (pickedFile == null) return;
-      this._sendMessage(ImageMessageNode(path: pickedFile[0].path));
+      _sendMessage(ImageMessageNode(path: pickedFile[0].path));
     }
     // 拍照
     if (value == 1) {
       final pickedFile = await ImagePickers.openCamera(cameraMimeType: CameraMimeType.photo);
       if (pickedFile == null) return;
-      this._sendMessage(ImageMessageNode(path: pickedFile.path));
+      _sendMessage(ImageMessageNode(path: pickedFile.path));
     }
   }
 
@@ -216,15 +215,18 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
       PermissionStatus status = await Permission.microphone.status;
       if (status != PermissionStatus.granted) {
         EasyLoading.showToast("未获取到麦克风权限");
-        throw RecordingPermissionException("未获取到麦克风权限");
+        throw "未获取到麦克风权限";
       }
       print('===>  获取了权限');
       var time = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-      print(t_CODEC.CODEC_AAC.index);
-      String path = '$_tempPath/$time${t_CODEC.CODEC_AAC.index.toInt()}';
+      String path = '$_tempPath/$time${AudioFormat.AAC.index}';
+      _recorderModule = FlutterAudioRecorder(path, audioFormat: AudioFormat.AAC);
+      await _recorderModule.initialized;
       print('===>  准备开始录音$path');
-      await recorderModule.startRecorder();
       print('===>  开始录音');
+      await _recorderModule.start();
+      var recording = await _recorderModule.current(channel: 0);
+      print(recording.status);
       print("path == $path");
     } catch (err) {
       setState(() {
@@ -235,8 +237,9 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
 
   _recordEnd() async {
     try {
-      await recorderModule.stopRecorder();
-      print(">>>>>>>>>>>>>>done");
+      var result = await _recorderModule.stop();
+      _sendMessage(SoundMessageNode(path: result.path, duration: result.duration.inSeconds));
+      print(">>>>>>>>>>>>>>${result.path}");
     } catch (err) {
       print('stopRecorder error: $err');
     }
@@ -408,16 +411,16 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   _returnMessage(MessageEntity item) {
     switch (item.elemType) {
       case MessageElemTypeEnum.Text:
-        return _widgetMessageTalk(item, isMe: item.self);
+        return WidgetMessageTalk(item, isMe: item.self);
         break;
       case MessageElemTypeEnum.Sound:
-        return _widgetMessageTalk(item, isMe: item.self);
+        return WidgetMessageTalk(item, isMe: item.self);
         break;
       case MessageElemTypeEnum.Image:
         return _widgetMessagePic(item);
         break;
       default:
-        return _widgetMessageTalk(item, isMe: item.self);
+        return WidgetMessageTalk(item, isMe: item.self);
     }
   }
 
@@ -466,7 +469,75 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
     );
   }
 
-  Widget _widgetMessageTalk(MessageEntity item, {bool isMe = false}) {
+  Widget _widgetFloatInfo() {
+    return Container(
+      width: 690.w,
+      padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 24.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14.w),
+        color: Theme.of(context).primaryColor,
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ImageIcon(
+                AssetImage('assets/images/chat/icon_warn.png'),
+                size: 20.w,
+                color: Theme.of(context).accentColor,
+              ),
+              SizedBox(width: 10.w),
+              Text('温馨提示', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
+            ],
+          ),
+          SizedBox(height: 10.w),
+          Text('15：00前老师在线实时回复。15：00后老师将次日回复', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.2)),
+        ],
+      ),
+    );
+  }
+}
+
+class WidgetMessageTalk extends StatefulWidget {
+  final MessageEntity item;
+  final bool isMe;
+  const WidgetMessageTalk(
+    this.item, {
+    Key key,
+    this.isMe = false,
+  }) : super(key: key);
+
+  @override
+  _WidgetMessageTalkState createState() => _WidgetMessageTalkState();
+}
+
+class _WidgetMessageTalkState extends State<WidgetMessageTalk> {
+  AudioPlayer _playerModule = AudioPlayer();
+  bool _isPlaying = false;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.item.elemType == MessageElemTypeEnum.Sound) {
+      _playerModule.onPlayerCompletion.listen((event) {
+        if (_playerModule.state == AudioPlayerState.COMPLETED) {
+          setState(() {
+            _isPlaying = false;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var isMe = widget.isMe;
+    var item = widget.item;
     return Stack(
       overflow: Overflow.visible,
       clipBehavior: Clip.none,
@@ -503,11 +574,24 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                 ),
               ),
         GestureDetector(
-          onTap: () {
+          onTap: () async {
             if (item.elemType == MessageElemTypeEnum.Sound) {
-              var node = item.node as SoundMessageNode;
-              String path = node.path == null || node.path == '' ? (_tempPath + "/" + node.uuid) : node.path;
-              playerModule.startPlayer(path);
+              try {
+                if (_isPlaying) {
+                  _isPlaying = false;
+                  _playerModule.stop();
+                } else {
+                  _isPlaying = true;
+                  var node = item.node as SoundMessageNode;
+                  String path = node.path == null || node.path == '' ? (_tempPath + "/" + node.uuid) : node.path;
+                  print("????????????????$path");
+                  int result = await _playerModule.play(path, isLocal: true);
+                  print(result);
+                }
+                setState(() {});
+              } catch (e) {
+                print('error:$e');
+              }
             }
           },
           child: Container(
@@ -516,45 +600,15 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16.w),
               color: isMe ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
-              // color: Color.fromRGBO(0, 0, 0, 0.2),
             ),
             child: Text(
-              item.elemType == MessageElemTypeEnum.Sound ? '[语音]' : (item.node as TextMessageNode).content,
+              item.elemType == MessageElemTypeEnum.Sound ? '[${_isPlaying ? "正在播放" : "语音"}]' : (item.node as TextMessageNode).content,
               style: Styles.normalFont(fontSize: 28.sp, height: 1.5, color: isMe ? Colors.white : Styles.colorText),
               textAlign: isMe ? TextAlign.right : TextAlign.left,
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _widgetFloatInfo() {
-    return Container(
-      width: 690.w,
-      padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 24.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14.w),
-        color: Theme.of(context).primaryColor,
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ImageIcon(
-                AssetImage('assets/images/chat/icon_warn.png'),
-                size: 20.w,
-                color: Theme.of(context).accentColor,
-              ),
-              SizedBox(width: 10.w),
-              Text('温馨提示', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666)),
-            ],
-          ),
-          SizedBox(height: 10.w),
-          Text('15：00前老师在线实时回复。15：00后老师将次日回复', style: Styles.normalFont(fontSize: 24.sp, color: Styles.color666666, height: 1.2)),
-        ],
-      ),
     );
   }
 }
