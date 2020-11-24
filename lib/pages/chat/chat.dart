@@ -27,6 +27,8 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
   bool get wantKeepAlive => false;
 
   List<ConversationEntity> _list = [];
+  List<ConversationEntity> _searchList = [];
+  String _searchWord = '';
   int _nextSeq = 0;
   bool hasLogin = false;
   RefreshController _listController = RefreshController(initialRefresh: false);
@@ -77,6 +79,17 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
     }
   }
 
+  _onSearch(String value) {
+    var list = _list;
+    _searchWord = value;
+    for (var item in list) {
+      if (item.showName.contains(value)) {
+        _searchList.add(item);
+      }
+    }
+    setState(() {});
+  }
+
   _toDetail() {
     NavigatorUtils.pushNamed(context, '/chat.detail');
   }
@@ -114,10 +127,13 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
                     color: Color(0xFFBCBCBC),
                   ),
                 ),
+                inputText: _searchWord,
                 hintText: S.current.search,
-                readOnly: true,
-                onTap: () {
-                  NavigatorUtils.pushNamed(context, '/chat.search');
+                onSubmitted: _onSearch,
+                onClear: () {
+                  setState(() {
+                    _searchWord = "";
+                  });
                 },
               ),
             ),
@@ -125,20 +141,39 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
         ],
       ),
       backgroundColor: Theme.of(context).primaryColor,
-      body: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        onRefresh: _onRefresh,
-        onLoading: _onLoading,
-        controller: _listController,
-        header: myCustomHeader(),
-        footer: myCustomFooter(),
-        child: ListView(
-          children: [
-            ListView.separated(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: _list.length,
+      body: _searchWord.isEmpty
+          ? SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: true,
+              onRefresh: _onRefresh,
+              onLoading: _onLoading,
+              controller: _listController,
+              header: myCustomHeader(),
+              footer: myCustomFooter(),
+              child: ListView(
+                children: [
+                  ListView.separated(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: _list.length,
+                    separatorBuilder: (context, index) => Container(
+                      width: 690.w,
+                      height: 0.5,
+                      color: Color(0xFFE6E6E6),
+                      margin: EdgeInsets.symmetric(horizontal: 30.w),
+                    ),
+                    itemBuilder: (context, index) => ChatListItem(
+                      data: _list[index],
+                      onTap: () {
+                        _toPerson(_list[index]);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : ListView.separated(
+              itemCount: _searchList.length ?? 0,
               separatorBuilder: (context, index) => Container(
                 width: 690.w,
                 height: 0.5,
@@ -146,15 +181,12 @@ class _ChatPageState extends State<ChatPage> with UtilsMixin, AutomaticKeepAlive
                 margin: EdgeInsets.symmetric(horizontal: 30.w),
               ),
               itemBuilder: (context, index) => ChatListItem(
-                data: _list[index],
+                data: _searchList[index],
                 onTap: () {
-                  _toPerson(_list[index]);
+                  _toPerson(_searchList[index]);
                 },
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -66,6 +66,7 @@ dependencies:
   image_pickers: ^1.0.8+7 #https://pub.flutter-io.cn/packages/image_pickers
   flutter_audio_recorder: ^0.5.5 #https://pub.flutter-io.cn/packages/flutter_audio_recorder
   audioplayers: ^0.17.0 #https://pub.flutter-io.cn/packages/audioplayers
+  package_info: '>=0.4.3+2 <2.0.0' #https://pub.flutter-io.cn/packages/package_info
 
 dev_dependencies:
   flutter_test:
@@ -90,6 +91,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - assets/emoji_list.json
     - assets/images/logo.png
     - assets/images/logo_invite.png
     - assets/images/logo_text.png

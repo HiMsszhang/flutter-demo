@@ -23,6 +23,7 @@ import 'package:tencent_im_plugin/message_node/sound_message_node.dart';
 import 'package:tencent_im_plugin/message_node/text_message_node.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
+import 'package:molan_edu/widgets/emoji_list.dart';
 
 /// 临时目录
 String _tempPath;
@@ -55,6 +56,9 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   ///是否录音
   bool _isRecord = false;
 
+  ///是否显示表情
+  bool _isEmoji = false;
+
   ///正在录音
   bool _recording = false;
   List<Map> _toolsList = [
@@ -82,7 +86,6 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _recorderModule.stop();
     _inputController.clear();
     _inputController.dispose();
     TencentImPlugin.removeListener(_imListener);
@@ -99,6 +102,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
         } else {
           //显示键盘
           _isMore = false;
+          _isEmoji = false;
         }
       });
     });
@@ -197,13 +201,13 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   _onImageSelect(int value) async {
     // 图片
     if (value == 0) {
-      final pickedFile = await ImagePickers.pickerPaths(galleryMode: GalleryMode.image, selectCount: 1);
+      final pickedFile = await ImagePickers.pickerPaths(galleryMode: GalleryMode.image, selectCount: 1, compressSize: 1500, cropConfig: CropConfig(enableCrop: true));
       if (pickedFile == null) return;
       _sendMessage(ImageMessageNode(path: pickedFile[0].path));
     }
     // 拍照
     if (value == 1) {
-      final pickedFile = await ImagePickers.openCamera(cameraMimeType: CameraMimeType.photo);
+      final pickedFile = await ImagePickers.openCamera(cameraMimeType: CameraMimeType.photo, compressSize: 1500, cropConfig: CropConfig(enableCrop: true));
       if (pickedFile == null) return;
       _sendMessage(ImageMessageNode(path: pickedFile.path));
     }
@@ -326,7 +330,16 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                                 ),
                         ),
                       ),
-                      Image.asset('assets/images/chat/icon_emoji.png', width: 56.w, height: 56.w),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isEmoji = !_isEmoji;
+                            _isMore = false;
+                          });
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: Image.asset('assets/images/chat/icon_${_isEmoji ? "keyboard" : "emoji"}.png', width: 56.w, height: 56.w),
+                      ),
                       SizedBox(width: 20.w),
                       _message != ''
                           ? Container(
@@ -353,6 +366,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                               onTap: () {
                                 setState(() {
                                   _isMore = !_isMore;
+                                  _isEmoji = false;
                                 });
                                 FocusScope.of(context).unfocus();
                               },
@@ -370,35 +384,45 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                     alignment: WrapAlignment.start,
                     runSpacing: 30.w,
                     children: List.generate(
-                        _toolsList.length,
-                        (index) => Container(
-                              width: 170.w,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 100.w,
-                                    height: 100.w,
-                                    clipBehavior: Clip.hardEdge,
-                                    decoration: Styles.normalDecoration.copyWith(
-                                      borderRadius: BorderRadius.circular(16.w),
-                                      color: Colors.white,
-                                    ),
-                                    child: RawMaterialButton(
-                                      padding: EdgeInsets.zero,
-                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      onPressed: () {
-                                        _onToolSelect(index);
-                                      },
-                                      child: Icon(_toolsList[index]['icon'], size: 40.w, color: Theme.of(context).buttonColor),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20.w),
-                                  Text(_toolsList[index]['title'], style: Styles.normalFont(fontSize: 24.sp)),
-                                ],
+                      _toolsList.length,
+                      (index) => Container(
+                        width: 170.w,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 100.w,
+                              height: 100.w,
+                              clipBehavior: Clip.hardEdge,
+                              decoration: Styles.normalDecoration.copyWith(
+                                borderRadius: BorderRadius.circular(16.w),
+                                color: Colors.white,
                               ),
-                            )),
+                              child: RawMaterialButton(
+                                padding: EdgeInsets.zero,
+                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                onPressed: () {
+                                  _onToolSelect(index);
+                                },
+                                child: Icon(_toolsList[index]['icon'], size: 40.w, color: Theme.of(context).buttonColor),
+                              ),
+                            ),
+                            SizedBox(height: 20.w),
+                            Text(_toolsList[index]['title'], style: Styles.normalFont(fontSize: 24.sp)),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
+                ),
+                EmojiList(
+                  isEmoji: _isEmoji,
+                  onTap: (value) {
+                    setState(() {
+                      _message = _message + value;
+                      _inputController.text = _message;
+                    });
+                  },
                 ),
               ],
             ),
@@ -456,6 +480,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
 
   Widget _widgetMessagePic(MessageEntity item) {
     ImageMessageNode node = item.node;
+    var path = (node.path == null || node.path == '') && node.imageData != null ? node.imageData[ImageTypeEnum.Thumb]?.url : node.path;
     return Container(
       constraints: BoxConstraints(
         maxHeight: 307.w,
@@ -465,7 +490,13 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.w),
       ),
-      child: (node.path == null || node.path == '') && node.imageData != null ? Image.network(node.imageData[ImageTypeEnum.Thumb]?.url) : Image.file(File(node.path)),
+      child: RawMaterialButton(
+        onPressed: () {
+          ///预览图片 Preview picture
+          ImagePickers.previewImage(path);
+        },
+        child: (node.path == null || node.path == '') && node.imageData != null ? Image.network(path) : Image.file(File(path)),
+      ),
     );
   }
 

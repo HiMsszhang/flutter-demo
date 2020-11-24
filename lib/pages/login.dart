@@ -69,6 +69,13 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
     _stopTimer();
   }
 
+  _showTerms() {
+    showDialog(
+      context: context,
+      builder: (context) => _widgetTerms(),
+    );
+  }
+
   _submit() async {
     if (_mobile.isEmpty) {
       showToast('请输入正确的手机号');
@@ -217,23 +224,25 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
                             keyboardType: TextInputType.number,
                           ),
                           SizedBox(height: 80.w),
-                          RawMaterialButton(
-                            onPressed: _submit,
-                            child: Container(
-                              width: double.infinity,
-                              height: 94.w,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(94.w),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color(0xFFFFABA4),
-                                    Color(0xFFFFC4A3),
-                                  ],
-                                ),
+                          Container(
+                            width: double.infinity,
+                            height: 94.w,
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(94.w),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xFFFFC0A3),
+                                  Color(0xFFFFABA4),
+                                ],
                               ),
+                            ),
+                            child: RawMaterialButton(
+                              padding: EdgeInsets.zero,
+                              materialTapTargetSize: MaterialTapTargetSize.padded,
+                              onPressed: _showTerms,
                               child: Text('注册即登录', style: Styles.normalFont(fontSize: 36.sp, color: Colors.white, fontWeight: FontWeight.bold)),
                             ),
                           ),
@@ -265,6 +274,79 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
               ],
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _widgetTerms() {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Positioned.fill(child: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+        )),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 690.w,
+              padding: EdgeInsets.symmetric(horizontal: 43.w, vertical: 60.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.w),
+                color: Colors.white,
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    '用户服务协议及隐私政策',
+                    style: Styles.normalFont(fontSize: 30.sp, color: Color(0xFF6F5B59), fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 46.w),
+                  RichText(
+                    text: TextSpan(
+                      style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999, height: 42 / 24),
+                      children: [
+                        TextSpan(text: '亲爱的用户，在您使用墨岚教育课程APP前，请您务必认证阅读'),
+                        TextSpan(text: '《用户服务协议及隐私政策》', style: Styles.normalFont(color: Color(0xFF6F5B59))),
+                        TextSpan(text: '中各项条款，了解我们对您个人信息的处理规则。同时您应特别注意前述协议中免除或者限制我们责任的条款、对您权利进行限制的条款、约定争议解决方式和司法管辖的条款。如您已详细阅读并同意'),
+                        TextSpan(text: '《用户服务协议》', style: Styles.normalFont(color: Color(0xFF6F5B59))),
+                        TextSpan(text: '和'),
+                        TextSpan(text: '《隐私政策》', style: Styles.normalFont(color: Color(0xFF6F5B59))),
+                        TextSpan(text: '，请点击按钮开始使用我们的产品和服务。'),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 46.w),
+                  Container(
+                    width: double.infinity,
+                    height: 77.w,
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(77.w),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFFFC0A3),
+                          Color(0xFFFFABA4),
+                        ],
+                      ),
+                    ),
+                    child: RawMaterialButton(
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.padded,
+                      onPressed: _submit,
+                      child: Text('同意并登录', style: Styles.normalFont(fontSize: 28.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );

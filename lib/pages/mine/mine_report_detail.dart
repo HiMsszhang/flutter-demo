@@ -382,16 +382,9 @@ class _MineReportDetailPageState extends State<MineReportDetailPage> with UtilsM
       maxY: 2,
       lineBarsData: [
         LineChartBarData(
-          spots: [
-            FlSpot(1, 1),
-            FlSpot(2, 1),
-            FlSpot(3, 0),
-            FlSpot(4, 1),
-            FlSpot(5, 2),
-          ],
-          // List.generate(_data?.courseCatalogueList?.length ?? 0, (index) {
-          //   return FlSpot((index + 1).toDouble(), _data?.eveluateList[index]);
-          // }),
+          spots: List.generate(_data?.courseCatalogueList?.length ?? 0, (index) {
+            return FlSpot((index + 1).toDouble(), _data?.eveluateList[index]);
+          }),
           colors: [chartColors[0]],
           barWidth: 1,
           isStrokeCapRound: true,

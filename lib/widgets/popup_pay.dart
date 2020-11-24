@@ -109,7 +109,7 @@ class _PopupPayState extends State<PopupPay> with UtilsMixin {
         );
         print("--->$payResult");
         EasyLoading.show(status: '支付中', dismissOnTap: false, maskType: EasyLoadingMaskType.black);
-        _timer = Timer.periodic(new Duration(seconds: 1), (timer) async {
+        _timer = Timer.periodic(new Duration(seconds: 2), (timer) async {
           debugPrint(timer.tick.toString());
           await _getWxResult(res.courseOrderId);
         });
