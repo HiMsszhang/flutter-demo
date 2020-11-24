@@ -82,7 +82,6 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _recorderModule.stop();
     _inputController.clear();
     _inputController.dispose();
     TencentImPlugin.removeListener(_imListener);
@@ -370,34 +369,35 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                     alignment: WrapAlignment.start,
                     runSpacing: 30.w,
                     children: List.generate(
-                        _toolsList.length,
-                        (index) => Container(
-                              width: 170.w,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 100.w,
-                                    height: 100.w,
-                                    clipBehavior: Clip.hardEdge,
-                                    decoration: Styles.normalDecoration.copyWith(
-                                      borderRadius: BorderRadius.circular(16.w),
-                                      color: Colors.white,
-                                    ),
-                                    child: RawMaterialButton(
-                                      padding: EdgeInsets.zero,
-                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      onPressed: () {
-                                        _onToolSelect(index);
-                                      },
-                                      child: Icon(_toolsList[index]['icon'], size: 40.w, color: Theme.of(context).buttonColor),
-                                    ),
-                                  ),
-                                  SizedBox(height: 20.w),
-                                  Text(_toolsList[index]['title'], style: Styles.normalFont(fontSize: 24.sp)),
-                                ],
+                      _toolsList.length,
+                      (index) => Container(
+                        width: 170.w,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 100.w,
+                              height: 100.w,
+                              clipBehavior: Clip.hardEdge,
+                              decoration: Styles.normalDecoration.copyWith(
+                                borderRadius: BorderRadius.circular(16.w),
+                                color: Colors.white,
                               ),
-                            )),
+                              child: RawMaterialButton(
+                                padding: EdgeInsets.zero,
+                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                onPressed: () {
+                                  _onToolSelect(index);
+                                },
+                                child: Icon(_toolsList[index]['icon'], size: 40.w, color: Theme.of(context).buttonColor),
+                              ),
+                            ),
+                            SizedBox(height: 20.w),
+                            Text(_toolsList[index]['title'], style: Styles.normalFont(fontSize: 24.sp)),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
