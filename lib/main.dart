@@ -128,7 +128,7 @@ class _MyAppState extends State<MyApp> {
   UpdateEntity customParseJson(Map json, int buildNumber) {
     return UpdateEntity(
       hasUpdate: buildNumber < json['version_code'],
-      isIgnorable: json['update_status'] <= 3,
+      isIgnorable: json['update_status'] < 3,
       versionCode: json['version_code'],
       versionName: json['version_name'],
       updateContent: "\r\n${json['content']}\r\n",
