@@ -130,7 +130,7 @@ class _MyAppState extends State<MyApp> {
       isIgnorable: json['update_status'] <= 3,
       versionCode: json['version_code'],
       versionName: json['version_name'],
-      updateContent: json['content'],
+      updateContent: "\r\n${json['content']}\r\n",
       downloadUrl: json['down_url'],
       apkSize: json['apk_size'],
       apkMd5: json['apk_md5'],
@@ -141,12 +141,15 @@ class _MyAppState extends State<MyApp> {
     initXUpdate();
     DataResult res = await CommonAPI.getVersion();
     if (res.result) {
-      FlutterXUpdate.updateByInfo(
-        updateEntity: customParseJson(res.data),
-        topImageRes: 'bg_update_top',
-        themeColor: "#FFFFA06B",
-        buttonTextColor: "#FFFFFFFF",
-      );
+      if (Platform.isAndroid) {
+        FlutterXUpdate.updateByInfo(
+          updateEntity: customParseJson(res.data),
+          topImageRes: 'bg_update_top',
+          themeColor: "#FFFFBAA3",
+          buttonTextColor: "#FFFFFFFF",
+          widthRatio: 0.92,
+        );
+      }
     }
   }
 
