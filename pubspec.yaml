@@ -90,6 +90,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - assets/emoji_list.json
     - assets/images/logo.png
     - assets/images/logo_invite.png
     - assets/images/logo_text.png

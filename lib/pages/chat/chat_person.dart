@@ -23,6 +23,7 @@ import 'package:tencent_im_plugin/message_node/sound_message_node.dart';
 import 'package:tencent_im_plugin/message_node/text_message_node.dart';
 import 'package:tencent_im_plugin/tencent_im_plugin.dart';
 import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
+import 'package:molan_edu/widgets/emoji_list.dart';
 
 /// 临时目录
 String _tempPath;
@@ -54,6 +55,9 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
 
   ///是否录音
   bool _isRecord = false;
+
+  ///是否显示表情
+  bool _isEmoji = false;
 
   ///正在录音
   bool _recording = false;
@@ -98,6 +102,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
         } else {
           //显示键盘
           _isMore = false;
+          _isEmoji = false;
         }
       });
     });
@@ -325,7 +330,16 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                                 ),
                         ),
                       ),
-                      Image.asset('assets/images/chat/icon_emoji.png', width: 56.w, height: 56.w),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isEmoji = !_isEmoji;
+                            _isMore = false;
+                          });
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: Image.asset('assets/images/chat/icon_${_isEmoji ? "keyboard" : "emoji"}.png', width: 56.w, height: 56.w),
+                      ),
                       SizedBox(width: 20.w),
                       _message != ''
                           ? Container(
@@ -352,6 +366,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                               onTap: () {
                                 setState(() {
                                   _isMore = !_isMore;
+                                  _isEmoji = false;
                                 });
                                 FocusScope.of(context).unfocus();
                               },
@@ -399,6 +414,15 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
                       ),
                     ),
                   ),
+                ),
+                EmojiList(
+                  isEmoji: _isEmoji,
+                  onTap: (value) {
+                    setState(() {
+                      _message = _message + value;
+                      _inputController.text = _message;
+                    });
+                  },
                 ),
               ],
             ),
