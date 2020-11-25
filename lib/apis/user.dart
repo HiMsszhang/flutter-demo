@@ -60,4 +60,32 @@ class UserAPI {
       return DataResult(e, false);
     }
   }
+
+  //学员注销
+  static Future<DataResult> cancelLation({String mobile, code}) async {
+    var params = {
+      'mobile': mobile,
+      'code': code,
+    };
+    try {
+      Response res = await http.post('/cancellation', queryParameters: params);
+      return DataResult(res, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  //学员撤销注销
+  static Future<DataResult> restoreCancelLation({String mobile, code}) async {
+    var params = {
+      'mobile': mobile,
+      'code': code,
+    };
+    try {
+      Response res = await http.post('/restorecancellation', queryParameters: params);
+      return DataResult(res, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }
