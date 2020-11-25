@@ -10,10 +10,12 @@ import 'package:molan_edu/apis/user.dart';
 class UserState with ChangeNotifier, DiagnosticableTreeMixin {
   UserModel _user;
   bool _hasLogin = false;
+  bool _isLogout = false;
 
   UserModel get userInfo => _user;
 
   bool get hasLogin => _hasLogin;
+  bool get isLogout => _isLogout;
 
   Future updateUser(UserModel user) async {
     _hasLogin = true;
@@ -47,6 +49,20 @@ class UserState with ChangeNotifier, DiagnosticableTreeMixin {
     await LocalStorage.remove(Config.IM_SIGN);
     _hasLogin = false;
     _user = UserModel.empty();
+    notifyListeners();
+  }
+
+  //学员注销
+  Future userLongOut({String mobile, String code}) async {
+    await UserAPI.cancelLation(mobile: mobile, code: code);
+    _isLogout = true;
+    notifyListeners();
+  }
+
+  //学员撤销注销
+  Future userCancalLongOut({String mobile, String code}) async {
+    await UserAPI.restoreCancelLation(mobile: mobile, code: code);
+    _isLogout = false;
     notifyListeners();
   }
 }
