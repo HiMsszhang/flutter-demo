@@ -12,13 +12,13 @@ class Config {
 
   ///微信APPID
   static const WECHAT_APPID = 'wxfe9e70646d768fc2';
-  // static const weChatAppSecret = 'dcad950cd0633a27e353477c4ec12e7a';
   static const WECHAT_LINK = 'https://www.ximosf.com/app/';
 
-  // static const qqAppId = '100424468';
-  // static const qqAppKey = 'glFYjkHQGSOCJHMC';
   ///腾讯云im
   static const TENCENT_IM_APPID = '1400444900';
+
+  /// 蒲公英下载地址
+  static const PGY_URL = "https://www.pgyer.com/uTpp";
 
   static String get apiHost {
     if (env == Env.PROD) {

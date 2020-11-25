@@ -67,4 +67,23 @@ class CommonAPI {
       return DataResult(e, false);
     }
   }
+
+  /// 聊天记录
+  static Future<DataResult> saveMessage({
+    int teacherId,
+    int courseId,
+    String content,
+  }) async {
+    try {
+      var params = {
+        'teacher_id': teacherId,
+        'content': content,
+      };
+      if (courseId != null) params['course_id'] = courseId;
+      Response res = await http.post('/chat', queryParameters: params);
+      return DataResult(res.data ?? {}, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
 }

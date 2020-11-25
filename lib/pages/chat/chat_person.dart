@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_pickers/image_pickers.dart';
+import 'package:molan_edu/apis/common.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
@@ -31,10 +32,12 @@ String _tempPath;
 class ChatPersonPage extends StatefulWidget {
   final String id;
   final String name;
+  final int courseId;
   const ChatPersonPage({
     Key key,
     this.id,
     this.name,
+    this.courseId,
   }) : super(key: key);
 
   @override
@@ -160,6 +163,13 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
 
   _send() async {
     await _sendMessage(TextMessageNode(content: _message));
+    if (widget.id.contains("teacher")) {
+      await CommonAPI.saveMessage(
+        teacherId: int.parse(widget.id.replaceAll("teacher", "")),
+        courseId: widget.courseId,
+        content: _message,
+      );
+    }
     _message = '';
     _inputController.clear();
     FocusScope.of(context).unfocus();

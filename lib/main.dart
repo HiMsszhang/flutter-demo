@@ -116,7 +116,7 @@ class _MyAppState extends State<MyApp> {
         print("下载失败: $message");
         //下载失败
         if (message["code"] == 4000) {
-          FlutterXUpdate.showRetryUpdateTipDialog(retryContent: "该网址无法继续下载，是否考虑切换蒲公英下载？", retryUrl: "https://www.pgyer.com/uTpp");
+          FlutterXUpdate.showRetryUpdateTipDialog(retryContent: "该网址无法继续下载，是否考虑切换蒲公英下载？", retryUrl: Config.PGY_URL);
         }
       });
     } else {
