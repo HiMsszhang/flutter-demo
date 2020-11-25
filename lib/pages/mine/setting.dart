@@ -6,6 +6,7 @@ import 'package:molan_edu/models/ConfigModel.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/utils/local_storage.dart';
+import 'package:molan_edu/utils/cache_util.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({
@@ -21,18 +22,42 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
   bool _allowPlay = false;
   bool _allowDownload = false;
   ConfigModel _data;
+  bool hasLogin = false;
 
   @override
   void initState() {
     super.initState();
+    hasLogin = context.read<UserState>().hasLogin;
     _initFromCache();
     delayed(() async {
       await _load();
     });
   }
 
-  _clear() {
-    LocalStorage.clear();
+  _clear() async {
+    var size = await CacheUtil.getSize();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('确认'),
+        content: Text('缓存大小：$size，是否清除?'),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('取消'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          FlatButton(
+            child: Text('确定'),
+            onPressed: () async {
+              await CacheUtil.clean();
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   _load() async {
@@ -153,29 +178,33 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
           _widgetItem(
               title: '清除缓存',
               icon: 'clear',
-              onTap: () {
-                _clear();
+              onTap: () async {
+                await _clear();
               }),
-          _widgetItem(
-              title: '注销账户',
-              icon: 'delete',
-              onTap: () {
-                NavigatorUtils.pushNamed(context, "/user.logout");
-              }),
-          GestureDetector(
-            onTap: _logOut,
-            child: Container(
-              width: 690.w,
-              height: 90.w,
-              margin: EdgeInsets.symmetric(horizontal: 30.w).copyWith(top: 70.w),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(90.w),
-                color: Theme.of(context).accentColor,
-              ),
-              child: Text('退出登录', style: Styles.normalFont(fontSize: 32.sp, color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ),
+          hasLogin
+              ? _widgetItem(
+                  title: '注销账户',
+                  icon: 'delete',
+                  onTap: () {
+                    NavigatorUtils.pushNamed(context, "/user.logout");
+                  })
+              : Container(),
+          hasLogin
+              ? GestureDetector(
+                  onTap: _logOut,
+                  child: Container(
+                    width: 690.w,
+                    height: 90.w,
+                    margin: EdgeInsets.symmetric(horizontal: 30.w).copyWith(top: 70.w),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(90.w),
+                      color: Theme.of(context).accentColor,
+                    ),
+                    child: Text('退出登录', style: Styles.normalFont(fontSize: 32.sp, color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );

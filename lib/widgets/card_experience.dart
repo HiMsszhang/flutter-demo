@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:molan_edu/models/GroupModel.dart';
-import 'package:molan_edu/pages/course/course_detail.dart';
+import 'package:molan_edu/pages/timetable/timetable_detail.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 class CardExperience extends StatefulWidget {
@@ -22,7 +22,7 @@ class _CardExperienceState extends State<CardExperience> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        NavigatorUtils.push(context, CourseDetailPage(courseId: widget.data.id));
+        NavigatorUtils.push(context, TimetableDetailPage(id: widget.data.id, title: widget.data.courseTitle));
       },
       child: UnconstrainedBox(
         child: Stack(

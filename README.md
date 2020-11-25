@@ -30,3 +30,6 @@ samples, guidance on mobile development, and a full API reference.
 
 ## IconFont图标更新
 >flutter packages pub run iconfont -c http://at.alicdn.com/t/font_2147735_1hqi4q1wl43.css -d my_icons
+
+## 打包命令
+>flutter build apk --no-shrink
