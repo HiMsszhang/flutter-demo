@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
   _onNavItemTap(BuildContext context, int index) {
     switch (index) {
       case 0:
-        NavigatorUtils.pushNamed(context, '/group');
+        hasLogin ? NavigatorUtils.pushNamed(context, '/copybook') : toLoginPopup();
         break;
       case 1:
         widget.jumpToPage(1);

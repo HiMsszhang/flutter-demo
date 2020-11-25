@@ -10,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:molan_edu/pages/main.dart';
 import 'package:molan_edu/providers/common_state.dart';
 import 'package:molan_edu/providers/user_state.dart';
+import 'package:molan_edu/providers/copybook_state.dart';
 import 'package:molan_edu/generated/l10n.dart';
 import 'package:molan_edu/styles.dart';
 import 'package:molan_edu/utils/routes.dart';
@@ -29,6 +30,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => CommonState()),
         ChangeNotifierProvider(create: (_) => UserState()),
+        ChangeNotifierProvider(create: (_) => CopybookState()),
       ],
       child: MyApp(),
     ),

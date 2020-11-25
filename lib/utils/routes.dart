@@ -30,6 +30,7 @@ import 'package:molan_edu/pages/guide.dart';
 import 'package:molan_edu/pages/other/webview.dart';
 import 'package:molan_edu/pages/home/course_experience.dart';
 import 'package:molan_edu/pages/home/group/group_list.dart';
+import 'package:molan_edu/pages/copybook/copybook.dart';
 
 class MyRoutes {
   static routes(String name, Map arguments) {
@@ -97,6 +98,8 @@ class MyRoutes {
       '/user.logout': (context) => UserLogoutPage(),
       //用户注销详情
       '/logout.detail': (context) => LogoutDetailPage(),
+      //电子字帖
+      '/copybook': (context) => CopybookPage(),
     };
     return route[name];
   }
