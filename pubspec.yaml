@@ -107,6 +107,8 @@ flutter:
     - assets/images/timetable/
     - assets/images/invite/
     - assets/images/copybook/
+    - assets/images/copybook/grid/
+    - assets/images/copybook/background/
 
 flutter_intl:
   enabled: true
