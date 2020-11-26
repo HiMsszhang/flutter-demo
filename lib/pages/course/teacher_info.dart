@@ -27,12 +27,12 @@ class TeacherInfoPage extends StatefulWidget {
 class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
   TeacherInfoModel _data;
   bool _loadFlag = false;
-
   TeacherShareListResp _resp = new TeacherShareListResp();
   List<TeacherShareModel> _dataList;
   RefreshController _listController = RefreshController(initialRefresh: false);
   int _page = 1;
   int _listRow = 10;
+  int _isColection = 1;
 
   @override
   void initState() {
@@ -50,6 +50,7 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
   _getInfo() async {
     DataResult res = await TeacherAPI.info(teacherId: widget.id);
     _data = res.data;
+    _isColection = _data.isCollection;
     _loadFlag = true;
     setState(() {});
   }
@@ -135,7 +136,12 @@ class _TeacherInfoPageState extends State<TeacherInfoPage> with UtilsMixin {
                               padding: EdgeInsets.symmetric(horizontal: 30.w),
                               child: Column(
                                 children: [
-                                  CardMineTeacher(showTags: true, data: _data?.teacher),
+                                  CardMineTeacher(
+                                    isCollection: _isColection,
+                                    showTags: true,
+                                    data: _data?.teacher,
+                                    teacherId: _data?.teacher?.id,
+                                  ),
                                   Container(
                                     width: 690.w,
                                     height: 109.w,

@@ -1,28 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:molan_edu/apis/mine.dart';
+import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/models/TeacherModel.dart';
+import 'package:molan_edu/pages/course/teacher_info.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 
 class CardMineTeacher extends StatefulWidget {
   final bool showTags;
   final TeacherModel data;
+  final num teacherId;
+  final isCollection;
   CardMineTeacher({
     Key key,
     this.showTags = false,
+    this.isCollection = false,
+    this.teacherId,
     this.data,
   }) : super(key: key);
 
   _CardMineTeacherState createState() => _CardMineTeacherState();
 }
 
-class _CardMineTeacherState extends State<CardMineTeacher> {
+class _CardMineTeacherState extends State<CardMineTeacher> with UtilsMixin {
   bool _isCollection = true;
+
   Future _getTeacherCollection() async {
     DataResult result = await MineApi.teacherCollection(
-      teacherId: 1,
+      teacherId: widget.teacherId,
     );
     return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget?.isCollection == 1) {
+      _isCollection = true;
+    } else {
+      _isCollection = false;
+    }
   }
 
   @override
@@ -37,7 +54,14 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
       ),
       child: RawMaterialButton(
         padding: EdgeInsets.all(30.w),
-        onPressed: () {},
+        onPressed: () {
+          NavigatorUtils.push(
+              context,
+              TeacherInfoPage(
+                id: widget.teacherId,
+                teacherName: widget.data.teacherName,
+              ));
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -69,9 +93,8 @@ class _CardMineTeacherState extends State<CardMineTeacher> {
                 GestureDetector(
                   onTap: () {
                     _getTeacherCollection();
-                    setState(() {
-                      _isCollection = !_isCollection;
-                    });
+                    _isCollection = !_isCollection;
+                    setState(() {});
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10.w),

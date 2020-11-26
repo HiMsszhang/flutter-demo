@@ -9,7 +9,6 @@ import 'package:molan_edu/pages/course/teacher_info.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:chewie/chewie.dart';
-import 'package:molan_edu/utils/local_storage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:molan_edu/widgets/custom_controls.dart';
 import 'package:sticky_headers/sticky_headers.dart';
@@ -33,7 +32,7 @@ class CourseDetailPage extends StatefulWidget {
   _CourseDetailPageState createState() => _CourseDetailPageState();
 }
 
-class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, SingleTickerProviderStateMixin {
+class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin {
   VideoPlayerController _controller;
   ChewieController _chewieController;
   List<String> _tabList = ['课程简介', '课程目录', '课程规划'];
@@ -63,7 +62,11 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
 
   _load() async {
     widget.isGroup ? await _getGroupCourseDetail() : await _getCourseDetail();
-    await _initFromCache();
+    if (_data?.isCollection == 1) {
+      _isCollection = true;
+    } else {
+      _isCollection = false;
+    }
   }
 
   @override
@@ -71,18 +74,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
     _controller.dispose();
     _chewieController.dispose();
     super.dispose();
-  }
-
-  _initFromCache() async {
-    _isCollection = await LocalStorage.get('_isCollection') ?? false;
-
-    print('>>>>>>>>>>>>>>>>>>>>>>>');
-    print(_isCollection);
-    setState(() {});
-  }
-
-  _saveInfo() async {
-    await LocalStorage.set('_isCollection', _isCollection);
   }
 
   Future<CourseCataloguelistModleListResp> _getCourseCatalogueData() async {
@@ -191,10 +182,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> with UtilsMixin, Si
                                 color: Color.lerp(Colors.white, Colors.black, -stuckAmount),
                               ),
                               onPressed: () {
-                                _getCourseCollection();
-                                _isCollection = !_isCollection;
-                                setState(() {});
-                                _saveInfo();
+                                if (!hasLogin) {
+                                  toLoginPopup();
+                                } else {
+                                  _getCourseCollection();
+                                  _isCollection = !_isCollection;
+                                  setState(() {});
+                                }
                               },
                             ),
                           ],
