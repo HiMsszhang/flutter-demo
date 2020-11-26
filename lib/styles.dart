@@ -15,6 +15,12 @@ abstract class Styles {
   static const colorNoData = Color(0xFFFFC9A7);
   static const colorBtn = Color(0xFFFFA06B);
 
+  static const color2F3D58 = Color(0xFF2F3D58);
+  static const colorE3E5EA = Color(0xFFE3E5EA);
+  static const color444E6B = Color(0xFF444E6B);
+  static const colorCBCBCB = Color(0xFFCBCBCB);
+  static const color3C4962 = Color(0xFF3C4962);
+
   /// 一般字体
   static normalFont({
     double fontSize,

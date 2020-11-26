@@ -1,62 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-/// 网格类型
-enum CopybookGridType { none, mizi, jiugong, huitian, huigong, yuangong, zhonggong }
-
-/// 网格颜色
-enum CopybookGridColor { none, red, white, green }
-
-/// 字体颜色
-enum CopybookFontColor { none, black, white, red, gold }
-
-/// 纸张类型
-enum CopybookPaperType {
-  /// 无
-  none,
-
-  /// 自定义
-  custom,
-
-  /// 宣纸一
-  xuanzhi1,
-
-  /// 宣纸二
-  xuanzhi2,
-
-  /// 黑底白字
-  heidibaizi,
-
-  /// 毛边纸
-  maobianzhi,
-
-  /// 红纸
-  hongzhi,
-
-  /// 黄宣
-  huangxuan,
-
-  /// 蓝宣
-  lanxuan,
-
-  /// 青宣
-  qingxuan,
-
-  /// 洒金宣纸
-  jiujinxuanzhi,
-
-  /// 洒金黄宣
-  jiujinhuangxuan,
-
-  /// 洒金蓝宣
-  jiujinlanxuan,
-
-  /// 洒金青宣
-  jiujinqingxuan,
-
-  /// 洒金红纸
-  jiujinhongzhi,
-}
+import 'package:molan_edu/config/config.dart';
+import 'package:molan_edu/utils/imports.dart';
+import 'package:molan_edu/utils/local_storage.dart';
 
 class CopybookGridItem {
   String title;
@@ -65,7 +11,7 @@ class CopybookGridItem {
   String greenImage;
   String noneImage;
   String image;
-  CopybookGridType type;
+  String type;
 
   CopybookGridItem({
     this.type,
@@ -82,9 +28,9 @@ class CopybookGridItem {
 class CopybookPaperItem {
   String title;
   String image;
-  CopybookPaperType type;
+  String type;
 
-  CopybookPaperItem({this.title, this.image, this.type = CopybookPaperType.none});
+  CopybookPaperItem({this.title, this.image, this.type = 'none'});
 }
 
 class CopybookOption<T> {
@@ -98,32 +44,32 @@ class CopybookState with ChangeNotifier {
   /// 网格设置list
   List<CopybookGridItem> gridItems = [
     CopybookGridItem(
-      type: CopybookGridType.mizi,
+      type: 'mizi',
       title: '米字格',
       image: 'mizi',
     ),
     CopybookGridItem(
-      type: CopybookGridType.jiugong,
+      type: 'jiugong',
       title: '九宫格',
       image: 'jiugong',
     ),
     CopybookGridItem(
-      type: CopybookGridType.huitian,
+      type: 'huitian',
       title: '回田格',
       image: 'huitian',
     ),
     CopybookGridItem(
-      type: CopybookGridType.huigong,
+      type: 'huigong',
       title: '回宫格',
       image: 'huigong',
     ),
     CopybookGridItem(
-      type: CopybookGridType.yuangong,
+      type: 'yuangong',
       title: '圆宫格',
       image: 'yuangong',
     ),
     CopybookGridItem(
-      type: CopybookGridType.zhonggong,
+      type: 'zhonggong',
       title: '中宫格',
       image: 'zhonggong',
     ),
@@ -168,87 +114,87 @@ class CopybookState with ChangeNotifier {
     CopybookPaperItem(
       title: '无',
       image: 'none',
-      type: CopybookPaperType.none,
+      type: 'none',
     ),
     CopybookPaperItem(
       title: '宣纸一',
       image: 'xuanzhi1',
-      type: CopybookPaperType.xuanzhi1,
+      type: 'xuanzhi1',
     ),
     CopybookPaperItem(
       title: '宣纸二',
       image: 'xuanzhi2',
-      type: CopybookPaperType.xuanzhi2,
+      type: 'xuanzhi2',
     ),
     CopybookPaperItem(
       title: '黑底白字',
       image: 'heidibaizi',
-      type: CopybookPaperType.heidibaizi,
+      type: 'heidibaizi',
     ),
     CopybookPaperItem(
       title: '毛边纸',
       image: 'maobianzhi',
-      type: CopybookPaperType.maobianzhi,
+      type: 'maobianzhi',
     ),
     CopybookPaperItem(
       title: '红纸',
       image: 'hongzhi',
-      type: CopybookPaperType.hongzhi,
+      type: 'hongzhi',
     ),
     CopybookPaperItem(
       title: '黄宣',
       image: 'huangxuan',
-      type: CopybookPaperType.huangxuan,
+      type: 'huangxuan',
     ),
     CopybookPaperItem(
       title: '蓝宣',
       image: 'lanxuan',
-      type: CopybookPaperType.lanxuan,
+      type: 'lanxuan',
     ),
     CopybookPaperItem(
       title: '青宣',
       image: 'qingxuan',
-      type: CopybookPaperType.qingxuan,
+      type: 'qingxuan',
     ),
     CopybookPaperItem(
       title: '洒金宣纸',
       image: 'jiujinxuanzhi',
-      type: CopybookPaperType.jiujinxuanzhi,
+      type: 'jiujinxuanzhi',
     ),
     CopybookPaperItem(
       title: '洒金黄宣',
       image: 'jiujinhuangxuan',
-      type: CopybookPaperType.jiujinhuangxuan,
+      type: 'jiujinhuangxuan',
     ),
     CopybookPaperItem(
       title: '洒金蓝宣',
       image: 'jiujinlanxuan',
-      type: CopybookPaperType.jiujinlanxuan,
+      type: 'jiujinlanxuan',
     ),
     CopybookPaperItem(
       title: '洒金青宣',
       image: 'jiujinqingxuan',
-      type: CopybookPaperType.jiujinqingxuan,
+      type: 'jiujinqingxuan',
     ),
     CopybookPaperItem(
       title: '洒金红纸',
       image: 'jiujinhongzhi',
-      type: CopybookPaperType.jiujinhongzhi,
+      type: 'jiujinhongzhi',
     ),
     CopybookPaperItem(
       title: '自定义',
       image: 'custom',
-      type: CopybookPaperType.custom,
+      type: 'custom',
     ),
   ];
 
   void setConfig({
-    CopybookGridColor gridColor,
-    CopybookGridType gridType,
+    String gridColor,
+    String gridType,
     int resource,
     int compose,
     int fontColor,
-    CopybookPaperType paperType,
+    String paperType,
   }) {
     if (gridColor != null) _gridColor = gridColor;
     if (gridType != null) _gridType = gridType;
@@ -256,39 +202,47 @@ class CopybookState with ChangeNotifier {
     if (compose != null) _compose = compose;
     if (fontColor != null) _fontColor = fontColor;
     if (paperType != null) _paperType = paperType;
+    Future.delayed(Duration.zero, () async {
+      var obj = {
+        'gridColor': _gridColor,
+        'gridType': _gridType,
+        'resource': _resource,
+        'compose': _compose,
+        'fontColor': _fontColor,
+        'paperType': _paperType,
+        'customPaperPath': _customPaperPath,
+      };
+      await LocalStorage.setJSON(Config.COPYBOOK_SETTING, obj);
+    });
     notifyListeners();
   }
 
   void setCustomPaperPath(String path) {
-    customPaperPath = path;
+    _customPaperPath = path;
     notifyListeners();
   }
 
-  Map get getConfig {
-    return {
-      'gridColor': _gridColor,
-      'gridType': _gridType,
-      'resource': _resource,
-      'compose': _compose,
-      'fontColor': _fontColor,
-      'paperType': _paperType,
-      'customPaperPath': customPaperPath,
-    };
+  Future getConfig() async {
+    var obj = await LocalStorage.getJSON(Config.COPYBOOK_SETTING);
+    _gridColor = obj['gridColor'];
+    _gridType = obj['gridType'];
+    _resource = obj['resource'];
+    _compose = obj['compose'];
+    _fontColor = obj['fontColor'];
+    _paperType = obj['paperType'];
+    _customPaperPath = obj['customPaperPath'];
+    notifyListeners();
   }
 
   /// 网格颜色
-  CopybookGridColor _gridColor = CopybookGridColor.red;
+  String _gridColor = 'red';
 
-  CopybookGridColor get getGridColor => _gridColor;
-
-  String get getGridColorStr => _gridColor.toString().split('.')[1];
+  String get getGridColor => _gridColor;
 
   /// 网格类型
-  CopybookGridType _gridType = CopybookGridType.mizi;
+  String _gridType = 'mizi';
 
-  CopybookGridType get getGridType => _gridType;
-
-  String get getGridTypeStr => _gridType.toString().split('.')[1];
+  String get getGridType => _gridType;
 
   /// resource
   int _resource = 2;
@@ -305,22 +259,20 @@ class CopybookState with ChangeNotifier {
 
   int get getFontColor => _fontColor;
 
-  String get getFontColorStr => _fontColor.toString().split('.')[1];
-
   /// 背景设置
-  CopybookPaperType _paperType = CopybookPaperType.none;
+  String _paperType = 'none';
 
-  CopybookPaperType get getPaperType => _paperType;
-
-  String get getPaperTypeStr => _paperType.toString().split('.')[1];
+  String get getPaperType => _paperType;
 
   /// 自定义背景路径
-  String customPaperPath;
+  String _customPaperPath;
+
+  String get customPaperPath => _customPaperPath;
 
   String get getPaperPath {
-    if (getPaperType != CopybookPaperType.custom) {
-      return getPaperTypeStr;
+    if (getPaperType != 'custom') {
+      return _paperType;
     }
-    return customPaperPath;
+    return _customPaperPath;
   }
 }

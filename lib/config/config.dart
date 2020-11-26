@@ -37,4 +37,5 @@ class Config {
   static const String S_FIRST = 'first';
   static const String IM_SIGN = 'imSign';
   static const String S_HISTORY = 'searchHistory';
+  static const String COPYBOOK_SETTING = 'copybookSetting';
 }

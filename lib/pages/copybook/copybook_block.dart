@@ -34,7 +34,7 @@ class CopybookBlock extends StatefulWidget {
 }
 
 class _CopybookBlockState extends State<CopybookBlock> {
-  dynamic _config;
+  CopybookState _config;
 
   @override
   void initState() {
@@ -135,7 +135,7 @@ class _CopybookBlockState extends State<CopybookBlock> {
       child: ClipRRect(
         child: AspectRatio(
           aspectRatio: 1,
-          child: _config.getPaperType != CopybookPaperType.custom
+          child: _config.getPaperType != 'custom'
               ? Image.asset(
                   'assets/images/copybook/background/${_config.getPaperPath}.png',
                   fit: BoxFit.cover,
@@ -154,6 +154,9 @@ class _CopybookBlockState extends State<CopybookBlock> {
   }
 
   Widget _widgetGrid() {
+    var type = _config.getGridType;
+    var color = _config.getGridColor;
+    print(type);
     return Stack(alignment: Alignment.center, children: <Widget>[
       Container(
         alignment: Alignment.center,
@@ -164,7 +167,7 @@ class _CopybookBlockState extends State<CopybookBlock> {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/images/copybook/grid/${_config.getGridTypeStr}_${_config.getGridColorStr}.png'),
+              image: AssetImage('assets/images/copybook/grid/${type}_$color.png'),
               fit: BoxFit.contain,
             ),
           )),

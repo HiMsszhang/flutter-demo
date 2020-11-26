@@ -29,7 +29,7 @@ class ScaffoldWithAppbar extends StatelessWidget {
     this.bottomNavigationBar,
     this.onBack,
     this.floatingActionButton,
-    this.backgroundColor = Colors.transparent,
+    this.backgroundColor,
     this.showBorder = true,
     this.floatingActionButtonLocation,
     this.resizeToAvoidBottomInset = true,
@@ -39,7 +39,7 @@ class ScaffoldWithAppbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: this.resizeToAvoidBottomInset,
-      backgroundColor: this.backgroundColor,
+      backgroundColor: this.backgroundColor ?? Theme.of(context).primaryColor,
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,

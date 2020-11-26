@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/providers/copybook_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:molan_edu/pages/home/home.dart';
@@ -111,6 +112,7 @@ class _MainPageState extends State<MainPage> with UtilsMixin, HttpErrorListener 
   _load() {
     delayed(() async {
       await context.read<UserState>().getLogin();
+      await context.read<CopybookState>().getConfig();
       if (widget.page != 0) {
         _jumpToPage(widget.page);
       }

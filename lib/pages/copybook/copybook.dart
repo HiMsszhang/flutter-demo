@@ -41,6 +41,8 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   ScrollPosition _currentPosition;
   int _listRow = 15;
 
+  int _lastWordId;
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +61,9 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
 
   @override
   void dispose() {
+    delayed(() async {
+      await CopybookAPI.setPosition(copybookId: _bookList[_selectedIndex].id, wordId: _lastWordId);
+    });
     EasyLoading.dismiss();
     _config.removeListener(_configListener);
     _controller.dispose();
@@ -66,9 +71,6 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   }
 
   _configListener() async {
-    print('changed!!!!!!!!!!!!!');
-    print(_config.getResource);
-    setState(() {});
     await _getWords();
   }
 
@@ -177,8 +179,7 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
     }
     var currentIndex = (_controller.offset + h) ~/ h;
     var currentPage = (currentIndex ~/ _listRow) + 1;
-    print(currentPage);
-    print(currentIndex);
+    _lastWordId = _wordsList[currentIndex].id;
     var direction = _controller.position.userScrollDirection;
     _currentPage = currentPage;
     _currentPosition = _controller.position;
@@ -253,7 +254,9 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
                         _item(
                           title: '设置',
                           icon: 'assets/images/mine/icon_setting.png',
-                          onTap: () {},
+                          onTap: () {
+                            NavigatorUtils.popAndPushNamed(context, '/copybook.setting');
+                          },
                         ),
                       ],
                     ),

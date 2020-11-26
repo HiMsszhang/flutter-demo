@@ -22,16 +22,35 @@ class CopybookAPI {
     }
   }
 
+  /// 获取字帖设置
+  static Future<DataResult> getSetting() async {
+    try {
+      Response res = await http.post('/getcopybooksetting');
+      return DataResult(CopyBookSettingModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
   /// 字帖设置
-  static Future<DataResult> setting({
-    int copybookId,
+  static Future<DataResult> updateSetting({
+    ///资源设置(1原帖2精修)
+    int resource,
+
+    ///排版设置(1单列显示2双列显示3三列显示)
+    int typesetting,
+
+    ///字体颜色(1黑色2金色3红色4白色)
+    int fontColor,
   }) async {
     try {
       var params = {
-        'copybook_id': copybookId,
+        'resource': resource,
+        'typesetting': typesetting,
+        'font_color': fontColor,
       };
-      Response res = await http.post('/getcopybooksetting', queryParameters: params);
-      return DataResult(CopyBookSettingModel.fromJson(res.data ?? {}), true);
+      Response res = await http.post('/copybooksetting', queryParameters: params);
+      return DataResult(res.data ?? {}, true);
     } catch (e) {
       return DataResult(e, false);
     }
@@ -83,6 +102,23 @@ class CopybookAPI {
       };
       Response res = await http.post('/copybookwordmeaning', queryParameters: params);
       return DataResult(CopyBookWordMeaningModel.fromJson(res.data ?? {}), true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  /// 记录观看位置
+  static Future<DataResult> setPosition({
+    int copybookId,
+    int wordId,
+  }) async {
+    try {
+      var params = {
+        'copybook_id': copybookId,
+        'word_id': wordId,
+      };
+      Response res = await http.post('/getcopybooksetting', queryParameters: params);
+      return DataResult(CopyBookSettingModel.fromJson(res.data ?? {}), true);
     } catch (e) {
       return DataResult(e, false);
     }

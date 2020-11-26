@@ -123,7 +123,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
                             ),
                           ),
                         ),
-                        SizedBox(height: 14.w),
+                        SizedBox(height: 12.w),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -152,7 +152,7 @@ class _CardCourseState extends State<CardCourse> with UtilsMixin {
                             ),
                           ],
                         ),
-                        SizedBox(height: 25.w),
+                        SizedBox(height: 18.w),
                         Expanded(
                           child: Align(
                             alignment: Alignment.bottomLeft,
