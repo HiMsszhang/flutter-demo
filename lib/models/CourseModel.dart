@@ -135,6 +135,10 @@ class CourseDetailModel {
   @JsonKey(name: "course_desc", defaultValue: '')
   String courseDesc;
 
+  ///课程是否收藏
+  @JsonKey(name: "is_collection", defaultValue: 0)
+  num isCollection;
+
   //课程规划
   @JsonKey(name: "curriculum_planning", defaultValue: '')
   String curriculumPlanning;

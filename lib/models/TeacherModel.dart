@@ -38,6 +38,10 @@ class TeacherModel {
   @JsonKey(name: 'teacher_name', defaultValue: '')
   String teacherName;
 
+  ///老师id
+  @JsonKey(name: 'teacher_id', defaultValue: 0)
+  int teacherId;
+
   /// 老师图像
   @JsonKey(defaultValue: '')
   String avatar;

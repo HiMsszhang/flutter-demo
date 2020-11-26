@@ -32,9 +32,11 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
   TeacherCollectionModel _teacherDate;
   RefreshController _listController = RefreshController(initialRefresh: false);
   List _courseDataList = [];
+  List _teacherDateList = [];
   int _page = 1;
   int _listRow = 10;
   String _value = '';
+  int _isCollection = 1;
 
   @override
   void initState() {
@@ -55,6 +57,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
   void _onRefresh() async {
     _page = 1;
     _courseDataList = await _getCourseCollectionList();
+    _teacherDateList = await _getTeacherCollectionList();
     setState(() {});
     _listController.refreshCompleted();
   }
@@ -65,7 +68,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
     } else {
       _page++;
       _courseDataList.addAll(await _getCourseCollectionList());
-
+      _teacherDateList.addAll(await _getTeacherCollectionList());
       _listController.loadComplete();
     }
     if (mounted) setState(() {});
@@ -88,7 +91,7 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
       teacherName: _value,
     );
     _teacherDate = result.data;
-    return result;
+    return _teacherDate.data;
   }
 
   @override
@@ -226,6 +229,8 @@ class _MineFavoritePageState extends State<MineFavoritePage> with UtilsMixin {
                       var item = _teacherDate?.data;
                       return CardMineTeacher(
                         data: item[index],
+                        teacherId: item[index].teacherId,
+                        isCollection: _isCollection,
                       );
                     },
                   ),
