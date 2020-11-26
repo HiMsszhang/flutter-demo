@@ -8,6 +8,7 @@ import 'package:molan_edu/pages/course/teacher_info.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/custom_rating_bar.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:molan_edu/widgets/no_data.dart';
 
 class MineHeadMasterPage extends StatefulWidget {
   const MineHeadMasterPage({
@@ -96,23 +97,31 @@ class _MineHeadMasterPageState extends State<MineHeadMasterPage> with UtilsMixin
     return ScaffoldWithAppbar(
       backgroundColor: Theme.of(context).primaryColor,
       title: '我的班主任',
-      body: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        onRefresh: _onRefresh,
-        onLoading: _onLoading,
-        controller: _listController,
-        header: myCustomHeader(),
-        footer: myCustomFooter(),
-        child: ListView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 34.w),
-          itemCount: _data?.data?.length ?? 0,
-          itemBuilder: (context, index) {
-            var item = _data?.data[index];
-            return _widgetItem(item);
-          },
-        ),
-      ),
+      body: _data?.total == 0
+          ? NoData(text: '还没有任何班主任哦', backgroundColor: Color(0xFFFFF7F3), url: "assets/images/mine/favorite_no_teacher.png")
+          : SmartRefresher(
+              enablePullDown: true,
+              enablePullUp: true,
+              onRefresh: _onRefresh,
+              onLoading: _onLoading,
+              controller: _listController,
+              header: myCustomHeader(),
+              footer: myCustomFooter(),
+              child: ListView(
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 34.w),
+                    itemCount: _data?.data?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      var item = _data?.data[index];
+                      return _widgetItem(item);
+                    },
+                  ),
+                ],
+              ),
+            ),
     );
   }
 

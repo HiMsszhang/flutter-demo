@@ -105,7 +105,7 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin, Automati
                 ),
               ),
               Expanded(
-                child: !hasLogin && _data?.total != null
+                child: !hasLogin
                     ? Container(
                         child: RichText(
                           textAlign: TextAlign.center,
@@ -120,7 +120,7 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin, Automati
                                   },
                                   child: Text(
                                     '登录',
-                                    style: Styles.normalFont(fontSize: 30.sp, color: Theme.of(context).accentColor, decoration: TextDecoration.underline),
+                                    style: Styles.normalFont(fontSize: 30.sp, color: Styles.color999999, decoration: TextDecoration.underline, height: 1.5),
                                   ),
                                 ),
                               ),
@@ -155,7 +155,7 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin, Automati
                                               },
                                               child: Text(
                                                 '看看吧',
-                                                style: Styles.normalFont(fontSize: 30.sp, color: Theme.of(context).accentColor, decoration: TextDecoration.underline),
+                                                style: Styles.normalFont(fontSize: 30.sp, color: Styles.color999999, decoration: TextDecoration.underline),
                                               ),
                                             ),
                                           ),
