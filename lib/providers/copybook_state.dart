@@ -131,8 +131,8 @@ class CopybookState with ChangeNotifier {
 
   /// 资源设置list
   List<CopybookOption<int>> resourceList = [
-    CopybookOption<int>(title: '精修', value: 1),
-    CopybookOption<int>(title: '原帖', value: 2),
+    CopybookOption<int>(title: '精修', value: 2),
+    CopybookOption<int>(title: '原帖', value: 1),
 //    CopybookOption<int>(title: '对比', value: 3),
   ];
 
@@ -144,21 +144,21 @@ class CopybookState with ChangeNotifier {
   ];
 
   /// 字体颜色设置list
-  List<CopybookOption<CopybookFontColor>> fontColorList = [
-    CopybookOption<CopybookFontColor>(
+  List<CopybookOption<int>> fontColorList = [
+    CopybookOption<int>(
       title: '黑色',
       value: 2,
     ),
-    CopybookOption<CopybookFontColor>(
-      title: '白色',
+    CopybookOption<int>(
+      title: '金色',
       value: 3,
     ),
-    CopybookOption<CopybookFontColor>(
+    CopybookOption<int>(
       title: '红色',
       value: 4,
     ),
-    CopybookOption<CopybookFontColor>(
-      title: '金色',
+    CopybookOption<int>(
+      title: '白色',
       value: 5,
     ),
   ];
@@ -291,9 +291,9 @@ class CopybookState with ChangeNotifier {
   String get getGridTypeStr => _gridType.toString().split('.')[1];
 
   /// resource
-  int _resource = 1;
+  int _resource = 2;
 
-  int get getResource => _resource;
+  int get getResource => _resource != 1 ? _fontColor : _resource;
 
   /// 排版
   int _compose = 1;
@@ -301,7 +301,7 @@ class CopybookState with ChangeNotifier {
   int get getCompose => _compose;
 
   /// 字体颜色
-  int _fontColor = 1;
+  int _fontColor = 2;
 
   int get getFontColor => _fontColor;
 

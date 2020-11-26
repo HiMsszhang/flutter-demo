@@ -12,7 +12,10 @@ class BigImgPage extends StatefulWidget {
   /// 背景图片
   final Widget bg;
 
-  BigImgPage({this.imgUrl, this.bg});
+  BigImgPage({
+    this.imgUrl,
+    this.bg,
+  });
 
   @override
   _BigImgPageState createState() => _BigImgPageState();
@@ -28,6 +31,7 @@ class _BigImgPageState extends State<BigImgPage> with UtilsMixin {
     super.initState();
     delayed(() {
       _init();
+      setState(() {});
     });
   }
 
@@ -63,11 +67,11 @@ class _BigImgPageState extends State<BigImgPage> with UtilsMixin {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        widget.bg,
+                        widget.bg ?? Container(color: Colors.black),
                         CachedNetworkImage(
                           imageUrl: item,
                           fit: BoxFit.contain,
-                          placeholder: (context, url) => Image.asset("assets/images/placeholder.png"),
+                          placeholder: (context, url) => MyLoading(),
                         ),
                       ],
                     ),

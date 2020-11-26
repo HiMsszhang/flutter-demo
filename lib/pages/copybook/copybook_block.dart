@@ -53,23 +53,18 @@ class _CopybookBlockState extends State<CopybookBlock> {
               return;
             }
             NavigatorUtils.push(
-                context,
-                BigImgPage(
-                  imgUrl: widget.imgUrl,
-                  bg: _config.getPaperType != CopybookPaperType.custom
-                      ? Image.asset(
-                          'assets/images/copybook/background/${_config.getPaperPath}.png',
-                          fit: BoxFit.cover,
-                        )
-                      : (_config.customPaperPath == null
-                          ? Image.asset(
-                              'assets/images/copybook/background/custom.png',
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              File.fromUri(Uri.file(_config.customPaperPath)),
-                            )),
-                ));
+              context,
+              BigImgPage(
+                imgUrl: widget.imgUrl,
+                bg: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    _widgetBg(),
+                    _widgetGrid(),
+                  ],
+                ),
+              ),
+            );
           },
           child: Container(
             height: widget.size ?? width,
@@ -92,12 +87,19 @@ class _CopybookBlockState extends State<CopybookBlock> {
                       alignment: Alignment.center,
                       width: ScreenUtil().setWidth(widget.cWidth),
                       height: ScreenUtil().setWidth(widget.cHeight),
-                      decoration: BoxDecoration(color: Color.fromRGBO(99, 100, 103, 0.5), borderRadius: BorderRadius.all(Radius.circular(ScreenUtil().setWidth(widget.cWidth)))),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(99, 100, 103, 0.5),
+                        borderRadius: BorderRadius.all(Radius.circular(ScreenUtil().setWidth(widget.cWidth))),
+                      ),
                       child: Container(
                         alignment: Alignment.center,
                         width: ScreenUtil().setWidth(widget.cWidth),
                         height: ScreenUtil().setWidth(widget.cWidth),
-                        decoration: BoxDecoration(color: Color.fromRGBO(99, 100, 103, 0.5), border: new Border.all(color: Color.fromRGBO(255, 255, 255, 0.16), width: 0.5), borderRadius: BorderRadius.all(Radius.circular(240))),
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(99, 100, 103, 0.5),
+                          border: new Border.all(color: Color.fromRGBO(255, 255, 255, 0.16), width: 0.5),
+                          borderRadius: BorderRadius.all(Radius.circular(240)),
+                        ),
                         margin: EdgeInsets.all(ScreenUtil().setWidth(6 / _config.getCompose)),
                         child: Text(
                           widget.word,

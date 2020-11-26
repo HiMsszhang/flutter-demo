@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
+import 'package:molan_edu/pages/other/big_image.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:flutter/rendering.dart';
@@ -27,7 +28,7 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   CopyBookListResp _bookResp;
   List<CopyBookModel> _bookList;
   int _bookPage = 1;
-  int _bookLimit = 10;
+  int _bookLimit = 20;
 
   int _fixedCrossAxisCount = 1;
   List<String> _letterItems = [];
@@ -44,6 +45,7 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   void initState() {
     super.initState();
     _config = context.read<CopybookState>();
+    _config.addListener(_configListener);
     delayed(() async {
       _bookList = await _getCourseList();
       int currentIndex = 1;
@@ -58,8 +60,16 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   @override
   void dispose() {
     EasyLoading.dismiss();
+    _config.removeListener(_configListener);
     _controller.dispose();
     super.dispose();
+  }
+
+  _configListener() async {
+    print('changed!!!!!!!!!!!!!');
+    print(_config.getResource);
+    setState(() {});
+    await _getWords();
   }
 
   _hideFilter(int index) {
@@ -89,7 +99,7 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   _getWords({bool isLoad = false}) async {
     delayed(() async {
       EasyLoading.show();
-      DataResult dataResult = await CopybookAPI.wordList(copybookId: _bookList?.elementAt(_selectedIndex)?.id, fontColor: _config.getFontColor, page: _currentPage, listRow: _listRow);
+      DataResult dataResult = await CopybookAPI.wordList(copybookId: _bookList?.elementAt(_selectedIndex)?.id, fontColor: _config.getResource, page: _currentPage, listRow: _listRow);
       if (!isLoad) {
         _wordsList = List.generate(
           _bookList?.elementAt(_selectedIndex)?.wordNum,
@@ -182,6 +192,81 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
     setState(() {});
   }
 
+  _showMenu() {
+    Widget _item({String icon, String title, VoidCallback onTap}) {
+      return FlatButton(
+        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 20.w),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        child: Column(
+          children: [
+            ImageIcon(
+              AssetImage(icon),
+              size: 38.w,
+              color: Colors.white,
+            ),
+            SizedBox(height: 6.w),
+            Text(title ?? '', style: Styles.normalFont(fontSize: 24.sp, color: Colors.white)),
+          ],
+        ),
+        onPressed: () {
+          onTap();
+        },
+      );
+    }
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, buildSetState) {
+            CopybookState config = context.watch<CopybookState>();
+            return Stack(
+              children: [
+                Positioned(
+                  top: 30.w + kToolbarHeight,
+                  right: 30.w,
+                  child: Container(
+                    width: 76.w,
+                    padding: EdgeInsets.symmetric(vertical: 20.w),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(76.w),
+                      color: Color(0xFF949494).withOpacity(0.8),
+                    ),
+                    child: Column(
+                      children: [
+                        _item(
+                          title: config.getResource == 1 ? '高清' : '原贴',
+                          icon: 'assets/images/copybook/icon_${config.getResource == 1 ? "hd" : "original"}.png',
+                          onTap: () {
+                            var res = config.getResource;
+                            config.setConfig(resource: res == 1 ? 2 : 1);
+                          },
+                        ),
+                        _item(
+                          title: '大图',
+                          icon: 'assets/images/copybook/icon_zoom.png',
+                          onTap: () {
+                            NavigatorUtils.push(context, BigImgPage(imgUrl: _bookList[_selectedIndex].image));
+                          },
+                        ),
+                        _item(
+                          title: '设置',
+                          icon: 'assets/images/mine/icon_setting.png',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithAppbar(
@@ -209,8 +294,11 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
             color: Styles.colorText,
             size: 33.w,
           ),
-          onPressed: () {},
+          onPressed: () {
+            _showMenu();
+          },
         ),
+        SizedBox(width: 10.w),
       ],
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
@@ -229,7 +317,12 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
                   word: _letterItems.length <= 0 ? "-" : _letterItems[index],
                   child: CachedNetworkImage(
                     imageUrl: _wordsList[index].image,
-                    placeholder: (context, url) => Image.asset("assets/images/placeholder.png"),
+                    placeholder: (context, url) => Image.asset(
+                      "assets/images/placeholder.png",
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
                     width: 750.w,
                     height: 750.w,
                   ),
