@@ -40,7 +40,7 @@ dependencies:
   material_segmented_control: ^2.1.0 #https://pub.flutter-io.cn/packages/material_segmented_control
   fl_chart: ^0.12.0 #https://pub.flutter-io.cn/packages/fl_chart
   # IM
-  tencent_im_plugin: ^1.1.2 #https://pub.flutter-io.cn/packages/tencent_im_plugin
+  tencent_im_plugin: ^1.1.3 #https://pub.flutter-io.cn/packages/tencent_im_plugin
   dio: ^3.0.10 #https://pub.flutter-io.cn/packages/dio
   dio_http_cache: ^0.2.11 #https://pub.flutter-io.cn/packages/dio_http_cache
   dio_cookie_manager: 1.0.0 #https://pub.flutter-io.cn/packages/dio_cookie_manager

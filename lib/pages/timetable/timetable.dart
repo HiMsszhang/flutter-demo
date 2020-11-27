@@ -105,75 +105,75 @@ class _TimetablePageState extends State<TimetablePage> with UtilsMixin, Automati
                 ),
               ),
               Expanded(
-                child: !hasLogin
-                    ? Container(
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
-                            children: [
-                              TextSpan(text: '暂无课程表\n请'),
-                              WidgetSpan(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    NavigatorUtils.pushNamed(context, '/login');
-                                  },
-                                  child: Text(
-                                    '登录',
-                                    style: Styles.normalFont(fontSize: 30.sp, color: Styles.color999999, decoration: TextDecoration.underline, height: 1.5),
-                                  ),
-                                ),
-                              ),
-                              TextSpan(text: '后查看'),
-                            ],
-                          ),
-                        ),
-                      )
-                    : SmartRefresher(
-                        enablePullDown: true,
-                        enablePullUp: true,
-                        onRefresh: _onRefresh,
-                        onLoading: _onLoading,
-                        controller: _listController,
-                        header: myCustomHeader(),
-                        footer: myCustomFooter(),
-                        child: ListView(
-                          children: [
-                            _data?.total == 0
-                                ? Container(
-                                    alignment: Alignment.center,
-                                    child: RichText(
-                                      textAlign: TextAlign.center,
-                                      text: TextSpan(
-                                        style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
-                                        children: [
-                                          TextSpan(text: '暂无课程表\n先去课程广场'),
-                                          WidgetSpan(
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                widget.jumpToPage(1);
-                                              },
-                                              child: Text(
-                                                '看看吧',
-                                                style: Styles.normalFont(fontSize: 30.sp, color: Styles.color999999, decoration: TextDecoration.underline),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                child: SmartRefresher(
+                  enablePullDown: true,
+                  enablePullUp: true,
+                  onRefresh: _onRefresh,
+                  onLoading: _onLoading,
+                  controller: _listController,
+                  header: myCustomHeader(),
+                  footer: myCustomFooter(),
+                  child: ListView(
+                    children: [
+                      !hasLogin
+                          ? Container(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
+                                  children: [
+                                    TextSpan(text: '暂无课程表\n请'),
+                                    WidgetSpan(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          NavigatorUtils.pushNamed(context, '/login');
+                                        },
+                                        child: Text(
+                                          '登录',
+                                          style: Styles.normalFont(fontSize: 30.sp, color: Styles.color999999, decoration: TextDecoration.underline, height: 1.5),
+                                        ),
                                       ),
                                     ),
-                                  )
-                                : Container(),
-                            ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
-                              itemCount: _dataList.length,
-                              itemBuilder: (context, index) => CardLeaning(data: _dataList[index]),
-                            ),
-                          ],
-                        ),
+                                    TextSpan(text: '后查看'),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : _data?.total == 0
+                              ? Container(
+                                  alignment: Alignment.center,
+                                  child: RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      style: Styles.normalFont(fontSize: 30.sp, color: Colors.white, height: 1.5),
+                                      children: [
+                                        TextSpan(text: '暂无课程表\n先去课程广场'),
+                                        WidgetSpan(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              widget.jumpToPage(1);
+                                            },
+                                            child: Text(
+                                              '看看吧',
+                                              style: Styles.normalFont(fontSize: 30.sp, color: Styles.color999999, decoration: TextDecoration.underline),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                      ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 40.w),
+                        itemCount: _dataList.length,
+                        itemBuilder: (context, index) => CardLeaning(data: _dataList[index]),
                       ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

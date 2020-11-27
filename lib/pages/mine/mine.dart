@@ -5,6 +5,7 @@ import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/widgets/common_avatar.dart';
 import 'package:molan_edu/models/UserModel.dart';
 import 'package:molan_edu/providers/user_state.dart';
+import 'package:molan_edu/pages/chat/chat_person.dart';
 
 class MinePage extends StatefulWidget {
   const MinePage({
@@ -73,6 +74,9 @@ class _MinePageState extends State<MinePage> with UtilsMixin, AutomaticKeepAlive
         break;
       case "setting":
         NavigatorUtils.pushNamed(context, '/setting');
+        break;
+      case "services":
+        hasLogin ? NavigatorUtils.push(context, ChatPersonPage(id: Config.TENCENT_IM_ACCOUNT_LIST[0]['id'], name: "官方客服")) : toLoginPopup();
         break;
     }
   }

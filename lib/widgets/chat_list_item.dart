@@ -10,10 +10,12 @@ import 'package:molan_edu/utils/date_dart/main.dart';
 class ChatListItem extends StatefulWidget {
   final VoidCallback onTap;
   final ConversationEntity data;
+  final bool isChat;
   ChatListItem({
     Key key,
     this.onTap,
     this.data,
+    this.isChat = true,
   }) : super(key: key);
 
   _ChatListItemState createState() => _ChatListItemState();
@@ -27,7 +29,7 @@ class _ChatListItemState extends State<ChatListItem> with UtilsMixin {
         result = '';
         break;
       case MessageElemTypeEnum.Text:
-        result = (widget.data.lastMessage.node as TextMessageNode).content;
+        result = widget.isChat ? (widget.data.lastMessage.node as TextMessageNode).content : '[消息]';
         break;
       case MessageElemTypeEnum.File:
         result = '[文件]';
@@ -112,7 +114,12 @@ class _ChatListItemState extends State<ChatListItem> with UtilsMixin {
                   // Text('[行书]勤礼碑一系列', style: Styles.normalFont(fontSize: 22.sp, color: Styles.color999999)),
                   Padding(
                     padding: EdgeInsets.only(top: 24.w),
-                    child: Text('${_showCount()}${_showText()}', style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666)),
+                    child: Text(
+                      '${_showCount()}${_showText()}',
+                      style: Styles.normalFont(fontSize: 26.sp, color: Styles.color666666),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

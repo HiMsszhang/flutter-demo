@@ -224,13 +224,15 @@ class CopybookState with ChangeNotifier {
 
   Future getConfig() async {
     var obj = await LocalStorage.getJSON(Config.COPYBOOK_SETTING);
-    _gridColor = obj['gridColor'];
-    _gridType = obj['gridType'];
-    _resource = obj['resource'];
-    _compose = obj['compose'];
-    _fontColor = obj['fontColor'];
-    _paperType = obj['paperType'];
-    _customPaperPath = obj['customPaperPath'];
+    if (obj != null) {
+      _gridColor = obj['gridColor'];
+      _gridType = obj['gridType'];
+      _resource = obj['resource'];
+      _compose = obj['compose'];
+      _fontColor = obj['fontColor'];
+      _paperType = obj['paperType'];
+      _customPaperPath = obj['customPaperPath'];
+    }
     notifyListeners();
   }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -70,6 +71,8 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   ];
 
   FlutterAudioRecorder _recorderModule;
+  bool _isFloatShow = true;
+  Timer _timer;
 
   @override
   void initState() {
@@ -78,17 +81,23 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
     _inputController = TextEditingController();
     TencentImPlugin.addListener(_imListener);
     delayed(() async {
+      await _setRead();
       _tempPath = (await getTemporaryDirectory()).path;
       await context.read<UserState>().getUser();
       _userId = context.read<UserState>().userInfo.id;
       await _getUser();
       await _getData();
     });
+    _timer = Timer(Duration(seconds: 6), () {
+      _isFloatShow = false;
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _timer.cancel();
     _inputController.clear();
     _inputController.dispose();
     TencentImPlugin.removeListener(_imListener);
@@ -132,6 +141,10 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
     }
   }
 
+  _setRead() async {
+    await TencentImPlugin.markC2CMessageAsRead(userID: widget.id);
+  }
+
   _getUser() async {
     List<UserEntity> res = await TencentImPlugin.getUsersInfo(userIDList: ['${_userId}user']);
     _userInfo = res[0];
@@ -139,16 +152,18 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
   }
 
   _getData() async {
-    _list = await TencentImPlugin.getC2CHistoryMessageList(userID: widget.id, count: 20);
-    print(_list[0].toJson());
-    // 下载语音
-    for (var item in _list) {
-      if (item.elemType == MessageElemTypeEnum.Sound) {
-        File file = new File(_tempPath + "/" + (item.node as SoundMessageNode).uuid);
-        if (!file.existsSync()) {
-          TencentImPlugin.downloadSound(message: FindMessageEntity(msgId: item.msgID), path: file.path).then((value) {
-            setState(() {});
-          });
+    _list = await TencentImPlugin.getC2CHistoryMessageList(userID: widget.id, count: 50);
+    if (_list.isNotEmpty) {
+      print(_list[0].toJson());
+      // 下载语音
+      for (var item in _list) {
+        if (item.elemType == MessageElemTypeEnum.Sound) {
+          File file = new File(_tempPath + "/" + (item.node as SoundMessageNode).uuid);
+          if (!file.existsSync()) {
+            TencentImPlugin.downloadSound(message: FindMessageEntity(msgId: item.msgID), path: file.path).then((value) {
+              setState(() {});
+            });
+          }
         }
       }
     }
@@ -266,7 +281,7 @@ class _ChatPersonPageState extends State<ChatPersonPage> with UtilsMixin, Widget
       backgroundColor: Color(0xFFF1F1F1),
       body: Column(
         children: [
-          _widgetFloatInfo(),
+          _isFloatShow ? _widgetFloatInfo() : Container(),
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 30.w),
@@ -625,7 +640,6 @@ class _WidgetMessageTalkState extends State<WidgetMessageTalk> {
                   _isPlaying = true;
                   var node = item.node as SoundMessageNode;
                   String path = node.path == null || node.path == '' ? (_tempPath + "/" + node.uuid) : node.path;
-                  print("????????????????$path");
                   int result = await _playerModule.play(path, isLocal: true);
                   print(result);
                 }

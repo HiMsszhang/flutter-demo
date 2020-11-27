@@ -17,6 +17,12 @@ class Config {
   ///腾讯云im
   static const TENCENT_IM_APPID = '1400444900';
 
+  ///im官方账号
+  static const TENCENT_IM_ACCOUNT_LIST = [
+    {'id': 'molan_service', 'type': 'chat'}, //客服
+    {'id': 'molan_message', 'type': 'message'}, //消息
+  ];
+
   /// 蒲公英下载地址
   static const PGY_URL = "https://www.pgyer.com/uTpp";
 
