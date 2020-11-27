@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
-import 'package:molan_edu/pages/other/big_image.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 import 'package:flutter/rendering.dart';
@@ -11,6 +10,7 @@ import 'package:molan_edu/apis/copybook.dart';
 import 'package:molan_edu/providers/copybook_state.dart';
 import 'package:molan_edu/pages/copybook/copybook_block.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:molan_edu/pages/other/big_image.dart';
 
 class CopybookPage extends StatefulWidget {
   CopybookPage({
@@ -30,7 +30,6 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   int _bookPage = 1;
   int _bookLimit = 20;
 
-  int _fixedCrossAxisCount = 1;
   List<String> _letterItems = [];
   ScrollController _controller = new ScrollController();
 
@@ -50,7 +49,7 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
     _config.addListener(_configListener);
     delayed(() async {
       _bookList = await _getCourseList();
-      int currentIndex = 1;
+      int currentIndex = _bookList[_selectedIndex].sn ?? 1;
       var currentPage = (currentIndex ~/ _listRow) + 1;
       _currentPage = currentPage;
       _controller.addListener(_scrollListener);
@@ -101,11 +100,17 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   _getWords({bool isLoad = false}) async {
     delayed(() async {
       EasyLoading.show();
-      DataResult dataResult = await CopybookAPI.wordList(copybookId: _bookList?.elementAt(_selectedIndex)?.id, fontColor: _config.getResource, page: _currentPage, listRow: _listRow);
+      DataResult dataResult = await CopybookAPI.wordList(copybookId: _bookList?.elementAt(_selectedIndex)?.id, fontColor: _config.getResource == 1 ? 1 : _config.getFontColor, page: _currentPage, listRow: _listRow);
       if (!isLoad) {
         _wordsList = List.generate(
           _bookList?.elementAt(_selectedIndex)?.wordNum,
-          (i) => new CopyBookWordModel(),
+          (i) => CopyBookWordModel.fromJson({
+            'id': 1,
+            'word': '-',
+            'image': '',
+            'shrink': '',
+            'word_num': 0,
+          }),
         );
         _wordsList.setAll((_currentPage - 1) * _listRow, dataResult.data.data);
       } else {
@@ -118,10 +123,10 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
       });
       print(_letterItems);
       if (!isLoad) {
-        int selectIndex = 0;
+        int selectIndex = _bookList[_selectedIndex].sn ?? 0;
         var h = 750.w;
-        if (_fixedCrossAxisCount == 2) h = 187.5.w;
-        if (_fixedCrossAxisCount == 3) {
+        if (_config.getCompose == 2) h = 187.5.w;
+        if (_config.getCompose == 3) {
           h = 80.w;
         }
         _controller.animateTo(h * (selectIndex),
@@ -157,29 +162,29 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
   double getGridWidth() {
     switch (_config.getCompose) {
       case 1:
-        return 88;
+        return 88.w;
         break;
       case 2:
-        return 41.7;
+        return 41.7.w;
         break;
       case 3:
-        return 27;
+        return 27.w;
         break;
       default:
-        return 88;
+        return 88.w;
         break;
     }
   }
 
   void _scrollListener() async {
     var h = 750.w;
-    if (_fixedCrossAxisCount == 2) h = 187.5.w;
-    if (_fixedCrossAxisCount == 3) {
+    if (_config.getCompose == 2) h = 187.5.w;
+    if (_config.getCompose == 3) {
       h = 80.w;
     }
     var currentIndex = (_controller.offset + h) ~/ h;
     var currentPage = (currentIndex ~/ _listRow) + 1;
-    _lastWordId = _wordsList[currentIndex].id;
+    _lastWordId = _wordsList[currentIndex - 1].id;
     var direction = _controller.position.userScrollDirection;
     _currentPage = currentPage;
     _currentPosition = _controller.position;
@@ -255,7 +260,7 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
                           title: '设置',
                           icon: 'assets/images/mine/icon_setting.png',
                           onTap: () {
-                            NavigatorUtils.popAndPushNamed(context, '/copybook.setting');
+                            NavigatorUtils.pushNamed(context, '/copybook.setting');
                           },
                         ),
                       ],
@@ -309,14 +314,13 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
           GridView.builder(
             controller: _controller,
             physics: ClampingScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: _fixedCrossAxisCount),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: _config.getCompose),
             itemCount: _letterItems.length,
             itemBuilder: (context, index) {
               return Container(
                 child: CopybookBlock(
-                  cFontSize: (36 / _fixedCrossAxisCount).ssp,
-                  cHeight: getGridWidth() * 2.w,
-                  cWidth: getGridWidth() * 2.w,
+                  cFontSize: (36 / _config.getCompose).ssp,
+                  cWidth: getGridWidth(),
                   word: _letterItems.length <= 0 ? "-" : _letterItems[index],
                   child: CachedNetworkImage(
                     imageUrl: _wordsList[index].image,

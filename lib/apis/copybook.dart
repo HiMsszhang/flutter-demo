@@ -117,7 +117,7 @@ class CopybookAPI {
         'copybook_id': copybookId,
         'word_id': wordId,
       };
-      Response res = await http.post('/getcopybooksetting', queryParameters: params);
+      Response res = await http.post('/copybookwordlog', queryParameters: params);
       return DataResult(CopyBookSettingModel.fromJson(res.data ?? {}), true);
     } catch (e) {
       return DataResult(e, false);

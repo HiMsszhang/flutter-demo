@@ -247,7 +247,7 @@ class CopybookState with ChangeNotifier {
   /// resource
   int _resource = 2;
 
-  int get getResource => _resource != 1 ? _fontColor : _resource;
+  int get getResource => _resource;
 
   /// 排版
   int _compose = 1;

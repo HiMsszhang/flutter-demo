@@ -14,7 +14,6 @@ class CopybookBlock extends StatefulWidget {
   final String word;
   final double cFontSize;
   final double cWidth;
-  final double cHeight;
   final String imgUrl;
   final bool hasDetail;
 
@@ -22,7 +21,6 @@ class CopybookBlock extends StatefulWidget {
     this.size,
     this.child,
     this.cFontSize: 20,
-    this.cHeight: 88,
     this.cWidth: 88,
     this.word,
     this.imgUrl,
@@ -85,16 +83,16 @@ class _CopybookBlockState extends State<CopybookBlock> {
                     onTap: () => CopybookDialog.show(context, word: widget.word),
                     child: Container(
                       alignment: Alignment.center,
-                      width: ScreenUtil().setWidth(widget.cWidth),
-                      height: ScreenUtil().setWidth(widget.cHeight),
+                      width: widget.cWidth,
+                      height: widget.cWidth,
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(99, 100, 103, 0.5),
-                        borderRadius: BorderRadius.all(Radius.circular(ScreenUtil().setWidth(widget.cWidth))),
+                        borderRadius: BorderRadius.all(Radius.circular(widget.cWidth)),
                       ),
                       child: Container(
                         alignment: Alignment.center,
-                        width: ScreenUtil().setWidth(widget.cWidth),
-                        height: ScreenUtil().setWidth(widget.cWidth),
+                        width: widget.cWidth,
+                        height: widget.cWidth,
                         decoration: BoxDecoration(
                           color: Color.fromRGBO(99, 100, 103, 0.5),
                           border: new Border.all(color: Color.fromRGBO(255, 255, 255, 0.16), width: 0.5),
@@ -156,7 +154,6 @@ class _CopybookBlockState extends State<CopybookBlock> {
   Widget _widgetGrid() {
     var type = _config.getGridType;
     var color = _config.getGridColor;
-    print(type);
     return Stack(alignment: Alignment.center, children: <Widget>[
       Container(
         alignment: Alignment.center,
