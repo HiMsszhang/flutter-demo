@@ -9,6 +9,8 @@ import 'package:molan_edu/apis/user.dart';
 import 'package:molan_edu/apis/common.dart';
 import 'package:molan_edu/models/UserModel.dart';
 import 'package:molan_edu/providers/user_state.dart';
+import 'package:molan_edu/models/ConfigModel.dart';
+import 'package:molan_edu/pages/other/article.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -28,6 +30,8 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
   String _text = '获取验证码';
 
   bool _isCountDown = false;
+  ConfigArticleModel _serviceData;
+  ConfigArticleModel _privacyData;
 
   void _startTimer() {
     _seconds = 60;
@@ -60,6 +64,7 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
     super.initState();
     delayed(() async {
       await context.read<UserState>().logOut();
+      await _getSetting();
     });
   }
 
@@ -67,6 +72,13 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
   void dispose() {
     super.dispose();
     _stopTimer();
+  }
+
+  _getSetting() async {
+    DataResult result = await CommonAPI.getArticle(type: 'useragreement');
+    DataResult res = await CommonAPI.getArticle(type: 'privacypolicy');
+    _serviceData = result.data;
+    _privacyData = res.data;
   }
 
   _showTerms() {
@@ -310,12 +322,32 @@ class _LoginPageState extends State<LoginPage> with UtilsMixin {
                     text: TextSpan(
                       style: Styles.normalFont(fontSize: 24.sp, color: Styles.color999999, height: 42 / 24),
                       children: [
-                        TextSpan(text: '亲爱的用户，在您使用墨岚教育课程APP前，请您务必认证阅读'),
+                        TextSpan(text: '亲爱的用户，在您使用墨岚教育课程APP前，请您务必认真阅读'),
                         TextSpan(text: '《用户服务协议及隐私政策》', style: Styles.normalFont(color: Color(0xFF6F5B59))),
                         TextSpan(text: '中各项条款，了解我们对您个人信息的处理规则。同时您应特别注意前述协议中免除或者限制我们责任的条款、对您权利进行限制的条款、约定争议解决方式和司法管辖的条款。如您已详细阅读并同意'),
-                        TextSpan(text: '《用户服务协议》', style: Styles.normalFont(color: Color(0xFF6F5B59))),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () {
+                              NavigatorUtils.push(context, ArticlePage(title: _serviceData.title, content: _serviceData.content));
+                            },
+                            child: Text(
+                              '《用户服务协议》',
+                              style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFF6F5B59), height: 1.5),
+                            ),
+                          ),
+                        ),
                         TextSpan(text: '和'),
-                        TextSpan(text: '《隐私政策》', style: Styles.normalFont(color: Color(0xFF6F5B59))),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () {
+                              NavigatorUtils.push(context, ArticlePage(title: _privacyData.title, content: _privacyData.content));
+                            },
+                            child: Text(
+                              '《隐私政策》',
+                              style: Styles.normalFont(fontSize: 24.sp, color: Color(0xFF6F5B59), height: 1.5),
+                            ),
+                          ),
+                        ),
                         TextSpan(text: '，请点击按钮开始使用我们的产品和服务。'),
                       ],
                     ),

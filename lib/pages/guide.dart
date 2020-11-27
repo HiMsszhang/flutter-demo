@@ -80,8 +80,8 @@ class _GuidePageState extends State<GuidePage> with UtilsMixin {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
+                                  Color(0xFFFFC0A3),
                                   Color(0xFFFFABA4),
-                                  Color(0xFFFFC4A3),
                                 ],
                               ),
                             ),

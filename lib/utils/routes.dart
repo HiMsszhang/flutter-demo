@@ -32,6 +32,7 @@ import 'package:molan_edu/pages/home/course_experience.dart';
 import 'package:molan_edu/pages/home/group/group_list.dart';
 import 'package:molan_edu/pages/copybook/copybook.dart';
 import 'package:molan_edu/pages/copybook/copybook_setting.dart';
+import 'package:molan_edu/pages/other/article.dart';
 
 class MyRoutes {
   static routes(String name, Map arguments) {
@@ -103,6 +104,8 @@ class MyRoutes {
       '/copybook': (context) => CopybookPage(),
       //电子字帖-设置
       '/copybook.setting': (context) => CopybookSettingPage(),
+      //文章
+      '/other.article': (context) => ArticlePage(),
     };
     return route[name];
   }

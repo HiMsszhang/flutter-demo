@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> with UtilsMixin, AutomaticKeepAlive
             color: Theme.of(context).primaryColor,
           ),
           child: AppBar(
-            brightness: Brightness.dark,
+            brightness: Brightness.light,
             backgroundColor: Theme.of(context).primaryColor,
             actions: [
               Container(

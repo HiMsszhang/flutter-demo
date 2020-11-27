@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:molan_edu/models/AdModel.dart';
+import 'package:molan_edu/models/ConfigModel.dart';
 import 'package:molan_edu/utils/net/http.dart';
 import 'result.dart';
 import 'package:http_parser/http_parser.dart';
@@ -82,6 +83,18 @@ class CommonAPI {
       if (courseId != null) params['course_id'] = courseId;
       Response res = await http.post('/chat', queryParameters: params);
       return DataResult(res.data ?? {}, true);
+    } catch (e) {
+      return DataResult(e, false);
+    }
+  }
+
+  /// 获取文章
+  static Future<DataResult> getArticle({
+    String type = 'useragreement',
+  }) async {
+    try {
+      Response res = await http.post('/$type');
+      return DataResult(ConfigArticleModel.fromJson(res.data ?? {}), true);
     } catch (e) {
       return DataResult(e, false);
     }

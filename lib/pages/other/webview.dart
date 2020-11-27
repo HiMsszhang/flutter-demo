@@ -16,7 +16,7 @@ class WebviewPage extends StatefulWidget {
 
 class _WebviewPageState extends State<WebviewPage> with UtilsMixin {
   WebViewController _controller;
-  String _title = "webview";
+  String _title = "";
   @override
   void initState() {
     super.initState();

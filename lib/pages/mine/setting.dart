@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:molan_edu/apis/setting.dart';
+import 'package:flutter_xupdate/flutter_xupdate.dart';
+import 'package:molan_edu/apis/common.dart';
 import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/models/ConfigModel.dart';
+import 'package:molan_edu/pages/other/article.dart';
 import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 import 'package:molan_edu/utils/local_storage.dart';
 import 'package:molan_edu/utils/cache_util.dart';
+import 'package:package_info/package_info.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({
@@ -21,8 +26,10 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
   bool _allowAutoPlay = false;
   bool _allowPlay = false;
   bool _allowDownload = false;
-  ConfigModel _data;
+  ConfigArticleModel _aboutData;
+  ConfigArticleModel _privacyData;
   bool hasLogin = false;
+  PackageInfo _packageInfo;
 
   @override
   void initState() {
@@ -30,6 +37,7 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
     hasLogin = context.read<UserState>().hasLogin;
     _initFromCache();
     delayed(() async {
+      _packageInfo = await PackageInfo.fromPlatform();
       await _load();
     });
   }
@@ -71,10 +79,10 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
   }
 
   Future _getSetting() async {
-    DataResult result = await SettingAPI.config(
-      name: 'customer_service_center',
-    );
-    _data = result.data;
+    DataResult result = await CommonAPI.getArticle(type: 'about');
+    DataResult res = await CommonAPI.getArticle(type: 'privacypolicy');
+    _aboutData = result.data;
+    _privacyData = res.data;
   }
 
   _initFromCache() async {
@@ -93,6 +101,35 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
     await LocalStorage.set('_allowDownload', _allowDownload);
   }
 
+  ///将自定义的json内容解析为UpdateEntity实体类
+  UpdateEntity customParseJson(Map json, int buildNumber) {
+    return UpdateEntity(
+      hasUpdate: buildNumber < json['version_code'],
+      isIgnorable: json['update_status'] < 3,
+      versionCode: json['version_code'],
+      versionName: json['version_name'],
+      updateContent: "\r\n${json['content']}\r\n",
+      downloadUrl: json['down_url'],
+      apkSize: json['apk_size'],
+      apkMd5: json['apk_md5'],
+    );
+  }
+
+  _checkUpdate() async {
+    DataResult res = await CommonAPI.getVersion();
+    if (res.result) {
+      if (Platform.isAndroid) {
+        FlutterXUpdate.updateByInfo(
+          updateEntity: customParseJson(res.data, int.parse(_packageInfo.buildNumber)),
+          topImageRes: 'bg_update_top',
+          themeColor: "#FFFFBAA3",
+          buttonTextColor: "#FFFFFFFF",
+          widthRatio: 0.92,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithAppbar(
@@ -104,13 +141,13 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
               title: '关于墨岚',
               icon: 'about',
               onTap: () {
-                NavigatorUtils.pushNamed(context, '/webview', arguments: {'url': _data.value});
+                NavigatorUtils.push(context, ArticlePage(title: _aboutData.title, content: _aboutData.content));
               }),
           _widgetItem(
               title: '隐私策略',
               icon: 'privacy',
               onTap: () {
-                NavigatorUtils.pushNamed(context, '/webview', arguments: {'url': _data.value});
+                NavigatorUtils.push(context, ArticlePage(title: _privacyData.title, content: _privacyData.content));
               }),
           _widgetItem(
             title: '视频自动播放',
@@ -181,6 +218,19 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
               onTap: () async {
                 await _clear();
               }),
+          Platform.isAndroid
+              ? _widgetItem(
+                  title: '检查更新',
+                  icon: 'update',
+                  action: Row(
+                    children: [
+                      Text('v${_packageInfo?.version}', style: Styles.normalFont(fontSize: 24.sp, color: Styles.colorInfo)),
+                      Icon(Icons.arrow_forward_ios, size: 30.w, color: Styles.color999999),
+                    ],
+                  ),
+                  onTap: _checkUpdate,
+                )
+              : Container(),
           hasLogin
               ? _widgetItem(
                   title: '注销账户',
@@ -195,7 +245,7 @@ class _SettingPageState extends State<SettingPage> with UtilsMixin {
                   child: Container(
                     width: 690.w,
                     height: 90.w,
-                    margin: EdgeInsets.symmetric(horizontal: 30.w).copyWith(top: 70.w),
+                    margin: EdgeInsets.symmetric(horizontal: 30.w, vertical: 70.w),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(90.w),

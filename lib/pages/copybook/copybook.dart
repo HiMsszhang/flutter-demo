@@ -73,11 +73,12 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
     await _getWords();
   }
 
-  _hideFilter(int index) {
+  _hideFilter(int index) async {
     setState(() {
       _selectedIndex = index;
       _isFilterShow = false;
     });
+    if (_bookResp.total > 0) await _getWords();
   }
 
   Future<List<CopyBookModel>> _getCourseList() async {
@@ -379,8 +380,8 @@ class _CopybookPageState extends State<CopybookPage> with UtilsMixin {
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               padding: EdgeInsets.symmetric(vertical: 20.w),
               child: Text(_bookList[index]?.copybookTitle ?? '', style: Styles.normalFont(fontSize: 30.sp, color: Styles.color666666)),
-              onPressed: () {
-                _hideFilter(index);
+              onPressed: () async {
+                await _hideFilter(index);
               },
             ),
             itemCount: _bookList?.length ?? 0,

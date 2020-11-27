@@ -6,11 +6,14 @@ part of 'ConfigModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ConfigModel _$ConfigModelFromJson(Map<String, dynamic> json) {
-  return ConfigModel()..value = json['value'] as String ?? '';
+ConfigArticleModel _$ConfigArticleModelFromJson(Map<String, dynamic> json) {
+  return ConfigArticleModel()
+    ..title = json['title'] as String ?? ''
+    ..content = json['content'] as String ?? '';
 }
 
-Map<String, dynamic> _$ConfigModelToJson(ConfigModel instance) =>
+Map<String, dynamic> _$ConfigArticleModelToJson(ConfigArticleModel instance) =>
     <String, dynamic>{
-      'value': instance.value,
+      'title': instance.title,
+      'content': instance.content,
     };

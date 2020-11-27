@@ -2,15 +2,17 @@ import 'package:json_annotation/json_annotation.dart';
 part 'ConfigModel.g.dart';
 
 @JsonSerializable()
-class ConfigModel {
+class ConfigArticleModel {
   @JsonKey(defaultValue: '')
-  String value;
-  ConfigModel();
+  String title;
+  @JsonKey(defaultValue: '')
+  String content;
+  ConfigArticleModel();
 
   //反序列化
-  factory ConfigModel.fromJson(Map<String, dynamic> json) => _$ConfigModelFromJson(json);
+  factory ConfigArticleModel.fromJson(Map<String, dynamic> json) => _$ConfigArticleModelFromJson(json);
 //序列化
-  Map<String, dynamic> toJson() => _$ConfigModelToJson(this);
+  Map<String, dynamic> toJson() => _$ConfigArticleModelToJson(this);
 
-  ConfigModel.empty();
+  ConfigArticleModel.empty();
 }

@@ -22,7 +22,7 @@ class _CardExperienceState extends State<CardExperience> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        NavigatorUtils.push(context, TimetableListPage(id: widget.data.id, title: widget.data.courseTitle));
+        NavigatorUtils.push(context, TimetableListPage(id: widget.data.id, title: widget.data.courseTitle, courseModelId: 1));
       },
       child: UnconstrainedBox(
         child: Stack(
