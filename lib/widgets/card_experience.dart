@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:molan_edu/mixins/utils_mixin.dart';
 import 'package:molan_edu/models/GroupModel.dart';
 import 'package:molan_edu/pages/timetable/timetable_list.dart';
+import 'package:molan_edu/providers/user_state.dart';
 import 'package:molan_edu/utils/imports.dart';
 
 class CardExperience extends StatefulWidget {
@@ -17,12 +19,13 @@ class CardExperience extends StatefulWidget {
   _CardExperienceState createState() => _CardExperienceState();
 }
 
-class _CardExperienceState extends State<CardExperience> {
+class _CardExperienceState extends State<CardExperience> with UtilsMixin {
   @override
   Widget build(BuildContext context) {
+    bool hasLogin = context.watch<UserState>().hasLogin;
     return GestureDetector(
       onTap: () {
-        NavigatorUtils.push(context, TimetableListPage(id: widget.data.id, title: widget.data.courseTitle, courseModelId: 1));
+        hasLogin ? NavigatorUtils.push(context, TimetableListPage(id: widget.data.id, title: widget.data.courseTitle, courseModelId: 1)) : toLoginPopup();
       },
       child: UnconstrainedBox(
         child: Stack(
